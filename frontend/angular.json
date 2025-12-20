@@ -31,11 +31,13 @@
             ],
             "tsConfig": "tsconfig.app.json",
             "assets": [
-              {
-                "glob": "**/*",
-                "input": "public"
-              }
-            ],
+               "src/assets",
+            {
+             "glob": "**/*",
+             "input": "public"
+            }
+],
+
             "styles": [
               "src/styles.css",
                "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css",

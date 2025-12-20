@@ -150,3 +150,35 @@ exports.updateVolunteer = async (req, res) => {
       });
     }
   };
+
+  
+
+exports.updateVolunteerByAdmin = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Champs autorisés à la modification
+    const { name,lastName,age,email,phone,address,gouvernorat} = req.body;
+
+    const updatedVolunteer = await Volunteer.findByIdAndUpdate(
+      id,
+      { name, lastName, age, email, phone, address,gouvernorat},
+      { new: true, runValidators: true }
+    );
+
+    if (!updatedVolunteer) {
+      return res.status(404).json({ message: 'Bénévole introuvable' });
+    }
+
+    res.status(200).json({
+      message: 'Bénévole mis à jour avec succès',
+      volunteer: updatedVolunteer
+    });
+
+  } catch (error) {
+    res.status(500).json({
+      message: 'Erreur lors de la mise à jour du bénévole',
+      error: error.message
+    });
+  }
+};

@@ -61,6 +61,34 @@ a:hover, a:active, a:focus {
     margin-left: 0;
 }
 
+/**********************************/
+/*********** Translation button CSS **********/
+/**********************************/
+.dropdown .btn-outline-light {
+  border-radius: 20px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.dropdown .btn-outline-light:hover {
+  background-color: #ffc107;
+  color: #000;
+}
+
+.dropdown-menu {
+  background-color: #222;
+  border: none;
+}
+
+.dropdown-item {
+  color: #fff;
+}
+
+.dropdown-item:hover {
+  background-color: #ffc107;
+  color: #000;
+}
+
 
 /**********************************/
 /*********** Nav Bar CSS **********/

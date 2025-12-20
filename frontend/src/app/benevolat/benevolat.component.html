@@ -127,6 +127,30 @@
 
           </form>
 
+         <!-- OTP Modal -->
+<div class="otp-modal" *ngIf="showOtpModal">
+  <div class="otp-modal-content">
+    <h2>Vérification de l'email</h2>
+    <p>Un code OTP a été envoyé à <strong>{{ userEmail }}</strong>.</p>
+    <p>Veuillez le saisir ci-dessous pour confirmer votre inscription.</p>
+
+    <input
+      type="text"
+      maxlength="6"
+      placeholder="Entrez le code OTP"
+      [(ngModel)]="otpCode"
+      class="otp-input"
+    />
+
+    <div class="otp-buttons">
+      <button class="btn-verify" (click)="verifyOtp()">Vérifier</button>
+      <button class="btn-cancel" (click)="cancelOtp()">Annuler</button>
+    </div>
+  </div>
+</div>
+
+
+
           <!-- Side Image (Permanently on the Right Side) -->
           <div class="image-container">
             <div class="login_box_img">
@@ -144,6 +168,6 @@
       </section>
     </div>
   </div>
-</div>+
+</div>
 
 <app-footer></app-footer>

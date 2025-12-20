@@ -19,6 +19,7 @@ const projectRoutes = require('./routes/projectRoutes');
 const messageRoutes = require('./routes/messageRoutes');
 const notificationRoutes = require('./routes/notificationRoutes');
 const abonnementRoutes = require('./routes/abonnementRoutes');
+const translationRoutes = require('./routes/translationRoutes');
 const uploads = require('./utils/upload'); 
 const app = express();
 
@@ -64,6 +65,7 @@ app.use('/api/projects', projectRoutes);
 app.use('/api/messages', messageRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/abonnement', abonnementRoutes);
+app.use('/api', translationRoutes);
 
 
 

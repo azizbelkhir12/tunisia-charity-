@@ -38,4 +38,9 @@ export class VolunteerService {
   updateVolunteer(id: string, data: any): Observable<any> {
     return this.http.put(`${this.apiUrl}/update/${id}`, data);
   }
+
+  updateVolunteerByAdmin(id: string, data: any) {
+  return this.http.put(`${this.apiUrl}/admin-volunteer/${id}`, data);
+}
+
 }

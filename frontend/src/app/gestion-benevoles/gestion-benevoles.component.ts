@@ -27,6 +27,7 @@ statut: any;
   status: 'active' | 'inactive';
 }
 
+
 @Component({
   selector: 'app-gestion-benevoles',
   templateUrl: './gestion-benevoles.component.html',
@@ -38,6 +39,9 @@ export class GestionBenevolesComponent implements OnInit {
   benevoles: Benevole[] = [];
   volunteers: any[] = [];
   demandesBenevolat: any[] = [];
+  selectedVolunteer: any = null;
+  isEditModalOpen = false;
+
 
   totalBenevoles = this.volunteers.length;
   totalBenevolesActifs = 0;
@@ -405,6 +409,50 @@ deactivateVolunteer(volunteer: Benevole) {
       }
     });
   }
+
+  openEditModal(benevole: Benevole) {
+  this.selectedVolunteer = { ...benevole }; // clone pour éviter effet direct
+  this.isEditModalOpen = true;
+}
+
+closeEditModal() {
+  this.isEditModalOpen = false;
+  this.selectedVolunteer = null;
+}
+
+updateVolunteer() {
+  if (!this.selectedVolunteer?._id) {
+    Swal.fire('Erreur', 'ID du bénévole manquant', 'error');
+    return;
+  }
+
+  this.isLoading = true;
+
+  this.volunteerService.updateVolunteerByAdmin(this.selectedVolunteer._id, this.selectedVolunteer).subscribe({
+      next: () => {
+        this.isLoading = false;
+        this.closeEditModal();
+        this.fetchVolunteers(); // refresh table
+
+        Swal.fire({
+          icon: 'success',
+          title: 'Succès',
+          text: 'Bénévole modifié avec succès',
+          timer: 2000,
+          showConfirmButton: false
+        });
+      },
+      error: (err) => {
+        this.isLoading = false;
+        Swal.fire(
+          'Erreur',
+          err.error?.message || 'Erreur lors de la modification',
+          'error'
+        );
+      }
+    });
+}
+
 
   fetchVolunteers() {
     this.volunteerService.getVolunteers().subscribe(

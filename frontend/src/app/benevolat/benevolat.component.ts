@@ -20,6 +20,11 @@ export class BenevolatComponent {
   path: string = "";
   user: any;
   isLoading: boolean = false;
+  showOtpModal: boolean = false;
+  otpCode: string = '';
+  userEmail: string = '';
+
+
 
   constructor(private router: Router, private activatedRoute: ActivatedRoute, private demandeService: DemandeService) { }
 
@@ -84,45 +89,86 @@ export class BenevolatComponent {
   }
 
   submit() {
-    this.signupForm.markAllAsTouched();
+  this.signupForm.markAllAsTouched();
 
-    if (this.signupForm.invalid) {
+  if (this.signupForm.invalid) {
+    Swal.fire({
+      icon: 'error',
+      title: 'Erreur',
+      text: 'Veuillez remplir tous les champs correctement',
+    });
+    return;
+  }
+
+  const formData = {
+    ...this.signupForm.value,
+    Prenom: this.signupForm.value.Prenom.trim(),
+    age: Number(this.signupForm.value.age)
+  };
+  delete formData.confirmPassword;
+
+  this.isLoading = true;
+
+  this.demandeService.Demande(formData).subscribe({
+    next: (response: any) => {
+      this.isLoading = false;
+      this.userEmail = formData.email;
+      this.showOtpModal = true; // 👈 Show modal
+
+      Swal.fire({
+        icon: 'info',
+        title: 'Vérification requise',
+        text: 'Un code OTP a été envoyé à votre e-mail.',
+      });
+    },
+    error: (error) => {
+      this.isLoading = false;
+      const errorMessage = error.error?.message || 'Une erreur est survenue. Veuillez réessayer.';
       Swal.fire({
         icon: 'error',
         title: 'Erreur',
-        text: 'Veuillez remplir tous les champs correctement',
+        text: errorMessage,
       });
-      return;
     }
+  });
+}
 
-    const formData = {
-      ...this.signupForm.value,
-      Prenom: this.signupForm.value.Prenom.trim(),
-      age: Number(this.signupForm.value.age)
-    };
-    delete formData.confirmPassword;
 
-    this.isLoading = true;
-
-    this.demandeService.Demande(formData).subscribe({
-      next: (response) => {
-        this.isLoading = false;
-        this.signupForm.reset();
-        Swal.fire({
-          icon: 'success',
-          title: 'Succès',
-          text: 'Inscription réussie !',
-        });
-      },
-      error: (error) => {
-        this.isLoading = false;
-        const errorMessage = error.error?.message || 'Une erreur est survenue. Veuillez réessayer.';
-        Swal.fire({
-          icon: 'error',
-          title: 'Erreur',
-          text: errorMessage,
-        });
-      }
+verifyOtp() {
+  if (!this.otpCode.trim()) {
+    Swal.fire({
+      icon: 'warning',
+      title: 'Attention',
+      text: 'Veuillez entrer le code OTP envoyé à votre e-mail.',
     });
+    return;
   }
+
+  this.demandeService.verifyOtp(this.userEmail, this.otpCode).subscribe({
+    next: (res: any) => {
+      Swal.fire({
+        icon: 'success',
+        title: 'Succès',
+        text: 'Votre adresse e-mail a été vérifiée avec succès !',
+      });
+      this.signupForm.reset();
+      this.showOtpModal = false;
+      this.otpCode = '';
+    },
+    error: (err) => {
+      Swal.fire({
+        icon: 'error',
+        title: 'Erreur',
+        text: err.error?.message || 'Code OTP invalide ou expiré.',
+      });
+    }
+  });
+}
+
+cancelOtp() {
+  this.showOtpModal = false;
+  this.otpCode = '';
+}
+
+
 }

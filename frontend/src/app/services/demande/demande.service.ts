@@ -15,6 +15,10 @@ export class DemandeService {
     return this.http.post(`${this.apiUrl}/demande`, formData);
   }
 
+  verifyOtp(email: string, otp: string) {
+  return this.http.post(`${this.apiUrl}/verify-otp`, { email, otp });
+}
+
   getAllDemandes(): Observable<any> {
     return this.http.get<any[]>(`${this.apiUrl}/pending`);
   }

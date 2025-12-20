@@ -133,6 +133,11 @@
                 <td>{{ benevole.gouvernorat }}</td>
                 <td>{{ benevole.status }}</td>
                 <td>
+                  <button class="btn btn-warning btn-sm"
+                  (click)="openEditModal(benevole)"
+                  [disabled]="isLoading">
+                  <i class="fas fa-edit"></i>
+                  </button>
                   <button *ngIf="benevole.status === 'inactive'"
                           class="btn btn-success btn-sm"
                           (click)="activateVolunteer(benevole)"
@@ -157,6 +162,76 @@
         </div>
       </div>
     </div>
+
+    <!-- BACKDROP -->
+<div class="modal-backdrop fade show" *ngIf="isEditModalOpen"></div>
+
+<!-- EDIT MODAL -->
+<div class="modal fade show d-block" *ngIf="isEditModalOpen" style="background: rgba(0,0,0,0.5);">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content">
+
+      <div class="modal-header">
+        <h5 class="modal-title">
+          <i class="fas fa-user-edit"></i> Modifier Bénévole
+        </h5>
+        <button type="button" class="btn-close" (click)="closeEditModal()"></button>
+      </div>
+
+      <div class="modal-body">
+        <div class="row g-3">
+
+          <div class="col-md-6">
+            <label class="form-label">Nom</label>
+            <input class="form-control" [(ngModel)]="selectedVolunteer.name">
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label">Prénom</label>
+            <input class="form-control" [(ngModel)]="selectedVolunteer.lastName">
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label">Email</label>
+            <input class="form-control" [(ngModel)]="selectedVolunteer.email">
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label">Âge</label>
+            <input type="number" class="form-control" [(ngModel)]="selectedVolunteer.age">
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label">Téléphone</label>
+            <input class="form-control" [(ngModel)]="selectedVolunteer.phone">
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label">Adresse</label>
+            <input class="form-control" [(ngModel)]="selectedVolunteer.address">
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label">Gouvernorat</label>
+            <input class="form-control" [(ngModel)]="selectedVolunteer.gouvernorat">
+          </div>
+
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-secondary" (click)="closeEditModal()">Annuler</button>
+        <button class="btn btn-primary"
+                (click)="updateVolunteer()"
+                [disabled]="isLoading">
+          <i class="fas fa-save"></i> Enregistrer
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
 
     <!-- Template si pas de demandes -->
     <ng-template #noDemandesTemplate>

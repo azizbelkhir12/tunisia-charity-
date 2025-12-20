@@ -16,6 +16,9 @@ const DemandeSchema = new mongoose.Schema({
     enum: ['pending', 'accepted', 'rejected'], 
     default: 'pending' 
   },
+  otp: String,
+  otpExpires: Date,
+  isVerified: { type: Boolean, default: false },
 });
 
 module.exports = mongoose.model('Demande', DemandeSchema);

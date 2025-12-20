@@ -14,6 +14,7 @@
   "dependencies": {
     "@n8n/chat": "^0.27.1",
     "@sendinblue/client": "^3.3.1",
+    "@vitalets/google-translate-api": "^9.2.1",
     "axios": "^1.8.4",
     "bcryptjs": "^3.0.2",
     "chart.js": "^4.4.8",
@@ -27,7 +28,8 @@
     "nodemailer": "^6.10.1",
     "passport": "^0.7.0",
     "passport-google-oauth20": "^2.0.0",
-    "socket.io": "^4.8.1"
+    "socket.io": "^4.8.1",
+    "translate-google-api": "^1.0.4"
   },
   "devDependencies": {
     "nodemon": "^3.1.9"

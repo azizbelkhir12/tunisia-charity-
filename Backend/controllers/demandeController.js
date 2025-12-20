@@ -4,42 +4,109 @@ const jwt = require('jsonwebtoken');
 const Benevole = require('../models/Volunteer');
 const nodemailer = require('nodemailer');
 
-exports.Demande = async (req, res) => {
-    try {
-        const { name,Prenom, age, email, password, address, phone, gouvernorat, reason } = req.body;
 
-        if (!name || !Prenom || !age || !email || !password || !address || !phone || !gouvernorat || !reason) {
-            return res.status(400).json({ message: 'All fields are required' });
-        }
 
-        const existingUser = await Demande.findOne({ email });
-        if (existingUser) {
-            return res.status(400).json({ message: 'Email already in use' });
-        }
+exports.requestOtp = async (req, res) => {
+  try {
+    const { name, Prenom, age, email, password, address, phone, gouvernorat, reason } = req.body;
 
-        // Hash the password
-        const hashedPassword = await bcrypt.hash(password.trim(), 10);
-
-        // Create a new Demande instance
-        const newDemande = new Demande({
-            name: name.trim(),
-            Prenom: Prenom.trim(),
-            age: age,
-            email: email.trim(),
-            password: hashedPassword,
-            address: address.trim(),
-            phone: phone.trim(),
-            gouvernorat: gouvernorat.trim(),
-            reason: reason.trim(),
-        });
-
-        await newDemande.save();
-        res.status(201).json({ message: 'Demande created successfully', demande: newDemande });
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({ message: 'Internal server error' });
+    if (!name || !Prenom || !age || !email || !password || !address || !phone || !gouvernorat || !reason) {
+      return res.status(400).json({ message: 'All fields are required' });
     }
+
+    const existing = await Demande.findOne({ email });
+    if (existing) {
+      return res.status(400).json({ message: 'Email already in use' });
+    }
+
+    // Generate OTP and expiry
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    const otpExpires = Date.now() + 10 * 60 * 1000; // 10 min
+
+    // Hash password (before saving)
+    const hashedPassword = await bcrypt.hash(password.trim(), 10);
+
+    // Create demande in DB but mark as not verified yet
+    const newDemande = new Demande({
+      name: name.trim(),
+      Prenom: Prenom.trim(),
+      age,
+      email: email.trim(),
+      password: hashedPassword,
+      address: address.trim(),
+      phone: phone.trim(),
+      gouvernorat: gouvernorat.trim(),
+      reason: reason.trim(),
+      otp,
+      otpExpires,
+      isVerified: false,
+      status: 'pending',
+    });
+
+    await newDemande.save();
+
+    // Configure transporter
+    const transporter = nodemailer.createTransport({
+      host: process.env.EMAIL_HOST,
+      port: parseInt(process.env.EMAIL_PORT, 10),
+      secure: false,
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+      },
+      tls: { rejectUnauthorized: false },
+    });
+
+    // Send OTP email
+    await transporter.sendMail({
+      from: `"Volunteer Verification" <${process.env.EMAIL_USER}>`,
+      to: email,
+      subject: 'Your OTP Code - Volunteer Verification',
+      html: `
+        <p>Hello ${Prenom},</p>
+        <p>Thank you for your interest in volunteering.</p>
+        <p>Your verification code is: <b>${otp}</b></p>
+        <p>This code will expire in 10 minutes.</p>
+      `,
+    });
+
+    console.log('✅ OTP sent to:', email);
+    res.status(200).json({ message: 'OTP sent successfully. Please verify your email.' });
+  } catch (err) {
+    console.error('❌ Error sending OTP:', err);
+    res.status(500).json({ message: 'Failed to send OTP', error: err.message });
+  }
 };
+
+
+
+
+
+exports.verifyOTP = async (req, res) => {
+  try {
+    const { email, otp } = req.body;
+
+    const user = await Demande.findOne({ email });
+    if (!user) return res.status(404).json({ message: 'User not found' });
+
+    if (user.isVerified) return res.status(400).json({ message: 'User already verified' });
+
+    if (user.otp !== otp) return res.status(400).json({ message: 'Invalid OTP' });
+
+    if (Date.now() > user.otpExpires) return res.status(400).json({ message: 'OTP expired' });
+
+    user.isVerified = true;
+    user.otp = undefined;
+    user.otpExpires = undefined;
+    await user.save();
+
+    res.status(200).json({ message: 'Email verified successfully' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+};
+
 
 
 exports.getAllDemandes = async (req, res) => {
