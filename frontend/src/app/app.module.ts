@@ -78,7 +78,6 @@ export function HttpLoaderFactory(http: HttpClient) {
 }
 
 
-
 @NgModule({
   declarations: [
     AppComponent,
@@ -154,8 +153,7 @@ export function HttpLoaderFactory(http: HttpClient) {
         provide: TranslateLoader,
         useFactory: HttpLoaderFactory,
         deps: [HttpClient]
-      },
-      defaultLanguage: 'fr'
+      }
     })
   ],
   providers: [],

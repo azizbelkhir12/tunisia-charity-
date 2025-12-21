@@ -1,0 +1,81 @@
+{
+  "NAV": {
+    "HOME": "Home",
+    "CONTACT": "Contact",
+    "Rapports": "Reports",
+    "Rejoignez-nous": "Join Us",
+    "LOGIN": "Login",
+    "REGISTER": "Create Account",
+    "DONATE": "Donate",
+    "Langue" : "Language"
+  },
+  "BANNER": {
+    "TEXT": "Your support has the power to transform lives in a concrete and lasting way. Every act of generosity helps feed a hungry child, treat a patient without resources, provide shelter to a family in need, or give access to education to a young person without a future.",
+    "DONATE_BTN": "Donate Now"
+  },
+  "ABOUT": {
+    "SUBTITLE": "About Us",
+    "TITLE": "Humanitarian Aid in Tunisia",
+    "TEXT1": "The association TUNISIA CHARITY تونس الخيرية is a non-governmental non-profit organization. It aims to serve society by mobilizing the efforts of benefactors to solve the problems of their communities and help those in need.",
+    "TEXT2": "The association works in emergency relief, sustainable development, and the fight against poverty. It also promotes the spirit of cooperation and solidarity within society."
+  },
+  "SERVICE": {
+    "SUBTITLE": "Our Actions",
+    "TITLE": "We believe we can save more lives with you",
+
+    "ITEMS": {
+      "EDUCATION": {
+        "TITLE": "Children Education Support",
+        "DESC": "Providing school supplies and educational support for orphaned children."
+      },
+      "WATER": {
+        "TITLE": "Clean Water",
+        "DESC": "Ensuring access to clean and safe drinking water."
+      },
+      "SPONSORSHIP": {
+        "TITLE": "Child Sponsorship",
+        "DESC": "Finding sponsors to support children in need."
+      },
+      "POVERTY": {
+        "TITLE": "Fight Against Poverty",
+        "DESC": "Supporting vulnerable families with material, educational, and social aid."
+      },
+      "EMERGENCY": {
+        "TITLE": "Humanitarian Emergency",
+        "DESC": "Immediate assistance to crisis victims with food, shelter, and care."
+      },
+      "SOCIAL": {
+        "TITLE": "Social Aid",
+        "DESC": "Helping people in difficult situations."
+      }
+    }
+  },
+  "FACTS": {
+    "TITLE": "Our Achievements",
+    "ITEMS": {
+      "VOLUNTEERS": "Volunteers",
+      "DONORS": "Donors",
+      "BENEFICIARIES": "Beneficiaries",
+      "PROJECTS": "Projects"
+    }
+  },
+  "CAUSES": {
+    "SUBTITLE": "Our Projects",
+    "TITLE": "Let's explore the different projects in our association"
+  },
+  "CONTACT": {
+    "SUBTITLE": "At Your Service",
+    "TITLE": "Have questions? Contact us!",
+    "NAME": "Your Name",
+    "EMAIL": "Your Email",
+    "SUBJECT": "Subject",
+    "MESSAGE": "Message",
+    "SEND": "Send Message"
+  },
+  "LANG": {
+    "BUTTON": "Language",
+    "FR": "Français",
+    "EN": "English",
+    "AR": "العربية"
+  }
+}

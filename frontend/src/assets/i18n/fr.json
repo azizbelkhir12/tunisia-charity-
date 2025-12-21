@@ -1,0 +1,81 @@
+{
+  "NAV": {
+    "HOME": "Accueil",
+    "CONTACT": "Contact",
+    "Rapports": "Rapports",
+    "Rejoignez-nous": "Rejoignez-nous",
+    "LOGIN": "Se Connecter",
+    "REGISTER": "Créer compte",
+    "DONATE": "Faire un don",
+    "Langue" : "Langue"
+  },
+  "BANNER": {
+    "TEXT": "Votre soutien a le pouvoir de transformer des vies de manière concrète et durable. Chaque geste de générosité permet de nourrir un enfant affamé, de soigner un malade sans ressources, d'offrir un toit à une famille dans le besoin, ou de donner accès à l'éducation à un jeune privé d'avenir.",
+    "DONATE_BTN": "Faire un don"
+  },
+  "ABOUT": {
+    "SUBTITLE": "À propos de nous",
+    "TITLE": "Aide humanitaire en Tunisie",
+    "TEXT1": "L’association TUNISIA CHARITY تونس الخيرية est une organisation non gouvernementale à but non lucratif. Elle vise à servir la société en mobilisant les efforts des bienfaiteurs pour résoudre les problèmes de leurs communautés et venir en aide aux personnes dans le besoin.",
+    "TEXT2": "L’association intervient dans le domaine du secours aux sinistrés en cas d’urgence, du développement durable et de la lutte contre la pauvreté. Elle œuvre également à promouvoir l’esprit de coopération et de solidarité au sein de la société."
+  },
+  "SERVICE": {
+   "SUBTITLE": "Nos Actions",
+    "TITLE": "Nous croyons que nous pouvons sauver plus de vies avec vous",
+
+    "ITEMS": {
+      "EDUCATION": {
+        "TITLE": "Soutien à l’Éducation des Enfants",
+        "DESC": "Fournir des fournitures scolaires et du soutien aux enfants orphelins."
+      },
+      "WATER": {
+        "TITLE": "Eau Pure",
+        "DESC": "Assurer l'accès à une eau potable propre et sûre."
+      },
+      "SPONSORSHIP": {
+        "TITLE": "Parrainage d’Enfants",
+        "DESC": "Trouver des parrains pour soutenir les enfants dans le besoin."
+      },
+      "POVERTY": {
+        "TITLE": "Lutte contre la pauvreté",
+        "DESC": "Soutien aux familles précaires avec aide matérielle, éducative et sociale."
+      },
+      "EMERGENCY": {
+        "TITLE": "Urgence humanitaire",
+        "DESC": "Assistance immédiate aux victimes de crises avec aide alimentaire, abris et soins."
+      },
+      "SOCIAL": {
+        "TITLE": "Aide Sociale",
+        "DESC": "Aider les personnes en situation difficile."
+      }
+    }
+  },
+  "FACTS": {
+    "TITLE": "Nos Réalisations",
+    "ITEMS": {
+      "VOLUNTEERS": "Bénévoles",
+      "DONORS": "Donateurs",
+      "BENEFICIARIES": "Bénéficiaires",
+      "PROJECTS": "Projets"
+    }
+  },
+  "CAUSES": {
+    "SUBTITLE": "Nos Projets",
+    "TITLE": "Explorons les différentes projets dans notre associations"
+  },
+  "CONTACT": {
+    "SUBTITLE": "À Votre Écoute",
+    "TITLE": "Des questions ? Contactez-nous !",
+    "NAME": "Veuillez entrer votre nom.",
+    "EMAIL": "Veuillez entrer une adresse e-mail valide.",
+    "SUBJECT": "Veuillez entrer un sujet",
+    "MESSAGE": "Message",
+    "SEND": "Envoyer Message"
+  },
+  "LANG": {
+    "BUTTON": "Langue",
+    "FR": "Français",
+    "EN": "English",
+    "AR": "العربية"
+  }
+}

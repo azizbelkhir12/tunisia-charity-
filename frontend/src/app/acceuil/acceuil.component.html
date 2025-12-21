@@ -10,21 +10,21 @@
 
     <div class="collapse navbar-collapse justify-content-center" id="navbarCollapse">
       <div class="navbar-nav">
-        <a routerLink="/" routerLinkActive="active" class="nav-item nav-link">Home</a>
-        <a routerLink="/contact" routerLinkActive="active" class="nav-item nav-link">Contact</a>
-        <a routerLink="/rapports" routerLinkActive="active" class="nav-item nav-link">Rapports</a>
-        <a routerLink="/benevolat" routerLinkActive="active" class="nav-item nav-link">Rejoignez-nous</a>
+        <a routerLink="/" routerLinkActive="active" class="nav-item nav-link">{{ 'NAV.HOME' | translate }}</a>
+        <a routerLink="/contact" routerLinkActive="active" class="nav-item nav-link">{{ 'NAV.CONTACT' | translate }}</a>
+        <a routerLink="/rapports" routerLinkActive="active" class="nav-item nav-link">{{ 'NAV.Rapports' | translate }}</a>
+        <a routerLink="/benevolat" routerLinkActive="active" class="nav-item nav-link">{{ 'NAV.Rejoignez-nous' | translate }}</a>
       </div>
 
       <div class="navbar-nav login">
-        <a routerLink="/login" routerLinkActive="active" class="nav-link">Se Connecter</a>
-        <a routerLink="/register" routerLinkActive="active" class="nav-link">Créer compte</a>
-        <a routerLink="/payment" class="btn btn-custom">Faire un don</a>
+        <a routerLink="/login" routerLinkActive="active" class="nav-link">{{ 'NAV.LOGIN' | translate }}</a>
+        <a routerLink="/register" routerLinkActive="active" class="nav-link">{{ 'NAV.REGISTER' | translate }}</a>
+        <a routerLink="/payment" class="btn btn-custom">{{ 'NAV.DONATE' | translate }}</a>
       </div>
       <!-- Dans votre navbar -->
 <div class="dropdown ms-3">
   <button class="btn btn-outline-light dropdown-toggle" type="button" id="langDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-    <i class="fas fa-language"></i> Langue
+    <i class="fas fa-language"></i> {{ 'NAV.Langue' | translate }}
   </button>
   <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="langDropdown">
     <li><a class="dropdown-item" (click)="translatePage('fr')"><i class="flag-icon flag-icon-fr"></i> Français</a></li>
@@ -44,9 +44,9 @@
 <div class="banner-container">
   <img src="assets/banner.jpg" alt="Banner" class="banner-image">
   <div class="banner-caption">
-    <p class="banner-text">Votre soutien a le pouvoir de transformer des vies de manière concrète et durable. Chaque geste de générosité permet de nourrir un enfant affamé, de soigner un malade sans ressources, d'offrir un toit à une famille dans le besoin, ou de donner accès à l'éducation à un jeune privé d'avenir.</p>
+    <p class="banner-text">{{ 'BANNER.TEXT' | translate }}</p>
     <div class="btn-don-container">
-      <a routerLink="/payment" class=" btn-don">Faire un don</a>
+      <a routerLink="/payment" class=" btn-don">{{ 'BANNER.DONATE_BTN' | translate }}</a>
   </div></div>
 </div>
 
@@ -59,14 +59,14 @@
       </div>
       <div class="col-lg-6">
         <div class="section-header">
-          <p>À propos de nous</p>
-          <h2>Aide humanitaire en Tunisie</h2>
+          <p>{{ 'ABOUT.SUBTITLE' | translate }}</p>
+          <h2>{{ 'ABOUT.TITLE' | translate }}</h2>
         </div>
         <div class="about-text">
           <p>
-            L’association TUNISIA CHARITY تونس الخيرية est une organisation non gouvernementale à but non lucratif. Elle vise à servir la société en mobilisant les efforts des bienfaiteurs pour résoudre les problèmes de leurs communautés et venir en aide aux personnes dans le besoin.
+            {{ 'ABOUT.TEXT1' | translate }}
             <br><br>
-            L’association intervient dans le domaine du secours aux sinistrés en cas d’urgence, du développement durable et de la lutte contre la pauvreté. Elle œuvre également à promouvoir l’esprit de coopération et de solidarité au sein de la société.
+            {{ 'ABOUT.TEXT2' | translate }}
           </p>
         </div>
       </div>
@@ -79,8 +79,8 @@
 <div class="service">
   <div class="container">
     <div class="section-header text-center">
-      <p>Nos Actions</p>
-      <h2>Nous croyons que nous pouvons sauver plus de vies avec vous</h2>
+      <p>{{ 'SERVICE.SUBTITLE' | translate }}</p>
+      <h2>{{ 'SERVICE.TITLE' | translate }}</h2>
     </div>
     <div class="row">
       <div class="col-lg-4 col-md-6" *ngFor="let service of services">
@@ -89,8 +89,8 @@
             <i [class]="service.icon"></i>
           </div>
           <div class="service-text">
-            <h3>{{ service.title }}</h3>
-            <p>{{ service.description }}</p>
+            <h3>{{ service.title | translate }}</h3>
+            <p>{{ service.description | translate }}</p>
           </div>
         </div>
       </div>
@@ -107,7 +107,7 @@
         <div class="facts-item">
           <div class="facts-text">
             <h3>{{ fact.value }}</h3>
-            <p>{{ fact.text }}</p>
+            <p>{{ fact.text | translate }}</p>
           </div>
         </div>
       </div>
@@ -120,8 +120,8 @@
 <div class="causes">
   <div class="container">
     <div class="section-header text-center">
-      <p>Nos Projets</p>
-      <h2>Explorons les différentes projets dans notre associations</h2>
+      <p>{{ 'CAUSES.SUBTITLE' | translate }}</p>
+      <h2>{{ 'CAUSES.TITLE' | translate }}</h2>
     </div>
 
     <div class="causes-carousel">
@@ -155,8 +155,8 @@
 <div class="contact">
   <div class="container">
     <div class="section-header text-center">
-      <p>À Votre Écoute</p>
-      <h2>Des questions ? Contactez-nous !</h2>
+      <p>{{ 'CONTACT.SUBTITLE' | translate }}</p>
+      <h2>{{ 'CONTACT.TITLE' | translate }}</h2>
     </div>
 
     <div class="contact-img">
@@ -170,23 +170,23 @@
 
       <form [formGroup]="contactForm" (ngSubmit)="onSubmitForm()">
         <div class="control-group">
-          <input type="text" class="form-control" placeholder="Votre Nom" formControlName="name" required />
-          <p *ngIf="contactForm.controls['name'].invalid && contactForm.controls['name'].touched" class="text-danger">Veuillez entrer votre nom.</p>
+          <input type="text" class="form-control" placeholder="{{ 'CONTACT.NAME' | translate }}" formControlName="name" required />
+          <p *ngIf="contactForm.controls['name'].invalid && contactForm.controls['name'].touched" class="text-danger">{{ 'CONTACT.NAME' | translate }}</p>
         </div>
         <div class="control-group">
-          <input type="email" class="form-control" placeholder="Votre Email" formControlName="email" required />
-          <p *ngIf="contactForm.controls['email'].invalid && contactForm.controls['email'].touched" class="text-danger">Veuillez entrer une adresse e-mail valide.</p>
+          <input type="email" class="form-control" placeholder="{{ 'CONTACT.EMAIL' | translate }}" formControlName="email" required />
+          <p *ngIf="contactForm.controls['email'].invalid && contactForm.controls['email'].touched" class="text-danger">{{ 'CONTACT.EMAIL' | translate }}</p>
         </div>
         <div class="control-group">
-          <input type="text" class="form-control" placeholder="Sujet" formControlName="subject" required />
-          <p *ngIf="contactForm.controls['subject'].invalid && contactForm.controls['subject'].touched" class="text-danger">Veuillez entrer un sujet</p>
+          <input type="text" class="form-control" placeholder="{{ 'CONTACT.SUBJECT' | translate }}" formControlName="subject" required />
+          <p *ngIf="contactForm.controls['subject'].invalid && contactForm.controls['subject'].touched" class="text-danger">{{ 'CONTACT.SUBJECT' | translate }}</p>
         </div>
         <div class="control-group">
-          <textarea class="form-control" placeholder="Message" formControlName="message" required></textarea>
-          <p *ngIf="contactForm.controls['message'].invalid && contactForm.controls['message'].touched" class="text-danger">Le message doit contenir au moins 10 caractères</p>
+          <textarea class="form-control" placeholder="{{ 'CONTACT.MESSAGE' | translate }}" formControlName="message" required></textarea>
+          <p *ngIf="contactForm.controls['message'].invalid && contactForm.controls['message'].touched" class="text-danger">{{ 'CONTACT.MESSAGE' | translate }}</p>
         </div>
         <div>
-          <button class="btn btn-custom" type="submit" [disabled]="contactForm.invalid">Envoyer Message</button>
+          <button class="btn btn-custom" type="submit" [disabled]="contactForm.invalid">{{ 'CONTACT.SEND' | translate }}</button>
         </div>
       </form>
     </div>

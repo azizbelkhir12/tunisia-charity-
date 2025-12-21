@@ -6,7 +6,9 @@ import { ProjetService } from '../services/projet/projet.service';
 import { BeneficiaryService } from '../services/beneficiary/beneficiary.service';
 import { VolunteerService } from '../services/volunteer/volunteer.service';
 import { DonorsService } from '../services/donors/donors.service';
-import { TranslationApiService } from '../services/translation/translation-api.service';
+import { TranslateService } from '@ngx-translate/core';
+
+
 import '@n8n/chat/style.css';
 import { createChat } from '@n8n/chat';
 import Swal from 'sweetalert2';
@@ -28,21 +30,44 @@ export class AcceuilComponent {
    currentLanguage: string = 'fr';
 
   services = [
-    { icon: 'flaticon-diet', title: ' Soutien à lÉducation des Enfants ', description: 'Fournir des fournitures scolaires et du soutien aux enfants orphelins.' },
-    { icon: 'flaticon-water', title: 'Eau Pure', description: 'Assurer l\'accès à de l\'eau potable propre et sûre.' }
-,   { icon: 'flaticon-orphelinat', title: 'Parrainage d\'Enfants', description: 'Trouver des parrains pour soutenir les enfants dans le besoin.' },
+  {
+    icon: 'flaticon-diet',
+    title: 'SERVICE.ITEMS.EDUCATION.TITLE',
+    description: 'SERVICE.ITEMS.EDUCATION.DESC'
+  },
+  {
+    icon: 'flaticon-water',
+    title: 'SERVICE.ITEMS.WATER.TITLE',
+    description: 'SERVICE.ITEMS.WATER.DESC'
+  },
+  {
+    icon: 'flaticon-orphelinat',
+    title: 'SERVICE.ITEMS.SPONSORSHIP.TITLE',
+    description: 'SERVICE.ITEMS.SPONSORSHIP.DESC'
+  },
+  {
+    icon: 'flaticon-poverty',
+    title: 'SERVICE.ITEMS.POVERTY.TITLE',
+    description: 'SERVICE.ITEMS.POVERTY.DESC'
+  },
+  {
+    icon: 'flaticon-emergency',
+    title: 'SERVICE.ITEMS.EMERGENCY.TITLE',
+    description: 'SERVICE.ITEMS.EMERGENCY.DESC'
+  },
+  {
+    icon: 'flaticon-social-care',
+    title: 'SERVICE.ITEMS.SOCIAL.TITLE',
+    description: 'SERVICE.ITEMS.SOCIAL.DESC'
+  }
+];
 
-{ icon: 'flaticon-poverty', title: 'Lutte contre la pauvreté', description: 'Soutien aux familles précaires avec aide matérielle, éducative et sociale.' }
-,{ icon: 'flaticon-emergency', title: 'Urgence humanitaire', description: 'Assistance immédiate aux victimes de crises avec aide alimentaire, abris et soins.' }
-,{ icon: 'flaticon-social-care', title: 'Aide Sociale', description: 'Aider les personnes en situation difficile.' }
-
-  ];
 
   facts = [
-  { value: 0, text: 'Bénévole' },
-  {  value: 0, text: 'Donateurs' },
-  {  value: 0, text: 'Beneficiaire' },
-  {  value: 0, text: 'Projets' }
+  { value: 0, text: 'FACTS.ITEMS.VOLUNTEERS' },
+  { value: 0, text: 'FACTS.ITEMS.DONORS' },
+  { value: 0, text: 'FACTS.ITEMS.BENEFICIARIES' },
+  { value: 0, text: 'FACTS.ITEMS.PROJECTS' }
 ];
 
   
@@ -60,8 +85,12 @@ export class AcceuilComponent {
     private beneficiaryService: BeneficiaryService,
     private volunteerService: VolunteerService,
     private donorService: DonorsService, 
-    private translationApiService: TranslationApiService
+    private translate: TranslateService
   ) {
+    const savedLang = localStorage.getItem('lang') || 'fr';
+    this.translate.use(savedLang);
+    document.documentElement.dir = savedLang === 'ar' ? 'rtl' : 'ltr';
+
     this.donateForm = this.fb.group({
       name: ['', Validators.required],
       email: ['', [Validators.required, Validators.email]],
@@ -75,6 +104,7 @@ export class AcceuilComponent {
       message: ['', [Validators.required, Validators.minLength(10)]]
     });
   }
+  
 
   ngOnInit() {
     this.chargerProjets();
@@ -82,180 +112,14 @@ export class AcceuilComponent {
     this.loadCounts();
   }
 
+  translatePage(lang: string) {
+    this.translate.use(lang);
+    localStorage.setItem('lang', lang);
+    document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
+  }
+
   async ngAfterViewInit() {
     this.animateNumbers();
-  }
-
-  private storeOriginalTexts() {
-    const elements = document.querySelectorAll('p, h1, h2, h3, h4, a, button, span, label, div');
-    const textSet = new Set<string>();
-    
-    elements.forEach(el => {
-      const original = el.textContent?.trim();
-      if (original && original.length > 1 && !this.isSystemText(original)) {
-        textSet.add(original);
-      }
-    });
-    
-    textSet.forEach(text => {
-      this.originalTexts.set(text, text);
-    });
-    
-    console.log(`💾 ${this.originalTexts.size} textes uniques stockés`);
-  }
-
-  private isSystemText(text: string): boolean {
-    const systemTexts = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
-    return systemTexts.includes(text) || text.length < 2;
-  }
-
-  async translatePage(lang: string) {
-    if (this.isTranslating) {
-      console.log('⏳ Traduction déjà en cours...');
-      return;
-    }
-
-    this.isTranslating = true;
-    this.currentLanguage = lang;
-
-    try {
-      const swalResult = await Swal.fire({
-        title: 'Traduction en cours...',
-        text: 'Veuillez patienter, cela peut prendre quelques secondes',
-        allowOutsideClick: false,
-        showConfirmButton: false,
-        didOpen: () => {
-          Swal.showLoading();
-        }
-      });
-
-      // Textes principaux pour la traduction
-      const mainTexts = this.getMainTexts();
-      const uniqueTexts = [...new Set(mainTexts.filter(text => text && text.length > 1))];
-
-      console.log(`🌐 Début traduction: ${uniqueTexts.length} textes vers ${lang}`);
-
-      if (uniqueTexts.length === 0) {
-        this.storeOriginalTexts();
-        Swal.fire({
-          icon: 'warning',
-          title: 'Aucun texte à traduire',
-          text: 'Rechargement des textes...',
-          confirmButtonText: 'OK'
-        });
-        this.isTranslating = false;
-        return;
-      }
-
-      this.translationApiService.translateBatch(uniqueTexts, lang).subscribe({
-        next: (translations) => {
-          this.applyTranslations(translations, uniqueTexts);
-          
-          Swal.fire({
-            icon: 'success',
-            title: 'Traduction terminée !',
-            text: `La page a été traduite en ${this.getLanguageName(lang)}`,
-            timer: 2000,
-            showConfirmButton: false
-          });
-          
-          this.isTranslating = false;
-        },
-        error: (error) => {
-          console.error('❌ Erreur traduction:', error);
-          Swal.fire({
-            icon: 'error',
-            title: 'Erreur de traduction',
-            text: 'Impossible de traduire la page. Veuillez réessayer.',
-            confirmButtonText: 'OK'
-          });
-          this.isTranslating = false;
-        }
-      });
-
-    } catch (error) {
-      console.error('❌ Erreur inattendue:', error);
-      this.isTranslating = false;
-    }
-  }
-
-  private getMainTexts(): string[] {
-    return [
-      // Navigation
-      'Home', 'Contact', 'Rapports', 'Rejoignez-nous', 'Se Connecter', 'Créer compte', 
-      'Faire un don', 'Langue', 'Français', 'English', 'العربية',
-
-      // Bannière
-      'Votre soutien a le pouvoir de transformer des vies de manière concrète et durable. Chaque geste de générosité permet de nourrir un enfant affamé, de soigner un malade sans ressources, d\'offrir un toit à une famille dans le besoin, ou de donner accès à l\'éducation à un jeune privé d\'avenir.',
-
-      // À propos
-      'À propos de nous', 'Aide humanitaire en Tunisie',
-      'L\'association TUNISIA CHARITY تونس الخيرية est une organisation non gouvernementale à but non lucratif. Elle vise à servir la société en mobilisant les efforts des bienfaiteurs pour résoudre les problèmes de leurs communautés et venir en aide aux personnes dans le besoin. L\'association intervient dans le domaine du secours aux sinistrés en cas d\'urgence, du développement durable et de la lutte contre la pauvreté. Elle œuvre également à promouvoir l\'esprit de coopération et de solidarité au sein de la société.',
-
-      // Services
-      'Nos Actions', 'Nous croyons que nous pouvons sauver plus de vies avec vous',
-      ...this.services.map(s => s.title),
-      ...this.services.map(s => s.description),
-
-      // Projets
-      'Nos Projets', 'Explorons les différentes projets dans notre associations',
-
-      // Contact
-      'À Votre Écoute', 'Des questions ? Contactez-nous !',
-      'Votre Nom', 'Votre Email', 'Sujet', 'Message',
-      'Envoyer Message', 'Le message doit contenir au moins 10 caractères',
-      'Veuillez entrer votre nom', 'Veuillez entrer une adresse e-mail valide',
-      'Veuillez entrer un sujet',
-
-      // Facts
-      ...this.facts.map(f => f.text)
-    ];
-  }
-
-  private applyTranslations(translations: any[], originalTexts: string[]) {
-    const elements = document.querySelectorAll('p, h1, h2, h3, h4, a, button, span, label, div');
-    let translationCount = 0;
-    
-    elements.forEach(el => {
-      const original = el.textContent?.trim();
-      if (original && original.length > 1) {
-        const index = originalTexts.indexOf(original);
-        if (index !== -1 && translations[index] && translations[index].success !== false) {
-          const translatedText = translations[index].translatedText;
-          if (translatedText && translatedText !== original) {
-            el.textContent = translatedText;
-            translationCount++;
-          }
-        }
-      }
-    });
-    
-    console.log(`✅ ${translationCount} traductions appliquées`);
-    
-    // Mettre à jour le texte du bouton de langue
-    this.updateLanguageButton();
-  }
-
-  private updateLanguageButton() {
-    const langButton = document.querySelector('#langDropdown');
-    if (langButton) {
-      const languageNames: Record<string, string> = {
-        'fr': 'Français',
-        'en': 'English', 
-        'ar': 'العربية'
-      };
-      const label = languageNames[this.currentLanguage] ?? 'Langue';
-      langButton.innerHTML = `<i class="fas fa-language"></i> ${label}`;
-    }
-  }
-
-  private getLanguageName(code: string): string {
-    const languages: { [key: string]: string } = {
-      'fr': 'Français',
-      'en': 'Anglais',
-      'ar': 'Arabe'
-    };
-    return languages[code] || code;
   }
 
   loadCounts() {
