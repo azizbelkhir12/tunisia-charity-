@@ -13,7 +13,7 @@ export class ChatComponent {
   messages: any[] = [];
   newMessage = '';
 
-  senderId = '680aa169a707348ab78f8282';
+  senderId = '680aa169a707348ab78f8282'; // ADMIN ID
   senderRole = 'admin';
 
   receiverId = '';
@@ -35,40 +35,83 @@ export class ChatComponent {
     this.getVolunteers();
 
     this.socketService.onReceiveMessage().subscribe((msg: any) => {
-      this.messages.push(msg);
+
+      // If chat is open → show message
+      if (msg.senderId === this.receiverId) {
+        this.messages.push(msg);
+      }
+
+      // Always update conversation list
+      this.updateConversationList(msg);
     });
   }
 
- 
-    sendMessage() {
-      if (!this.newMessage.trim() || !this.receiverId) return;
-    
-      const message = {
-        senderId: this.senderId,
-        senderRole: this.senderRole,
-        receiverId: this.receiverId,
-        receiverRole: this.receiverRole,
-        text: this.newMessage
-      };
-    
-      // Add message locally immediately
-      this.messages.push(message);
-    
-      // Send via socket and API
-      this.socketService.sendMessage(message);
-      this.messageService.sendMessage(message).subscribe();
-    
-      this.newMessage = '';
+  sendMessage() {
+    if (!this.newMessage.trim() || !this.receiverId) return;
+
+    const message = {
+      senderId: this.senderId,
+      senderRole: this.senderRole,
+      receiverId: this.receiverId,
+      receiverRole: this.receiverRole,
+      text: this.newMessage
+    };
+
+    this.messages.push(message);
+    this.socketService.sendMessage(message);
+    this.messageService.sendMessage(message).subscribe();
+
+    // Update preview instantly
+    this.updateConversationList(message, true);
+
+    this.newMessage = '';
+  }
+
+  selectConversation(volunteer: any) {
+    this.receiverId = volunteer._id;
+    this.selectedVolunteerName = volunteer.name;
+
+    volunteer.unread = false;
+
+    this.messages = [];
+
+    this.messageService
+      .getConversation(this.senderId, this.receiverId)
+      .subscribe((res: any) => {
+        this.messages = res;
+      });
+  }
+
+  updateConversationList(msg: any, isMe = false) {
+    const userId = isMe ? msg.receiverId : msg.senderId;
+
+    const index = this.volunteers.findIndex(v => v._id === userId);
+    if (index === -1) return;
+
+    const conversation = this.volunteers[index];
+
+    conversation.lastMessage = msg.text;
+
+    if (!isMe && this.receiverId !== userId) {
+      conversation.unread = true;
     }
-    
-  ngOnDestroy(): void {
-    this.socketService.disconnect();
+
+    // Move to top
+    this.volunteers.splice(index, 1);
+    this.volunteers.unshift(conversation);
+
+    // 🔥 FORCE UI UPDATE
+    this.filteredVolunteers = [...this.volunteers];
   }
 
   getVolunteers() {
     this.volunteerService.getVolunteers().subscribe((data: any[]) => {
-      this.volunteers = data;
-      this.filteredVolunteers = data;
+      this.volunteers = data.map(v => ({
+        ...v,
+        unread: false,
+        lastMessage: ''
+      }));
+      this.filteredVolunteers = [...this.volunteers];
     });
   }
 
@@ -79,17 +122,8 @@ export class ChatComponent {
     );
   }
 
-  onVolunteerSelect(event: Event) {
-    const selectedId = (event.target as HTMLSelectElement).value;
-    const selectedVolunteer = this.volunteers.find(v => v._id === selectedId);
-
-    if (selectedVolunteer) {
-      this.receiverId = selectedVolunteer._id;
-      this.selectedVolunteerName = selectedVolunteer.name;
-
-      this.messageService.getConversation(this.senderId, this.receiverId).subscribe((res: any) => {
-        this.messages = res;
-      });
-    }
+  ngOnDestroy(): void {
+    this.socketService.disconnect();
   }
+  
 }

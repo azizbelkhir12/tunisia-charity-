@@ -1,42 +1,56 @@
-
 <div class="container-fluid chat-page">
   <div class="row justify-content-center">
     <div class="col-12 col-md-8 col-lg-6">
-      <h1 class="text-center mb-4">Chat avec l'Admin</h1>
-
       <div class="chat-container">
 
-
-        <!-- Message area -->
-        <div class="messages" tabindex="0" role="log" aria-live="polite" aria-relevant="additions">
-          <div
-            *ngFor="let msg of messages"
-            [ngClass]="{
-              'my-message': msg.senderId === senderId,
-              'other-message': msg.senderId !== senderId
-            }"
-            class="message-wrapper"
-          >
-            <div class="message-bubble" [title]="msg.senderRole">
-              <strong>{{ msg.senderRole }}:</strong> {{ msg.text }}
+        <!-- Chat Header -->
+        <div class="chat-header">
+          <div class="admin-info">
+            <div class="avatar">A</div>
+            <div>
+              <h4>Admin</h4>
+              <span class="status online">Online</span>
             </div>
           </div>
         </div>
 
-        <!-- Input area -->
+        <!-- Messages -->
+        <div class="messages" tabindex="0" role="log" aria-live="polite">
+          <div
+            *ngFor="let msg of messages"
+            class="message-wrapper"
+            [ngClass]="{
+              'my-message': msg.senderId === senderId,
+              'other-message': msg.senderId !== senderId
+            }"
+          >
+            <div class="message-bubble">
+              <p>{{ msg.text }}</p>
+              <span class="time">
+                {{ msg.createdAt | date:'HH:mm' }}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Input -->
         <div class="input-area">
           <input
             [(ngModel)]="newMessage"
             placeholder="Type a message..."
             (keyup.enter)="sendMessage()"
-            aria-label="Type your message"
           />
-          <button (click)="sendMessage()" [disabled]="!receiverId || !newMessage.trim()" aria-label="Send message">
+
+          <button
+            (click)="sendMessage()"
+            [disabled]="!receiverId || !newMessage.trim()"
+          >
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="white" viewBox="0 0 24 24">
               <path d="M2 21l21-9L2 3v7l15 2-15 2v7z"/>
             </svg>
           </button>
         </div>
+
       </div>
     </div>
   </div>
