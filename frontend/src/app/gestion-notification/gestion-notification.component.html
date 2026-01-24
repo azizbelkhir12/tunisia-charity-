@@ -38,81 +38,111 @@
   </div>
 
   <!-- Notification Form -->
-  <div class="forms-container">
-    <div class="form-card">
-      <h3>Envoyer une Notification</h3>
+  <!-- Notification Form -->
+<div class="forms-container">
+  <div class="form-card">
+    <h3>📢 Envoyer une Notification</h3>
 
-      <!-- Broadcast Checkbox -->
-      <div class="broadcast-checkbox">
-        <input
-          type="checkbox"
-          id="broadcast"
-          [(ngModel)]="isBroadcastMode"
-          name="broadcast"
-          (change)="onBroadcastChange()"
-        />
-        <label for="broadcast">Envoyer à tous les bénéficiaires ({{ listeBeneficiaires.length }})</label>
+    <!-- Mode Selection -->
+    <div class="mode-switch">
+      <label>
+        <input type="radio" name="mode" [(ngModel)]="broadcastType" value="single">
+        Individuel
+      </label>
+      <label>
+        <input type="radio" name="mode" [(ngModel)]="broadcastType" value="group">
+        Groupe
+      </label>
+      <label>
+        <input type="radio" name="mode" [(ngModel)]="broadcastType" value="all">
+        Tous
+      </label>
+    </div>
+
+    <!-- Search -->
+    <input
+      *ngIf="broadcastType !== 'all'"
+      type="text"
+      placeholder="🔍 Rechercher un bénéficiaire..."
+      [(ngModel)]="recherche"
+      (input)="filtrerBeneficiaires()"
+      class="search-input"
+    />
+
+    <form #notificationForm="ngForm"
+      (ngSubmit)="
+        broadcastType === 'all'
+          ? envoyerBroadcast()
+          : broadcastType === 'group'
+          ? envoyerGroupe()
+          : envoyerNotification()
+      "
+    >
+
+      <!-- SINGLE SELECT -->
+      <div *ngIf="broadcastType === 'single'">
+        <label>Bénéficiaire :</label>
+        <select
+          [(ngModel)]="notification.idBeneficiaire"
+          name="beneficiaire"
+          required
+        >
+          <option *ngFor="let b of beneficiairesFiltres" [value]="b._id">
+            {{ b.name }} {{ b.lastname }} ({{ b.email }})
+          </option>
+        </select>
       </div>
 
-      <!-- Search Bar (hidden in broadcast mode) -->
+      <!-- MULTI SELECT -->
+      <div *ngIf="broadcastType === 'group'" class="multi-select-box">
+        <label>Sélectionner les bénéficiaires :</label>
+
+        <div class="checkbox-list">
+          <label *ngFor="let b of beneficiairesFiltres">
+            <input
+              type="checkbox"
+              [value]="b._id"
+              (change)="toggleBeneficiary(b._id, $event)"
+            />
+            {{ b.name }} {{ b.lastname }}
+          </label>
+        </div>
+
+        <div class="selected-count">
+          ✔ {{ selectedBeneficiaries.length }} sélectionné(s)
+        </div>
+      </div>
+
+      <!-- Title -->
+      <label>Titre :</label>
       <input
-        *ngIf="!isBroadcastMode"
         type="text"
-        placeholder="Rechercher un bénéficiaire..."
-        [(ngModel)]="recherche"
-        (input)="filtrerBeneficiaires()"
-        class="search-input"
+        [(ngModel)]="notification.titre"
+        name="titre"
+        required
+        minlength="3"
       />
 
-      <form #notificationForm="ngForm" (ngSubmit)="isBroadcastMode ? envoyerBroadcast() : envoyerNotification()">
-        <!-- Beneficiary Select (hidden in broadcast mode) -->
-        <div *ngIf="!isBroadcastMode">
-          <label for="beneficiaire">Sélectionner un Bénéficiaire :</label>
-          <select
-            id="beneficiaire"
-            [(ngModel)]="notification.idBeneficiaire"
-            name="beneficiaire"
-            required
-          >
-            <option *ngFor="let b of beneficiairesFiltres" [value]="b._id">
-              {{ b.name }} {{ b.lastname }} ({{ b.email }})
-            </option>
-          </select>
-        </div>
+      <!-- Content -->
+      <label>Contenu :</label>
+      <textarea
+        rows="4"
+        [(ngModel)]="notification.contenu"
+        name="contenu"
+        required
+      ></textarea>
 
-        <!-- Common Fields -->
-        <label for="titre">Titre :</label>
-        <input
-          id="titre"
-          type="text"
-          [(ngModel)]="notification.titre"
-          name="titre"
-          required
-          minlength="3"
-          maxlength="100"
-          pattern="^[A-Za-zÀ-ÿ0-9 ,.'\-!?()]+$"
-          #titre="ngModel"
-        />
-        <div *ngIf="titre.invalid && (titre.dirty || titre.touched)" class="validation-error">
-          <div *ngIf="titre.errors?.['required']">Le titre est requis.</div>
-          <div *ngIf="titre.errors?.['minlength']">Le titre doit contenir au moins 3 caractères.</div>
-          <div *ngIf="titre.errors?.['maxlength']">Le titre ne doit pas dépasser 100 caractères.</div>
-          
-        </div>
-
-        <label for="contenu">Contenu :</label>
-        <textarea id="contenu" [(ngModel)]="notification.contenu" name="contenu" required minlength="5" maxlength="500" pattern="^[A-Za-zÀ-ÿ0-9 ,.'\-!?()]+$" #contenu="ngModel" cols="50" rows="4"></textarea>
-        <div *ngIf="contenu.invalid && (contenu.dirty || contenu.touched)" class="validation-error">
-          <div *ngIf="contenu.errors?.['required']">Le contenu est requis.</div>
-          <div *ngIf="contenu.errors?.['minlength']">Le contenu doit contenir au moins 5 caractères.</div>
-          <div *ngIf="contenu.errors?.['maxlength']">Le contenu ne doit pas dépasser 500 caractères.</div>
-        </div>
-
-        <button class="btn-blue" type="submit" [disabled]="notificationForm.invalid || (isBroadcastMode && listeBeneficiaires.length === 0)">
-          <i class="fas" [class.fa-paper-plane]="!isBroadcastMode" [class.fa-bullhorn]="isBroadcastMode"></i>
-          {{ isBroadcastMode ? 'Diffuser à tous' : 'Envoyer' }}
-        </button>
-      </form>
-    </div>
+      <button class="btn-blue" type="submit"
+        [disabled]="
+          notificationForm.invalid ||
+          (broadcastType === 'group' && selectedBeneficiaries.length === 0)
+        "
+      >
+        <i class="fas fa-paper-plane"></i>
+        Envoyer
+      </button>
+    </form>
   </div>
+</div>
+
 </div>

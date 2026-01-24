@@ -10,8 +10,9 @@ import Swal from 'sweetalert2';
   styleUrls: ['./gestion-notification.component.css'],
 })
 export class GestionNotificationComponent implements OnInit {
+  broadcastType: 'single' | 'group' | 'all' = 'single';
+  selectedBeneficiaries: string[] = [];
   isBroadcastMode = false;
-  broadcastType = 'all';
   broadcastGroup = '';
   message: string = '';
   beneficiaryGroups: any[] = [];
@@ -210,6 +211,47 @@ envoyerBroadcast(): void {
     this.message = `✅ ${msg}`;
     setTimeout(() => this.message = '', 5000);
   }
+
+  toggleBeneficiary(id: string, event: any): void {
+  if (event.target.checked) {
+    this.selectedBeneficiaries.push(id);
+  } else {
+    this.selectedBeneficiaries = this.selectedBeneficiaries.filter(b => b !== id);
+  }
+}
+
+envoyerGroupe(): void {
+  if (this.selectedBeneficiaries.length === 0) {
+    Swal.fire('Erreur', 'Aucun bénéficiaire sélectionné', 'error');
+    return;
+  }
+
+  const requests = this.selectedBeneficiaries.map(id => {
+    return this.notificationService.sendNotification({
+      idBeneficiaire: id,
+      titre: this.notification.titre,
+      contenu: this.notification.contenu
+    });
+  });
+
+  Promise.all(requests.map(r => r.toPromise()))
+    .then(() => {
+      Swal.fire({
+        icon: 'success',
+        title: 'Succès',
+        text: 'Notification envoyée au groupe',
+        timer: 4000
+      });
+      this.resetForm();
+      this.loadStatistics();
+    })
+    .catch(err => {
+      console.error(err);
+      Swal.fire('Erreur', 'Erreur lors de l’envoi au groupe', 'error');
+    });
+}
+
+
 
   private showError(msg: string): void {
     this.message = `❌ ${msg}`;
