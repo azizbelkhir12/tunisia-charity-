@@ -75,6 +75,37 @@
   background: #f8f9fa;
 }
 
+
+/**********************************/
+/*********** Translation button CSS **********/
+/**********************************/
+.dropdown  {
+  border-radius: 20px;
+  background-color:#ffc107 ;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.dropdown .btn-outline-light:hover {
+  background-color: #ffc107;
+  color: #000;
+}
+
+.dropdown-menu {
+  background-color: #222;
+  border: none;
+}
+
+.dropdown-item {
+  color: #222;
+}
+
+.dropdown-item:hover {
+  background-color: #ffc107;
+  color: #000;
+}
+
+
 /* Responsive Adjustments */
 @media (max-width: 991.98px) {
   .navbar .navbar-brand img {

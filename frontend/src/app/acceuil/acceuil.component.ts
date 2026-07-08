@@ -7,12 +7,9 @@ import { BeneficiaryService } from '../services/beneficiary/beneficiary.service'
 import { VolunteerService } from '../services/volunteer/volunteer.service';
 import { DonorsService } from '../services/donors/donors.service';
 import { TranslateService } from '@ngx-translate/core';
-
-
 import '@n8n/chat/style.css';
 import { createChat } from '@n8n/chat';
 import Swal from 'sweetalert2';
-//import { ScriptsService } from '../services/scripts.service';
 
 @Component({
   selector: 'app-acceuil',

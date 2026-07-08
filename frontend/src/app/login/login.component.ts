@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '../services/auth/auth.service';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-login',
@@ -9,7 +10,7 @@ import { AuthService } from '../services/auth/auth.service';
   styleUrl: './login.component.css'
 })
 export class LoginComponent {
-  constructor(private router: Router, private AuthService: AuthService) {}
+  constructor(private router: Router, private AuthService: AuthService, private translate: TranslateService) {}
 
   activeTab = 0; // Default active tab
 
@@ -35,6 +36,16 @@ export class LoginComponent {
   setActiveTab(index: number) {
     this.activeTab = index;
     this.loginData.userType = this.tabs[index].userType;
+  }
+
+  changeLang(lang: string) {
+    this.translate.use(lang);
+  }
+
+  translatePage(lang: string) {
+    this.translate.use(lang);
+    localStorage.setItem('lang', lang);
+    document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
   }
 
   // Form submissions

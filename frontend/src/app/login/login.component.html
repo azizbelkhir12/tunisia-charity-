@@ -6,8 +6,10 @@
       <!-- Tabs -->
       <ul class="nav nav-pills nav-justified">
         <li class="nav-item" *ngFor="let tab of tabs; let i = index">
-          <a class="nav-link" [ngClass]="{ active: activeTab === i }" (click)="setActiveTab(i)">
-            {{ tab.title }}
+          <a class="nav-link"
+            [ngClass]="{ active: activeTab === i }"
+            (click)="setActiveTab(i)">
+            {{ ('TABS.' + tab.title) | translate }}
           </a>
         </li>
       </ul>
@@ -19,23 +21,23 @@
 
             <!-- Volunteer Login Tab -->
             <ng-container *ngIf="tab.userType === 'volunteer'">
-              <h3 class="login-title">Espace de connexion des bénévoles</h3>
+              <h3 class="login-title">{{ 'LOGIN.VOLUNTEER_TITLE' | translate }}</h3>
               <section class="login-section">
                 <div class="row login-container">
                   <div class="col-md-6 form-column">
                     <form #loginForm="ngForm" (ngSubmit)="submitLogin()" class="login-form">
-                      <input type="email" placeholder="Entrez votre adresse e-mail" class="form-input" [(ngModel)]="loginData.email" name="email" required />
-                      <input type="password" placeholder="Mot de passe" class="form-input" [(ngModel)]="loginData.password" name="password" required />
-                      <button type="submit" class="submit-btn" [disabled]="loginForm.invalid">Se connecter</button>
+                      <input type="email" [placeholder]="'LOGIN.EMAIL_PLACEHOLDER' | translate" class="form-input" [(ngModel)]="loginData.email" name="email" required />
+                      <input type="password" [placeholder]="'LOGIN.PASSWORD_PLACEHOLDER' | translate" class="form-input" [(ngModel)]="loginData.password" name="password" required />
+                      <button type="submit" class="submit-btn" [disabled]="loginForm.invalid">{{ 'LOGIN.LOGIN_BTN' | translate }}</button>
                       <div class="error-message">{{ loginErrorMsg }}</div>
-                      <a routerLink="/forgot-password">Mot de passe oublié ?</a>
+                      <a routerLink="/forgot-password">{{ 'LOGIN.FORGOT_PASSWORD' | translate }}</a>
                     </form>
                   </div>
                   <div class="col-md-6 info-column">
                     <div class="login-info">
-                      <h4>Nouveau sur notre site ?</h4>
-                      <p>Rejoignez notre communauté de bénévoles et faites la différence dans la vie des personnes dans le besoin.</p>
-                      <a routerLink="/benevolat" class="info-btn">S'inscrire</a>
+                      <h4>{{ 'LOGIN.NEW_HERE' | translate }}</h4>
+                      <p>{{ 'LOGIN.JOIN_VOLUNTEERS' | translate }}</p>
+                      <a routerLink="/benevolat" class="info-btn">{{ 'LOGIN.SIGNUP' | translate }}</a>
                     </div>
                   </div>
                 </div>
@@ -44,23 +46,23 @@
 
             <!-- Donor Login Tab -->
             <ng-container *ngIf="tab.userType === 'donor'">
-              <h3 class="login-title">Espace de connexion des donateurs</h3>
+              <h3 class="login-title">{{ 'LOGIN.DONOR_TITLE' | translate }}</h3>
               <section class="login-section">
                 <div class="row login-container">
                   <div class="col-md-6 form-column">
                     <form #donationForm="ngForm" (ngSubmit)="submitLogin()" class="login-form">
-                      <input type="email" placeholder="Entrer votre Email" class="form-input" [(ngModel)]="loginData.email" name="email" required />
-                      <input type="password" placeholder="Entrer mot de passe" class="form-input" [(ngModel)]="loginData.password" name="password" required />
-                      <button type="submit" class="submit-btn" [disabled]="donationForm.invalid">Se connecter</button>
+                      <input type="email" [placeholder]="'LOGIN.EMAIL_PLACEHOLDER' | translate" class="form-input" [(ngModel)]="loginData.email" name="email" required />
+                      <input type="password" [placeholder]="'LOGIN.PASSWORD_PLACEHOLDER' | translate" class="form-input" [(ngModel)]="loginData.password" name="password" required />
+                      <button type="submit" class="submit-btn" [disabled]="donationForm.invalid">{{ 'LOGIN.LOGIN_BTN' | translate }}</button>
                       <div class="error-message">{{ loginErrorMsg }}</div>
-                      <a routerLink="/forgot-password">Mot de passe oublié ?</a>
+                      <a routerLink="/forgot-password">{{ 'LOGIN.FORGOT_PASSWORD' | translate }}</a>
                     </form>
                   </div>
                   <div class="col-md-6 info-column">
                     <div class="login-info">
-                      <h4>Faites la différence !</h4>
-                      <p>Votre don peut nous aider à fournir des ressources essentielles à ceux qui en ont besoin. Chaque contribution compte.</p>
-                      <a routerLink="/register" class="info-btn">S'inscrire</a>
+                      <h4>{{ 'LOGIN.MAKE_DIFFERENCE' | translate }}</h4>
+                      <p>{{ 'LOGIN.DONOR_TEXT' | translate }}</p>
+                      <a routerLink="/register" class="info-btn">{{ 'LOGIN.SIGNUP' | translate }}</a>
                     </div>
                   </div>
                 </div>
@@ -69,22 +71,22 @@
 
             <!-- Beneficiary Login Tab -->
             <ng-container *ngIf="tab.userType === 'beneficiary'">
-              <h3 class="login-title">Espace de connexion des bénéficiaires</h3>
+              <h3 class="login-title">{{ 'LOGIN.BENEFICIARY_TITLE' | translate }}</h3>
               <section class="login-section">
                 <div class="row login-container">
                   <div class="col-md-6 form-column">
                     <form #contactForm="ngForm" (ngSubmit)="submitLogin()" class="login-form">
-                      <input type="email" placeholder="Votre email" class="form-input" [(ngModel)]="loginData.email" name="email" required />
-                      <input type="password" placeholder="Entrer votre mot de passe" class="form-input" [(ngModel)]="loginData.password" name="password" required />
-                      <button type="submit" class="submit-btn" [disabled]="contactForm.invalid">Connexion</button>
+                      <input type="email" [placeholder]="'LOGIN.EMAIL_PLACEHOLDER' | translate" class="form-input" [(ngModel)]="loginData.email" name="email" required />
+                      <input type="password" [placeholder]="'LOGIN.PASSWORD_PLACEHOLDER' | translate" class="form-input" [(ngModel)]="loginData.password" name="password" required />
+                      <button type="submit" class="submit-btn" [disabled]="contactForm.invalid">{{ 'LOGIN.LOGIN_BTN' | translate }}</button>
                       <div class="error-message">{{ loginErrorMsg }}</div>
-                      <a routerLink="/forgot-password">Mot de passe oublié ?</a>
+                      <a routerLink="/forgot-password">{{ 'LOGIN.FORGOT_PASSWORD' | translate }}</a>
                     </form>
                   </div>
                   <div class="col-md-6 info-column">
                     <div class="login-info">
-                      <h4>Besoin d'aide ?</h4>
-                      <p>Nous sommes là pour vous aider. Connectez-vous pour accéder aux ressources disponibles ou contactez-nous pour plus d'informations.</p>
+                      <h4>{{ 'LOGIN.NEED_HELP' | translate }}</h4>
+                      <p>{{ 'LOGIN.BENEFICIARY_TEXT' | translate }}</p>
                     </div>
                   </div>
                 </div>

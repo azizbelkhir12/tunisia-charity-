@@ -77,5 +77,94 @@
     "FR": "Français",
     "EN": "English",
     "AR": "العربية"
+  },
+
+
+
+  
+  "CONTACT-PAGE": {
+    "TITLE": "Contact us",
+    "SUBTITLE": "We would love to hear from you",
+    "INFORMATIONS": "Information",
+    "ASSOCIATION": "Association",
+    "ADDRESS": "Address",
+    "PHONE": "Phone",
+    "EMAIL": "Email",
+    "WORK_HOURS": "Working hours"
+  },
+
+
+  
+  "VOLUNTEER": {
+    "TITLE": "Volunteer with us",
+    "SIGNUP": "Signup",
+    "NEW_HERE": "New on our website?",
+    "NEW_HERE_TEXT": "Register now and help others, share beauty, love and emotions through charity!",
+    "LOGIN": "Login"
+  },
+
+  "FORM": {
+    "NAME": "Last name",
+    "FIRSTNAME": "First name",
+    "AGE": "Age",
+    "EMAIL": "Email address",
+    "PASSWORD": "Password",
+    "CONFIRM_PASSWORD": "Confirm password",
+    "ADDRESS": "Full address",
+    "GOVERNORATE": "Choose a governorate",
+    "PHONE": "Phone number",
+    "REASON": "Why do you want to join us?"
+  },
+
+  "OTP": {
+    "TITLE": "Email verification",
+    "SENT": "An OTP code was sent to",
+    "INSTRUCTION": "Please enter it below to confirm your registration.",
+    "PLACEHOLDER": "Enter OTP code",
+    "VERIFY": "Verify",
+    "CANCEL": "Cancel"
+  },
+
+  "ERRORS": {
+    "REQUIRED": "This field is required",
+    "MIN_3": "Minimum 3 characters",
+    "MAX_50": "Maximum 50 characters",
+    "EMAIL_INVALID": "Invalid email format",
+    "AGE_MIN": "You must be at least 18 years old",
+    "AGE_MAX": "Age cannot exceed 99",
+    "PASSWORD_MATCH": "Passwords do not match"
+  },
+
+
+  
+  "TABS": {
+    "VOLUNTEER": "Volunteer",
+    "DONOR": "Donor",
+    "BENEFICIARY": "Beneficiary"
+  },
+
+  "LOGIN": {
+    "VOLUNTEER_TITLE": "Volunteer login area",
+    "DONOR_TITLE": "Donor login area",
+    "BENEFICIARY_TITLE": "Beneficiary login area",
+
+    "EMAIL_PLACEHOLDER": "Enter your email address",
+    "PASSWORD_PLACEHOLDER": "Password",
+    "LOGIN_BTN": "Login",
+    "LOGIN_SIMPLE": "Login",
+    "FORGOT_PASSWORD": "Forgot password?",
+
+    "NEW_HERE": "New to our website?",
+    "JOIN_VOLUNTEERS": "Join our volunteer community and make a difference in the lives of people in need.",
+    "SIGNUP": "Sign up",
+
+    "MAKE_DIFFERENCE": "Make a difference!",
+    "DONOR_TEXT": "Your donation helps us provide essential resources to those in need. Every contribution counts.",
+
+    "NEED_HELP": "Need help?",
+    "BENEFICIARY_TEXT": "We are here to help you. Log in to access available resources or contact us for more information."
   }
+
+
+
 }

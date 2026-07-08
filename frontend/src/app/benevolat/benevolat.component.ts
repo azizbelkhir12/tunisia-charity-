@@ -4,6 +4,7 @@ import { PatternValidatorsService } from '../services/patternValidators/patern-v
 import { ConfirmPasswordService } from '../services/confirm-password/confirm-password.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { DemandeService } from '../services/demande/demande.service';
+import { TranslateService } from '@ngx-translate/core';
 import Swal from 'sweetalert2';
 
 @Component({
@@ -26,7 +27,7 @@ export class BenevolatComponent {
 
 
 
-  constructor(private router: Router, private activatedRoute: ActivatedRoute, private demandeService: DemandeService) { }
+  constructor(private router: Router, private activatedRoute: ActivatedRoute, private demandeService: DemandeService, private translate: TranslateService) { }
 
   signupForm: FormGroup = new FormGroup({
     name: new FormControl('', [
@@ -86,6 +87,16 @@ export class BenevolatComponent {
 
   ngOnInit() {
     this.path = this.router.url;
+  }
+
+  changeLang(lang: string) {
+    this.translate.use(lang);
+  }
+
+  translatePage(lang: string) {
+    this.translate.use(lang);
+    localStorage.setItem('lang', lang);
+    document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
   }
 
   submit() {

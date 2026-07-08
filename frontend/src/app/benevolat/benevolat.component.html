@@ -5,7 +5,8 @@
   <div class="tab-content">
     <!-- Tab 1 Content -->
     <div id="tab-content-1" class="container" >
-        <h1 class="title">Faire de bénévolat avec nous</h1>
+        <h1 class="title">{{ 'VOLUNTEER.TITLE' | translate }}</h1>
+    
 
       <!-- Signup Section -->
       <section class="contact login_box_area" id="contact">
@@ -13,7 +14,7 @@
           <!-- Form -->
           <form [formGroup]="signupForm" class="form-container">
             <!-- Name Field -->
-            <input type="text" placeholder="Nom" class="box" formControlName="name" />
+            <input type="text" [placeholder]="'FORM.NAME' | translate" class="box" formControlName="name" />
             <div *ngIf="signupForm.get('name')?.invalid && (signupForm.get('name')?.dirty || signupForm.get('name')?.touched)" class="errorMsg">
               <div *ngIf="signupForm.get('name')?.errors?.['required']">Name is required</div>
               <div *ngIf="signupForm.get('name')?.errors?.['minlength']">Must be at least 3 characters</div>
@@ -21,7 +22,7 @@
             </div> <br>
 
             <!-- First Name Field -->
-            <input type="text" placeholder="Prénom" class="box" formControlName="Prenom">
+            <input type="text" [placeholder]="'FORM.FIRSTNAME' | translate" class="box" formControlName="Prenom">
             <div *ngIf="signupForm.get('Prenom')?.invalid && (signupForm.get('Prenom')?.dirty || signupForm.get('Prenom')?.touched)" class="errorMsg">
               <div *ngIf="signupForm.get('Prenom')?.errors?.['required']">Prénom is required</div>
               <div *ngIf="signupForm.get('Prenom')?.errors?.['minlength']">Must be at least 3 characters</div>
@@ -29,7 +30,7 @@
             </div> <br>
 
             <!-- Age Field -->
-            <input type="number" placeholder="Âge" class="box" formControlName="age" min="18" max="99">
+            <input type="number" [placeholder]="'FORM.AGE' | translate" class="box" formControlName="age" min="18" max="99">
             <div *ngIf="signupForm.get('age')?.invalid && (signupForm.get('age')?.dirty || signupForm.get('age')?.touched)" class="errorMsg">
               <div *ngIf="signupForm.get('age')?.errors?.['required']">Age is required</div>
               <div *ngIf="signupForm.get('age')?.errors?.['min']">You must be at least 18 years old</div>
@@ -37,7 +38,7 @@
             </div> <br>
 
             <!-- Email Field -->
-            <input type="email" placeholder="Email Address" formControlName="email" class="box">
+            <input type="email" [placeholder]="'FORM.EMAIL' | translate" formControlName="email" class="box">
             <span class="errorMsg">{{errorMsg}}</span>
             <div *ngIf="signupForm.get('email')?.invalid && (signupForm.get('email')?.dirty || signupForm.get('email')?.touched)" class="errorMsg">
               <div *ngIf="signupForm.get('email')?.errors?.['required']">Email is required</div>
@@ -45,7 +46,7 @@
             </div> <br>
 
             <!-- Password Field -->
-            <input type="password" placeholder="Mot De Passe " class="box" formControlName="password">
+            <input type="password" [placeholder]="'FORM.PASSWORD' | translate" class="box" formControlName="password">
             <div class="form-group" *ngIf="signupForm.get('password')?.invalid && (signupForm.get('password')?.dirty || signupForm.get('password')?.touched)">
               <label class="col invalid_msg" [ngClass]="signupForm.get('password')?.errors?.['required'] && signupForm.get('password')?.touched ? 'text-danger': 'text-success'">
                 <i class="material-icons">{{ signupForm.get('password')?.errors?.['required'] && signupForm.get('password')?.touched ? 'cancel': 'check_circle' }}</i>
@@ -74,7 +75,7 @@
             </div> <br>
 
             <!-- Confirm Password Field -->
-            <input type="password" placeholder="Confirmation mot de passe" class="box" formControlName="confirmPassword">
+            <input type="password" [placeholder]="'FORM.CONFIRM_PASSWORD' | translate" class="box" formControlName="confirmPassword">
             <div *ngIf="signupForm.get('confirmPassword')?.invalid && (signupForm.get('confirmPassword')?.dirty || signupForm.get('confirmPassword')?.touched)" class="errorMsg">
               <div *ngIf="signupForm.get('confirmPassword')?.errors?.['required']">Confirm Password is required</div>
               <div *ngIf="signupForm.get('confirmPassword')?.errors?.['notMatching']">Passwords do not match</div>
@@ -84,7 +85,7 @@
 
 
             <!-- Address Field -->
-            <input type="text" placeholder="Addresse complete " class="box" formControlName="address">
+            <input type="text" [placeholder]="'FORM.ADDRESS' | translate" class="box" formControlName="address">
             <div *ngIf="signupForm.get('address')?.invalid && (signupForm.get('address')?.dirty || signupForm.get('address')?.touched)" class="errorMsg">
               <div *ngIf="signupForm.get('address')?.errors?.['required']">Address is required</div>
               <div *ngIf="signupForm.get('address')?.errors?.['minlength']">Address must be at least 5 characters</div>
@@ -104,14 +105,14 @@
             </div> <br>
 
             <!-- Phone Field -->
-            <input type="tel" placeholder="Num de téléphone" class="box" formControlName="phone">
+            <input type="tel" [placeholder]="'FORM.PHONE' | translate" class="box" formControlName="phone">
             <div *ngIf="signupForm.get('phone')?.invalid && (signupForm.get('phone')?.dirty || signupForm.get('phone')?.touched)" class="errorMsg">
               <div *ngIf="signupForm.get('phone')?.errors?.['required']">Phone number is required</div>
               <div *ngIf="signupForm.get('phone')?.errors?.['pattern']">Invalid phone number (must start with +216 and have 8 digits)</div>
             </div> <br>
 
             <form *ngIf="signupForm" [formGroup]="signupForm">
-              <textarea formControlName="reason" placeholder="Pourquoi vous voulez nous rejoindre ?" rows="3" class="textarea-box"></textarea>
+              <textarea formControlName="reason" [placeholder]="'FORM.REASON' | translate" rows="3" class="textarea-box"></textarea>
               <div *ngIf="signupForm.get('reason')?.invalid && (signupForm.get('reason')?.dirty || signupForm.get('reason')?.touched)" class="errorMsg">
                 <div *ngIf="signupForm.get('reason')?.errors?.['required']">This field is required</div>
                 <div *ngIf="signupForm.get('reason')?.errors?.['minlength']">Must be at least 10 characters</div>
@@ -130,14 +131,14 @@
          <!-- OTP Modal -->
 <div class="otp-modal" *ngIf="showOtpModal">
   <div class="otp-modal-content">
-    <h2>Vérification de l'email</h2>
-    <p>Un code OTP a été envoyé à <strong>{{ userEmail }}</strong>.</p>
-    <p>Veuillez le saisir ci-dessous pour confirmer votre inscription.</p>
+    <h2>{{ 'OTP.TITLE' | translate }}</h2>
+    <p>{{ 'OTP.SENT' | translate }} <strong>{{ userEmail }}</strong>.</p>
+    <p>{{ 'OTP.INSTRUCTION' | translate }}</p>
 
     <input
       type="text"
       maxlength="6"
-      placeholder="Entrez le code OTP"
+      [placeholder]="'OTP.PLACEHOLDER' | translate"
       [(ngModel)]="otpCode"
       class="otp-input"
     />
@@ -156,11 +157,11 @@
             <div class="login_box_img">
               <img class="img-fluid" src="assets/register.png" alt="">
               <div class="hover">
-                <h4>Nouveau sur notre site ?</h4>
+                <h4>{{ 'VOLUNTEER.NEW_HERE' | translate }}</h4>
                 <p>
-                  Inscrivez-vous dès maintenant et aidez les autres, partagez la beauté, l’amour et les émotions à travers la charité !
+                  {{ 'VOLUNTEER.NEW_HERE_TEXT' | translate }}
                 </p>
-                <span><a routerLink="/login" class="btn-Flower">Connexion</a></span>
+                <span><a routerLink="/login" class="btn-Flower">{{ 'VOLUNTEER.LOGIN' | translate }}</a></span>
               </div>
             </div>
           </div>

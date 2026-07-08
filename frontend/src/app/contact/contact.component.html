@@ -1,56 +1,57 @@
 <app-navbar></app-navbar>
 
 <div class="contact-page">
-    <div class="contact-header">
-      <h1>Contactez-nous</h1>
-      <p>Nous aimerions avoir de vos nouvelles</p>
-    </div>
-  
-    <div class="contact-container">
-      <div class="contact-info">
-        <h2>Infomartions</h2>
-        
-        <div class="info-item">
-          <i class="fas fa-building"></i>
-          <div>
-            <h3>Association</h3>
-            <p>{{contactInfo.company}}</p>
-          </div>
-        </div>
-  
-        <div class="info-item">
-          <i class="fas fa-map-marker-alt"></i>
-          <div>
-            <h3>Addresse</h3>
-            <p>{{contactInfo.address}}</p>
-          </div>
-        </div>
-  
-        <div class="info-item">
-          <i class="fas fa-phone-alt"></i>
-          <div>
-            <h3>Telephone</h3>
-            <p>{{contactInfo.phone}}</p>
-          </div>
-        </div>
-  
-        <div class="info-item">
-          <i class="fas fa-envelope"></i>
-          <div>
-            <h3>Email</h3>
-            <p>{{contactInfo.email}}</p>
-          </div>
-        </div>
-  
-        <div class="info-item" *ngIf="contactInfo.hours">
-          <i class="fas fa-clock"></i>
-          <div>
-            <h3>Horaire de travail</h3>
-            <p>{{contactInfo.hours}}</p>
-          </div>
+  <div class="contact-header">
+    <h1>{{ 'CONTACT-PAGE.TITLE' | translate }}</h1>
+    <p>{{ 'CONTACT-PAGE.SUBTITLE' | translate }}</p>
+  </div>
+
+  <div class="contact-container">
+    <div class="contact-info">
+      <h2>{{ 'CONTACT-PAGE.INFORMATIONS' | translate }}</h2>
+
+      <div class="info-item">
+        <i class="fas fa-building"></i>
+        <div>
+          <h3>{{ 'CONTACT-PAGE.ASSOCIATION' | translate }}</h3>
+          <p>{{ contactInfo.company }}</p>
         </div>
       </div>
-    </div> 
+
+      <div class="info-item">
+        <i class="fas fa-map-marker-alt"></i>
+        <div>
+          <h3>{{ 'CONTACT-PAGE.ADDRESS' | translate }}</h3>
+          <p>{{ contactInfo.address }}</p>
+        </div>
+      </div>
+
+      <div class="info-item">
+        <i class="fas fa-phone-alt"></i>
+        <div>
+          <h3>{{ 'CONTACT-PAGE.PHONE' | translate }}</h3>
+          <p>{{ contactInfo.phone }}</p>
+        </div>
+      </div>
+
+      <div class="info-item">
+        <i class="fas fa-envelope"></i>
+        <div>
+          <h3>{{ 'CONTACT-PAGE.EMAIL' | translate }}</h3>
+          <p>{{ contactInfo.email }}</p>
+        </div>
+      </div>
+
+      <div class="info-item" *ngIf="contactInfo.hours">
+        <i class="fas fa-clock"></i>
+        <div>
+          <h3>{{ 'CONTACT-PAGE.WORK_HOURS' | translate }}</h3>
+          <p>{{ contactInfo.hours }}</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
 </div>
 
 <app-footer></app-footer>

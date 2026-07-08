@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-contact',
@@ -16,5 +17,16 @@ export class ContactComponent {
     hours: "Lundi - Vendredi: 9:00  - 17:00 ",
   
   };
+  constructor(private translate: TranslateService) { }
+
+  changeLang(lang: string) {
+    this.translate.use(lang);
+  }
+
+  translatePage(lang: string) {
+    this.translate.use(lang);
+    localStorage.setItem('lang', lang);
+    document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
+  }
 
 }

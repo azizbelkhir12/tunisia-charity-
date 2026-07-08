@@ -77,5 +77,101 @@
     "FR": "Français",
     "EN": "English",
     "AR": "العربية"
+  },
+
+
+
+  
+  "CONTACT-PAGE": {
+    "TITLE": "Contactez-nous",
+    "SUBTITLE": "Nous aimerions avoir de vos nouvelles",
+    "INFORMATIONS": "Informations",
+    "ASSOCIATION": "Association",
+    "ADDRESS": "Adresse",
+    "PHONE": "Téléphone",
+    "EMAIL": "Email",
+    "WORK_HOURS": "Horaire de travail"
+  },
+
+
+  
+  "VOLUNTEER": {
+    "TITLE": "Faire du bénévolat avec nous",
+    "SIGNUP": "S'inscrire",
+    "NEW_HERE": "Nouveau sur notre site ?",
+    "NEW_HERE_TEXT": "Inscrivez-vous dès maintenant et aidez les autres, partagez la beauté, l’amour et les émotions à travers la charité !",
+    "LOGIN": "Connexion"
+  },
+
+  "FORM": {
+    "NAME": "Nom",
+    "FIRSTNAME": "Prénom",
+    "AGE": "Âge",
+    "EMAIL": "Adresse email",
+    "PASSWORD": "Mot de passe",
+    "CONFIRM_PASSWORD": "Confirmation du mot de passe",
+    "ADDRESS": "Adresse complète",
+    "GOVERNORATE": "Choisir un gouvernorat",
+    "PHONE": "Numéro de téléphone",
+    "REASON": "Pourquoi voulez-vous nous rejoindre ?"
+  },
+
+  "OTP": {
+    "TITLE": "Vérification de l'email",
+    "SENT": "Un code OTP a été envoyé à",
+    "INSTRUCTION": "Veuillez le saisir ci-dessous pour confirmer votre inscription.",
+    "PLACEHOLDER": "Entrez le code OTP",
+    "VERIFY": "Vérifier",
+    "CANCEL": "Annuler"
+  },
+
+  "ERRORS": {
+    "REQUIRED": "Ce champ est obligatoire",
+    "MIN_3": "Minimum 3 caractères",
+    "MAX_50": "Maximum 50 caractères",
+    "EMAIL_INVALID": "Format de l’email invalide",
+    "AGE_MIN": "Vous devez avoir au moins 18 ans",
+    "AGE_MAX": "L'âge ne doit pas dépasser 99",
+    "PASSWORD_MATCH": "Les mots de passe ne correspondent pas"
+  },
+
+
+  
+  "TABS": {
+    "VOLUNTEER": "Bénévole",
+    "DONOR": "Donateur",
+    "BENEFICIARY": "Bénéficiaire"
+  },
+
+  "LOGIN": {
+    "VOLUNTEER_TITLE": "Espace de connexion des bénévoles",
+    "DONOR_TITLE": "Espace de connexion des donateurs",
+    "BENEFICIARY_TITLE": "Espace de connexion des bénéficiaires",
+
+    "EMAIL_PLACEHOLDER": "Entrez votre adresse e-mail",
+    "PASSWORD_PLACEHOLDER": "Mot de passe",
+    "LOGIN_BTN": "Se connecter",
+    "LOGIN_SIMPLE": "Connexion",
+    "FORGOT_PASSWORD": "Mot de passe oublié ?",
+
+    "NEW_HERE": "Nouveau sur notre site ?",
+    "JOIN_VOLUNTEERS": "Rejoignez notre communauté de bénévoles et faites la différence dans la vie des personnes dans le besoin.",
+    "SIGNUP": "S'inscrire",
+
+    "MAKE_DIFFERENCE": "Faites la différence !",
+    "DONOR_TEXT": "Votre don peut nous aider à fournir des ressources essentielles à ceux qui en ont besoin. Chaque contribution compte.",
+
+    "NEED_HELP": "Besoin d'aide ?",
+    "BENEFICIARY_TEXT": "Nous sommes là pour vous aider. Connectez-vous pour accéder aux ressources disponibles ou contactez-nous pour plus d'informations."
   }
+
+
+
+
+
 }
+
+
+
+
+
