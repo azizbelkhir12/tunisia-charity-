@@ -1,220 +1,507 @@
-import { Component } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { HttpClient } from '@angular/common/http';
+import {
+  AfterViewInit,
+  ChangeDetectorRef,
+  Component,
+  ElementRef,
+  OnDestroy,
+  QueryList,
+  ViewChildren,
+} from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { forkJoin } from 'rxjs';
+import { finalize } from 'rxjs/operators';
+import {
+  ArrowRight,
+  BookOpen,
+  Facebook,
+  HandHeart,
+  Heart,
+  Instagram,
+  LucideAngularModule,
+  Mail,
+  MapPin,
+  Menu,
+  Phone,
+  Sparkles,
+  Stethoscope,
+  Twitter,
+  Users,
+  Utensils,
+  X,
+} from 'lucide-angular';
 import { ContactService } from '../services/contact/contact.service';
 import { ProjetService } from '../services/projet/projet.service';
 import { BeneficiaryService } from '../services/beneficiary/beneficiary.service';
 import { VolunteerService } from '../services/volunteer/volunteer.service';
 import { DonorsService } from '../services/donors/donors.service';
-import { TranslateService } from '@ngx-translate/core';
-import '@n8n/chat/style.css';
-import { createChat } from '@n8n/chat';
 import Swal from 'sweetalert2';
+
+type NavItem = {
+  label: string;
+  href: string;
+};
+
+type IconCard = {
+  icon: string;
+  title: string;
+  text: string;
+};
+
+type ActionCard = IconCard & {
+  img: string;
+};
+
+interface Stat {
+  value: number;
+  label: string;
+  suffix: string;
+  display: number;
+  started: boolean;
+};
+
+type Project = {
+  img: string;
+  tag: string;
+  title: string;
+  text: string;
+  progress: number;
+};
+
+
 
 @Component({
   selector: 'app-acceuil',
   standalone: false,
   templateUrl: './acceuil.component.html',
-  styleUrl: './acceuil.component.css'
+  styleUrl: './acceuil.component.css',
 })
-export class AcceuilComponent {
-  scriptsService: any;
-  successMessage: string = '';
-  activeTab: string = 'about';
-   private chatWidget: any;
-   private originalTexts: Map<string, string> = new Map<string, string>();
-   isTranslating: boolean = false;
-   currentLanguage: string = 'fr';
+export class AcceuilComponent implements AfterViewInit, OnDestroy {
+  @ViewChildren('statCard') statCards!: QueryList<ElementRef<HTMLElement>>;
 
-  services = [
-  {
-    icon: 'flaticon-diet',
-    title: 'SERVICE.ITEMS.EDUCATION.TITLE',
-    description: 'SERVICE.ITEMS.EDUCATION.DESC'
-  },
-  {
-    icon: 'flaticon-water',
-    title: 'SERVICE.ITEMS.WATER.TITLE',
-    description: 'SERVICE.ITEMS.WATER.DESC'
-  },
-  {
-    icon: 'flaticon-orphelinat',
-    title: 'SERVICE.ITEMS.SPONSORSHIP.TITLE',
-    description: 'SERVICE.ITEMS.SPONSORSHIP.DESC'
-  },
-  {
-    icon: 'flaticon-poverty',
-    title: 'SERVICE.ITEMS.POVERTY.TITLE',
-    description: 'SERVICE.ITEMS.POVERTY.DESC'
-  },
-  {
-    icon: 'flaticon-emergency',
-    title: 'SERVICE.ITEMS.EMERGENCY.TITLE',
-    description: 'SERVICE.ITEMS.EMERGENCY.DESC'
-  },
-  {
-    icon: 'flaticon-social-care',
-    title: 'SERVICE.ITEMS.SOCIAL.TITLE',
-    description: 'SERVICE.ITEMS.SOCIAL.DESC'
-  }
-];
+  readonly currentYear = new Date().getFullYear();
+  readonly heroImg = 'assets/children.png';
+  readonly actionFood = 'assets/aboutf.jpg';
+  readonly actionEducation = 'assets/educatif.jpg';
+  readonly actionHealth = 'assets/volunteer.jpg';
+  readonly projectWater = 'assets/banner.jpg';
+  readonly projectGreen = 'assets/facts.jpg';
+  readonly projectShelter = 'assets/contact.jpg';
+  readonly logoAssetUrl = 'assets/logo2.png';
 
+  readonly nav: NavItem[] = [
+    { label: 'Accueil', href: '#accueil' },
+    { label: 'À propos', href: '#a-propos' },
+    { label: 'Nos actions', href: '#actions' },
+    { label: 'Projets', href: '#projets' },
+    { label: 'Contact', href: '#feedback' },
+  ];
 
-  facts = [
-  { value: 0, text: 'FACTS.ITEMS.VOLUNTEERS' },
-  { value: 0, text: 'FACTS.ITEMS.DONORS' },
-  { value: 0, text: 'FACTS.ITEMS.BENEFICIARIES' },
-  { value: 0, text: 'FACTS.ITEMS.PROJECTS' }
-];
+  readonly aboutItems: IconCard[] = [
+    {
+      icon: 'heart',
+      title: 'Solidarité',
+      text: "Une aide inconditionnelle, partout où c'est nécessaire.",
+    },
+    {
+      icon: 'users',
+      title: 'Communauté',
+      text: 'Un réseau de bénévoles engagés sur le terrain.',
+    },
+    {
+      icon: 'sparkles',
+      title: 'Transparence',
+      text: '100% des dons tracés, rapports publiés chaque année.',
+    },
+  ];
 
-  
-  donateForm: FormGroup;
-  contactForm: FormGroup;
-  donationAmounts = [10, 20, 30];
-  projets: any[] = [];
+  readonly actions: ActionCard[] = [
+    {
+      img: this.actionEducation,
+      icon: 'book-open',
+      title: 'Éducation pour tous',
+      text: 'Écoles, matériel scolaire et bourses pour les enfants défavorisés.',
+    },
+    {
+      img: this.actionFood,
+      icon: 'utensils',
+      title: 'Aide Social',
+      text: 'Aider les personnes en situation difficile.',
+    },
+    {
+      img: this.actionHealth,
+      icon: 'stethoscope',
+      title: 'parainage des enfants',
+      text: 'Trouver des parrains pour soutenir les enfants dans le besoin.',
+    },
+  ];
 
+   readonly stats: Stat[] = [
+    {
+      value: 0,
+      label: 'Donateurs',
+      suffix: '+',
+      display: 0,
+      started: false,
+    },
+    {
+      value: 0,
+      label: 'Bénéficiaires',
+      suffix: '+',
+      display: 0,
+      started: false,
+    },
+    {
+      value: 0,
+      label: 'Bénévoles',
+      suffix: '',
+      display: 0,
+      started: false,
+    },
+    {
+      value: 0,
+      label: 'Projets menés',
+      suffix: '',
+      display: 0,
+      started: false,
+    },
+  ];
+  projects: Project[] = [];
+  readonly socialIcons = ['facebook', 'instagram', 'twitter'];
 
-  constructor(
-    private fb: FormBuilder,
+  isSubmittingContact = false;
+  isLoadingStats = false;
+  open = false;
+  scrolled = false;
+  status: 'idle' | 'sent' = 'idle';
+  form = {
+    name: '',
+    email: '',
+    subject: '',
+    message: '',
+  };
+
+  private observer?: IntersectionObserver;
+  private sentTimeout?: ReturnType<typeof setTimeout>;
+
+  constructor(private readonly cdr: ChangeDetectorRef,
     private contactService: ContactService,
-    private http: HttpClient, 
     private projetService: ProjetService ,
     private beneficiaryService: BeneficiaryService,
     private volunteerService: VolunteerService,
     private donorService: DonorsService, 
-    private translate: TranslateService
   ) {
-    const savedLang = localStorage.getItem('lang') || 'fr';
-    this.translate.use(savedLang);
-    document.documentElement.dir = savedLang === 'ar' ? 'rtl' : 'ltr';
-
-    this.donateForm = this.fb.group({
-      name: ['', Validators.required],
-      email: ['', [Validators.required, Validators.email]],
-      amount: [this.donationAmounts[0], Validators.required]
-    });
-
-    this.contactForm = this.fb.group({
-      name: ['', Validators.required],
-      email: ['', [Validators.required, Validators.email]],
-      subject: ['', Validators.required],
-      message: ['', [Validators.required, Validators.minLength(10)]]
-    });
-  }
-  
-
-  ngOnInit() {
-    this.chargerProjets();
-    this.initializeChat();
-    this.loadCounts();
+    this.onScroll = this.onScroll.bind(this);
   }
 
-  translatePage(lang: string) {
-    this.translate.use(lang);
-    localStorage.setItem('lang', lang);
-    document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
+   ngOnInit(): void {
+    this.loadStats();
   }
 
-  async ngAfterViewInit() {
-    this.animateNumbers();
-  }
+  ngAfterViewInit(): void {
+    this.onScroll();
+    window.addEventListener('scroll', this.onScroll, { passive: true });
 
-  loadCounts() {
-  // Load Volunteers count
-  this.volunteerService.getVolunteers().subscribe(volunteers => {
-    this.facts[0].value = volunteers.length || 0;
-    this.animateNumbers();
-  });
+    this.observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          const index = Number(
+            (entry.target as HTMLElement).dataset['statIndex'],
+          );
+          const stat = this.stats[index];
 
-  // Load Donors count
-  this.donorService.getDonors().subscribe(donors => {
-    this.facts[1].value = donors.length || 0;
-    this.animateNumbers();
-  });
-
-  // Load Beneficiaries count
-  this.beneficiaryService.getBeneficiaires().subscribe(response => {
-    console.log('Beneficiaries:', response);
-    // Access the beneficiaries array from the data property
-    const beneficiaries = response.data.beneficiaries;
-    this.facts[2].value = beneficiaries.length || 0;
-    this.animateNumbers();
-});
-
-  // Load Projects count
-  this.projetService.getProjects().subscribe(projects => {
-    this.facts[3].value = projects.length || 0;
-    this.animateNumbers();
-  });
-}
-
-  
-  chargerProjets() {
-    this.projetService.getProjects().subscribe({
-      next: (projets) => {
-        this.projets = projets;
+          if (entry.isIntersecting && stat && !stat.started) {
+            stat.started = true;
+            this.animateCounter(stat);
+          }
+        });
       },
-      error: (err) => {
-        console.error('Erreur lors du chargement des projets:', err);
-      }
-    });
+      { threshold: 0.3 },
+    );
+
+    this.statCards.forEach((card) =>
+      this.observer?.observe(card.nativeElement),
+    );
   }
 
-  animateNumbers() {
-  this.facts.forEach((fact, index) => {
-    const end = fact.value;
-    let start = 0;
-    const duration = 2000; // Animation in 2 seconds
-    
-    // Only animate if the value is greater than 0
-    if (end > 0) {
-      const stepTime = Math.abs(Math.floor(duration / end));
-      const increment = Math.ceil(end / 100); // Increment value
+  ngOnDestroy(): void {
+    window.removeEventListener('scroll', this.onScroll);
+    this.observer?.disconnect();
 
-      const timer = setInterval(() => {
-        if (start < end) {
-          start += increment;
-          // Create a new array to trigger change detection
-          this.facts = [...this.facts];
-          this.facts[index].value = Math.min(start, end);
-        } else {
-          clearInterval(timer);
-        }
-      }, stepTime);
+    if (this.sentTimeout) {
+      clearTimeout(this.sentTimeout);
     }
-  });
-}
+  }
 
-  onSubmitForm() {
-    if (this.contactForm.valid) {
-      this.contactService.submitContactForm(this.contactForm.value).subscribe({
-        next: (response: { message: string }) => {
-          this.successMessage = response.message;
-          this.contactForm.reset();
-          Swal.fire({
-            icon: 'success',
-            title: 'Form Submitted',
-            text: this.successMessage,
-            confirmButtonText: 'OK'
-          });
+  closeMenu(): void {
+    this.open = false;
+  }
+
+  toggleMenu(): void {
+    this.open = !this.open;
+  }
+
+  private loadStats(): void {
+    this.isLoadingStats = true;
+
+    forkJoin({
+      donors: this.donorService.getDonors(),
+      beneficiaires: this.beneficiaryService.getBeneficiaires(),
+      volunteers: this.volunteerService.getVolunteers(),
+      projects: this.projetService.getProjects(),
+    })
+      .pipe(finalize(() => (this.isLoadingStats = false)))
+      .subscribe({
+        next: ({ donors, beneficiaires, volunteers, projects }) => {
+  this.stats[0].value = this.getTotal(donors);
+
+  this.stats[1].value =
+    beneficiaires?.results ??
+    beneficiaires?.data?.beneficiaries?.length ??
+    0;
+
+  this.stats[2].value = this.getTotal(volunteers);
+
+  this.stats[3].value =
+    projects?.results ??
+    projects?.data?.projects?.length ??
+    this.getTotal(projects);
+
+  this.projects = this.extractProjects(projects);
+
+  this.stats.forEach((stat) => {
+    stat.display = 0;
+    stat.started = false;
+  });
+
+  this.cdr.detectChanges();
+},
+        error: (error) => {
+          console.error(
+            'Erreur lors du chargement des statistiques :',
+            error
+          );
         },
-        error: (error: any) => {
-          console.error('Error submitting form:', error);
-          Swal.fire({
-            icon: 'error',
-            title: 'Submission Failed',
-            text: 'There was an error submitting the form. Please try again later.',
-            confirmButtonText: 'OK'
-          });
-        }
       });
-    }
   }
-initializeChat() {
-  this.chatWidget = createChat({
-    webhookUrl: 'https://azizbelkhir562.app.n8n.cloud/webhook/9a2a284e-92e0-4cd2-af6e-bc43b821ba6f/chat'
-  });
-}
-;
 
+  private getTotal(response: any): number {
+  if (response === null || response === undefined) {
+    return 0;
+  }
+
+  if (typeof response === 'number') {
+    return response;
+  }
+
+  if (Array.isArray(response)) {
+    return response.length;
+  }
+
+  if (typeof response?.totalElements === 'number') {
+    return response.totalElements;
+  }
+
+  if (typeof response?.count === 'number') {
+    return response.count;
+  }
+
+  if (typeof response?.total === 'number') {
+    return response.total;
+  }
+
+  if (typeof response?.results === 'number') {
+    return response.results;
+  }
+
+  if (Array.isArray(response?.data)) {
+    return response.data.length;
+  }
+
+  if (Array.isArray(response?.content)) {
+    return response.content.length;
+  }
+
+  if (Array.isArray(response?.data?.beneficiaries)) {
+    return response.data.beneficiaries.length;
+  }
+
+  return 0;
+}
+
+private extractProjects(response: any): Project[] {
+  const projectList =
+    response?.data?.projects ??
+    response?.projects ??
+    response?.data ??
+    response ??
+    [];
+
+  if (!Array.isArray(projectList)) {
+    console.warn('Format des projets non reconnu :', response);
+    return [];
+  }
+
+  return projectList.map((project: any) => ({
+    img:
+      project.image ??
+      project.img ??
+      project.imageUrl ??
+      project.photo ??
+      this.projectWater,
+
+    tag:
+      project.category ??
+      project.tag ??
+      project.type ??
+      'Projet solidaire',
+
+    title:
+      project.titre ??
+      project.name ??
+      project.nom ??
+      'Projet',
+
+    text:
+      project.description ??
+      project.text ??
+      '',
+
+    progress:
+      project.progress ??
+      project.percentage ??
+      project.progressPercentage ??
+      0,
+  }));
+}
+
+showAllProjects = false;
+
+get visibleProjects() {
+  return this.showAllProjects
+    ? this.projects
+    : this.projects.slice(0, 3);
+}
+
+toggleProjects(): void {
+  this.showAllProjects = !this.showAllProjects;
+}
+
+
+  onSubmit(): void {
+  const contactData = {
+    name: this.form.name.trim(),
+    email: this.form.email.trim(),
+    subject: this.form.subject.trim(),
+    message: this.form.message.trim(),
+  };
+
+  if (
+    !contactData.name ||
+    !contactData.email ||
+    !contactData.message
+  ) {
+    Swal.fire({
+      icon: 'warning',
+      title: 'Champs obligatoires',
+      text: 'Veuillez renseigner votre nom, votre email et votre message.',
+      confirmButtonText: 'D’accord',
+      confirmButtonColor: '#1677ff',
+    });
+
+    return;
+  }
+
+  if (!this.isValidEmail(contactData.email)) {
+    Swal.fire({
+      icon: 'warning',
+      title: 'Email invalide',
+      text: 'Veuillez saisir une adresse email valide.',
+      confirmButtonText: 'D’accord',
+      confirmButtonColor: '#1677ff',
+    });
+
+    return;
+  }
+
+  this.isSubmittingContact = true;
+
+  this.contactService
+    .submitContactForm(contactData)
+    .pipe(
+      finalize(() => {
+        this.isSubmittingContact = false;
+        this.cdr.detectChanges();
+      }),
+    )
+    .subscribe({
+      next: () => {
+        this.form = {
+          name: '',
+          email: '',
+          subject: '',
+          message: '',
+        };
+
+        Swal.fire({
+          icon: 'success',
+          title: 'Message envoyé',
+          text: 'Merci ! Votre message a bien été envoyé.',
+          confirmButtonText: 'Fermer',
+          confirmButtonColor: '#1677ff',
+        });
+      },
+
+      error: (error) => {
+        console.error(
+          'Erreur lors de l’envoi du formulaire de contact :',
+          error,
+        );
+
+        const errorMessage =
+          error?.error?.message ??
+          error?.error?.error ??
+          'Une erreur est survenue lors de l’envoi du message. Veuillez réessayer.';
+
+        Swal.fire({
+          icon: 'error',
+          title: 'Envoi impossible',
+          text: errorMessage,
+          confirmButtonText: 'Réessayer',
+          confirmButtonColor: '#f93737',
+        });
+      },
+    });
+}
+
+private isValidEmail(email: string): boolean {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email);
+}
+
+  formatNumber(value: number): string {
+    return value.toLocaleString('fr-FR');
+  }
+
+  private onScroll(): void {
+    this.scrolled = window.scrollY > 20;
+  }
+
+  private animateCounter(stat: Stat): void {
+    const duration = 2000;
+    const start = performance.now();
+
+    const tick = (now: number) => {
+      const progress = Math.min(1, (now - start) / duration);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      stat.display = Math.floor(eased * stat.value);
+      this.cdr.detectChanges();
+
+      if (progress < 1) {
+        requestAnimationFrame(tick);
+      }
+    };
+
+    requestAnimationFrame(tick);
+  }
 }

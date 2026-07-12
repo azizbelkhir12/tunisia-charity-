@@ -1,19 +1,30 @@
-import { Component , OnInit } from '@angular/core';
-import { RapportService  } from '../services/rapport/rapport.service';
-import { saveAs } from 'file-saver';
+import { Component, OnInit } from '@angular/core';
+import { Meta, Title } from '@angular/platform-browser';
+import { RapportService } from '../services/rapport/rapport.service';
 
-interface FileData {
-  data: any;
-  contentType: string;
-  originalName: string;
-}
+import {
+  ArrowLeft,
+  BarChart3,
+  BookOpen,
+  Calendar,
+  Download,
+  Eye,
+  FileText,
+  Heart,
+} from 'lucide-angular';
 
-interface Rapport {
-  _id: string;
+type ReportType = 'financier' | 'litteraire';
+type ReportFilter = 'tous' | ReportType;
+
+interface Report {
+  id: string;
   titre: string;
-  type: string;
-  date: Date;
-  file: FileData;
+  year: string;
+  type: ReportType;
+  description: string;
+  pages: number;
+  size: string;
+  file: string;
 }
 
 @Component({
@@ -22,86 +33,229 @@ interface Rapport {
   templateUrl: './rapports.component.html',
   styleUrl: './rapports.component.css'
 })
-export class RapportsComponent {
-  rapports: Rapport[] = [];
-  filteredRapports: Rapport[] = [];
-  loading = true;
-  currentPage = 1;
-  itemsPerPage = 6;
-  searchTerm = '';
-  errorMessage: string | null = null;
+export class RapportsComponent implements OnInit {
+    readonly currentYear = new Date().getFullYear();
 
-  // Mapping des types aux icônes FontAwesome
-  typeIcons: { [key: string]: string } = {
-    financier: 'fa-file-invoice-dollar',
-    litteraire: 'fa-book-open'
+  readonly icons = {
+    arrowLeft: ArrowLeft,
+    barChart: BarChart3,
+    bookOpen: BookOpen,
+    calendar: Calendar,
+    download: Download,
+    eye: Eye,
+    fileText: FileText,
+    heart: Heart,
   };
 
-  constructor(private rapportService: RapportService) {}
+  filter: ReportFilter = 'tous';
+
+   readonly filters = [
+    {
+      key: 'tous' as const,
+      label: 'Tous les rapports',
+      icon: FileText,
+    },
+    {
+      key: 'financier' as const,
+      label: 'Financiers',
+      icon: BarChart3,
+    },
+    {
+      key: 'litteraire' as const,
+      label: 'Littéraires',
+      icon: BookOpen,
+    },
+  ];
+
+  reports: Report[] = [];
+
+  isLoading = false;
+  errorMessage = '';
+
+  constructor(
+    private readonly titleService: Title,
+    private readonly metaService: Meta,
+    private  rapportService: RapportService
+  ) {}
 
   ngOnInit(): void {
-    this.loadRapports();
+    this.initializeMetaTags();
+    this.getRapports();
   }
 
-  loadRapports(): void {
-    this.loading = true;
-    this.errorMessage = null;
-    
+  private initializeMetaTags(): void {
+    this.titleService.setTitle('Rapports — Tunisia Charity');
+
+    this.metaService.updateTag({
+      name: 'description',
+      content:
+        'Consultez et téléchargez les rapports financiers et littéraires annuels de Tunisia Charity en toute transparence.',
+    });
+
+    this.metaService.updateTag({
+      property: 'og:title',
+      content: 'Rapports — Tunisia Charity',
+    });
+
+    this.metaService.updateTag({
+      property: 'og:description',
+      content:
+        'Transparence et redevabilité : nos rapports financiers et littéraires à télécharger.',
+    });
+  }
+
+  getRapports(): void {
+    this.isLoading = true;
+    this.errorMessage = '';
+
     this.rapportService.getRapports().subscribe({
-      next: (data: any) => {
-        this.rapports = data;
-        this.filteredRapports = [...this.rapports];
-        this.loading = false;
+      next: (response: any) => {
+      
+        if (Array.isArray(response)) {
+          this.reports = response;
+        }
+        else {
+          this.reports = [];
+        }
+
+        this.isLoading = false;
       },
+
       error: (error) => {
-        console.error('Error loading rapports:', error);
-        this.errorMessage = 'Erreur lors du chargement des rapports. Veuillez réessayer plus tard.';
-        this.loading = false;
-      }
+        console.error('Error loading reports:', error);
+
+        this.reports = [];
+        this.errorMessage =
+          'Une erreur est survenue lors du chargement des rapports.';
+        this.isLoading = false;
+      },
     });
   }
 
-  downloadRapport(rapport: Rapport): void {
-    this.rapportService.telechargerRapport(rapport._id).subscribe({
-      next: (blob: Blob) => {
-        saveAs(blob, rapport.file.originalName);
-      },
-      error: (error) => {
-        console.error('Download error:', error);
-        this.errorMessage = 'Erreur lors du téléchargement du rapport.';
-      }
-    });
-  }
+  onTelechargerRapport(report: Report): void {
+  this.rapportService.telechargerRapport(report.id).subscribe({
+    next: (blob: Blob) => {
+      const pdfBlob = new Blob([blob], {
+        type: 'application/pdf',
+      });
 
-  filterRapports(): void {
-    if (!this.searchTerm) {
-      this.filteredRapports = [...this.rapports];
-    } else {
-      const term = this.searchTerm.toLowerCase();
-      this.filteredRapports = this.rapports.filter(rapport => 
-        rapport.titre.toLowerCase().includes(term) ||
-        rapport.type.toLowerCase().includes(term)
+      const fileUrl = URL.createObjectURL(pdfBlob);
+
+      const link = document.createElement('a');
+      link.href = fileUrl;
+      link.download = this.getPdfFileName(report.titre);
+
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      URL.revokeObjectURL(fileUrl);
+    },
+
+    error: (error) => {
+      console.error(
+        'Erreur lors du téléchargement du rapport :',
+        error
       );
+
+      this.errorMessage =
+        'Impossible de télécharger ce rapport.';
+    },
+  });
+}
+
+onConsulterRapport(report: Report): void {
+  // Ouvrir immédiatement l’onglet pour éviter le blocage des pop-ups
+  const previewWindow = window.open('', '_blank');
+
+  if (previewWindow) {
+    previewWindow.document.title = 'Chargement du rapport';
+    previewWindow.document.body.innerHTML = `
+      <p style="
+        font-family: Arial, sans-serif;
+        text-align: center;
+        margin-top: 40px;
+        color: #5a5a5a;
+      ">
+        Chargement du rapport...
+      </p>
+    `;
+  }
+
+  this.rapportService.consulterRapport(report.id).subscribe({
+    next: (blob: Blob) => {
+      const pdfBlob = new Blob([blob], {
+        type: 'application/pdf',
+      });
+
+      const fileUrl = URL.createObjectURL(pdfBlob);
+
+      if (previewWindow) {
+        previewWindow.location.href = fileUrl;
+      } else {
+        window.open(fileUrl, '_blank');
+      }
+
+      // Laisser suffisamment de temps au navigateur pour charger le PDF
+      setTimeout(() => {
+        URL.revokeObjectURL(fileUrl);
+      }, 300000);
+    },
+
+    error: (error) => {
+      console.error(
+        'Erreur lors de la consultation du rapport :',
+        error
+      );
+
+      previewWindow?.close();
+
+      this.errorMessage =
+        'Impossible de consulter ce rapport.';
+    },
+  });
+}
+
+private getPdfFileName(title: string): string {
+  const normalizedTitle = title
+    .trim()
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+
+  return `${normalizedTitle || 'rapport'}.pdf`;
+}
+
+
+
+  get filteredReports(): Report[] {
+    if (this.filter === 'tous') {
+      return this.reports;
     }
-    this.currentPage = 1; // Reset to first page when filtering
+
+    return this.reports.filter((report) => report.type === this.filter);
   }
 
-  get paginatedRapports(): Rapport[] {
-    const startIndex = (this.currentPage - 1) * this.itemsPerPage;
-    return this.filteredRapports.slice(startIndex, startIndex + this.itemsPerPage);
+  setFilter(filter: ReportFilter): void {
+    this.filter = filter;
   }
 
-  changePage(page: number): void {
-    this.currentPage = page;
+  isFinancial(report: Report): boolean {
+    return report.type === 'financier';
   }
 
-  get totalPages(): number {
-    return Math.ceil(this.filteredRapports.length / this.itemsPerPage);
+  getReportIcon(report: Report) {
+    return this.isFinancial(report) ? BarChart3 : BookOpen;
   }
 
-  getTypeIcon(type: string): string {
-    return this.typeIcons[type] || 'fa-file-alt';
+  getReportBadge(report: Report): string {
+    return this.isFinancial(report) ? 'Financier' : 'Littéraire';
   }
 
+  trackByReportId(_index: number, report: Report): string {
+    return report.id;
+  }
   
 }

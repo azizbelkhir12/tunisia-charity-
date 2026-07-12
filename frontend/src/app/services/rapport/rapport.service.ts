@@ -25,5 +25,9 @@ export class RapportService {
   telechargerRapport(id: string): Observable<any> {
     return this.http.get(`${this.apiUrl}/downloadRapport/${id}`, { responseType: 'blob' });
   }
+
+  consulterRapport(id: string): Observable<Blob> {
+  return this.telechargerRapport(id);
+}
   
 }

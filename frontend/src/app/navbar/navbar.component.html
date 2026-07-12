@@ -1,65 +1,169 @@
-<!-- Nav Bar Start -->
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-  <div class="container-fluid">
+<header
+    class="sticky top-0 z-50 transition-all"
+    [ngClass]="
+      scrolled
+        ? 'bg-background/85 backdrop-blur-md border-b border-border'
+        : 'bg-transparent'
+    "
+  >
+    <div class="container-x flex items-center justify-between h-18 py-3">
+      <a
+        routerLink="/"
+        class="flex items-center gap-3"
+        aria-label="Accueil Tunisia Charity"
+      >
+        <img
+          [src]="logoAssetUrl"
+          alt="Tunisia Charity"
+          class="h-12 w-12 rounded-full object-contain bg-white"
+        />
+        <span
+          class="font-display text-xl font-semibold text-primary hidden sm:inline"
+        >
+          Tunisia Charity
+        </span>
+      </a>
 
-    <!-- Logo -->
-    <a routerLink="/" class="navbar-brand">
-      <img src="assets/logo2.png" alt="Logo" class="img-fluid">
-    </a>
-
-    <!-- Toggle button -->
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-
-    <!-- Navbar content -->
-    <div class="collapse navbar-collapse" id="navbarCollapse">
-
-      <div class="navbar-nav me-auto">
-        <a routerLink="/" class="nav-item nav-link active">
-          {{ 'NAV.HOME' | translate }}
+      <nav
+        class="hidden md:flex items-center gap-8"
+        aria-label="Navigation principale"
+      >
+        <a
+          routerLink="/"
+          routerLinkActive="active"
+          [routerLinkActiveOptions]="{ exact: true }"
+          ariaCurrentWhenActive="page"
+          class="nav-link text-sm font-medium text-foreground/80 transition-colors"
+        >
+          Accueil
         </a>
 
-        <a routerLink="/contact" class="nav-item nav-link">
-          {{ 'NAV.CONTACT' | translate }}
+        <a
+          routerLink="/rapports"
+          routerLinkActive="active"
+          ariaCurrentWhenActive="page"
+          class="nav-link text-sm font-medium text-foreground/80 transition-colors"
+        >
+          Rapports
         </a>
 
-        <a routerLink="/rapports" class="nav-item nav-link">
-          {{ 'NAV.Rapports' | translate }}
+        <a
+          routerLink="/benevolat"
+          routerLinkActive="active"
+          ariaCurrentWhenActive="page"
+          class="nav-link text-sm font-medium text-foreground/80 transition-colors"
+        >
+          Rejoignez-nous
+        </a>
+      </nav>
+
+      <div class="hidden md:flex items-center gap-2">
+        <!-- Login -->
+        <a
+          routerLink="/login"
+          routerLinkActive="active"
+          class="auth-login inline-flex items-center gap-2 rounded-full px-4 py-2.5 text-sm font-semibold text-secondary transition"
+        >
+          <i-lucide name="log-in" class="w-4 h-4"></i-lucide>
+          Se connecter
         </a>
 
-        <a routerLink="/benevolat" class="nav-item nav-link">
-          {{ 'NAV.Rejoignez-nous' | translate }}
+        <!-- Register -->
+        <a
+          routerLink="/register"
+          routerLinkActive="active"
+          class="auth-register inline-flex items-center gap-2 rounded-full border border-primary px-4 py-2.5 text-sm font-semibold text-primary transition"
+        >
+          <i-lucide name="user-plus" class="w-4 h-4"></i-lucide>
+          S'inscrire
+        </a>
+
+        <!-- Donation -->
+        <a
+          routerLink="/payment"
+          fragment="feedback"
+          class="donate-button inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition"
+        >
+          <i-lucide name="heart" class="w-4 h-4" fill="currentColor"></i-lucide>
+
+          Faire un don
         </a>
       </div>
 
-      <div class="navbar-nav ms-auto">
-        <a routerLink="/login" class="nav-link">
-          {{ 'NAV.LOGIN' | translate }}
-        </a>
-
-        <a routerLink="/register" class="nav-link">
-          {{ 'NAV.REGISTER' | translate }}
-        </a>
-
-        <button type="button" routerLink="/payment" class="btn-custom ms-2">
-          {{ 'NAV.DONATE' | translate }}
-        </button>
-      </div>
-
-      <!-- Dans votre navbar -->
-<div class="dropdown ms-3">
-  <button class="btn  dropdown-toggle" type="button" id="langDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-    <i class="fas fa-language"></i> {{ 'NAV.Langue' | translate }}
-  </button>
-  <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="langDropdown">
-    <li><a class="dropdown-item" (click)="translatePage('fr')"><i class="flag-icon flag-icon-fr"></i> Français</a></li>
-    <li><a class="dropdown-item" (click)="translatePage('en')"><i class="flag-icon flag-icon-gb"></i> English</a></li>
-    <li><a class="dropdown-item" (click)="translatePage('ar')"><i class="flag-icon flag-icon-sa"></i> العربية</a></li>
-  </ul>
-</div>
-
+      <button
+        type="button"
+        class="md:hidden p-2 rounded-md hover:bg-muted"
+        (click)="toggleMenu()"
+        [attr.aria-expanded]="open"
+        aria-label="Ouvrir le menu"
+      >
+        <i-lucide
+          *ngIf="open; else menuIcon"
+          name="x"
+          class="w-6 h-6"
+        ></i-lucide>
+        <ng-template #menuIcon>
+          <i-lucide name="menu" class="w-6 h-6"></i-lucide>
+        </ng-template>
+      </button>
     </div>
-  </div>
-</nav>
-<!-- Nav Bar End -->
+
+    <div *ngIf="open" class="md:hidden border-t border-border bg-background">
+      <div class="container-x py-4 flex flex-col gap-2">
+        <a
+          routerLink="/"
+          routerLinkActive="active"
+          [routerLinkActiveOptions]="{ exact: true }"
+          ariaCurrentWhenActive="page"
+          (click)="closeMenu()"
+          class="mobile-nav-link"
+        >
+          Accueil
+        </a>
+
+        <a
+          routerLink="/rapports"
+          routerLinkActive="active"
+          ariaCurrentWhenActive="page"
+          (click)="closeMenu()"
+          class="mobile-nav-link"
+        >
+          Rapports
+        </a>
+
+        <a
+          routerLink="/benevolat"
+          routerLinkActive="active"
+          ariaCurrentWhenActive="page"
+          (click)="closeMenu()"
+          class="mobile-nav-link"
+        >
+          Rejoignez-nous
+        </a>
+
+        <div class="mobile-auth-actions">
+          <a
+            routerLink="/login"
+            routerLinkActive="active"
+            ariaCurrentWhenActive="page"
+            (click)="closeMenu()"
+            class="mobile-login-button"
+          >
+            <i-lucide name="log-in" class="w-4 h-4"></i-lucide>
+            Se connecter
+          </a>
+
+          <a
+            routerLink="/register"
+            routerLinkActive="active"
+            ariaCurrentWhenActive="page"
+            (click)="closeMenu()"
+            class="mobile-register-button"
+          >
+            <i-lucide name="user-plus" class="w-4 h-4"></i-lucide>
+            S'inscrire
+          </a>
+        </div>
+      </div>
+    </div>
+  </header>

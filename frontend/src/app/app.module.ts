@@ -16,6 +16,27 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatOptionModule } from '@angular/material/core';
 import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
+import {
+  ArrowRight,
+  BookOpen,
+  Facebook,
+  HandHeart,
+  Heart,
+  Instagram,
+  LogIn,
+  LucideAngularModule,
+  Mail,
+  MapPin,
+  Menu,
+  Phone,
+  Sparkles,
+  Stethoscope,
+  Twitter,
+  UserPlus,
+  Users,
+  Utensils,
+  X,
+} from 'lucide-angular';
 
 
 import { AppComponent } from './app.component';
@@ -128,8 +149,8 @@ export function HttpLoaderFactory(http: HttpClient) {
       ChatAdminComponent,
       ForgotPasswordComponent,
       ResetPasswordComponent,
-
   ],
+  
   imports: [
     BrowserModule,
     AppRoutingModule,
@@ -148,6 +169,26 @@ export function HttpLoaderFactory(http: HttpClient) {
     MatFormFieldModule,
     MatButtonModule,
     MatOptionModule,
+   LucideAngularModule.pick({
+  ArrowRight,
+  BookOpen,
+  Facebook,
+  HandHeart,
+  Heart,
+  Instagram,
+  LogIn,
+  Mail,
+  MapPin,
+  Menu,
+  Phone,
+  Sparkles,
+  Stethoscope,
+  Twitter,
+  UserPlus,
+  Users,
+  Utensils,
+  X,
+}),
     TranslateModule.forRoot({
       loader: {
         provide: TranslateLoader,

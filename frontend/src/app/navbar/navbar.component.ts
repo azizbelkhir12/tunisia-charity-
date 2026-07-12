@@ -8,6 +8,10 @@ import { TranslateService } from '@ngx-translate/core';
   styleUrl: './navbar.component.css'
 })
 export class NavbarComponent {
+
+  open = false;
+  scrolled = false;
+  readonly logoAssetUrl = 'assets/logo2.png';
   constructor(private translate: TranslateService) {
     const savedLang = localStorage.getItem('lang') || 'fr';
     this.translate.use(savedLang);
@@ -16,6 +20,14 @@ export class NavbarComponent {
 
   changeLang(lang: string) {
     this.translate.use(lang);
+  }
+
+  closeMenu(): void {
+    this.open = false;
+  }
+
+  toggleMenu(): void {
+    this.open = !this.open;
   }
 
   translatePage(lang: string) {

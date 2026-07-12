@@ -1,70 +1,85 @@
-<!-- Footer Start -->
-<div class="footer">
-  <div class="container">
-    <div class="row">
+<footer class="bg-ink text-cream">
+    <div class="container-x py-14 grid md:grid-cols-4 gap-10">
+      <div class="md:col-span-2">
+        <div class="flex items-center gap-3">
+          <img
+            [src]="logoAssetUrl"
+            alt="Tunisia Charity"
+            class="h-12 w-12 rounded-full object-contain bg-white p-1"
+          />
+          <span class="font-display text-2xl font-semibold"
+            >Tunisia Charity</span
+          >
+        </div>
 
-      <!-- Logo à gauche -->
-      <div class="col-lg-3 col-md-6">
-        <div class="footer-logo">
-          <img src="assets/logo2.png" alt="Logo de l'association" style="max-width: 100%; height: auto;">
+        <p class="mt-4 text-cream/70 max-w-md">
+          Une association reconnue d'intérêt général. Vos dons sont déductibles
+          à 66% de vos impôts.
+        </p>
+        <div class="mt-6 flex items-center gap-3">
+          <a
+            *ngFor="let icon of socialIcons"
+            href="#"
+            class="grid place-items-center w-10 h-10 rounded-full bg-cream/10 hover:bg-primary transition"
+            aria-label="Réseau social"
+          >
+            <i-lucide [name]="icon" class="w-4 h-4"></i-lucide>
+          </a>
         </div>
       </div>
 
-      <!-- Contact Info -->
-      <div class="col-lg-3 col-md-6">
-        <div class="footer-contact">
-          <h2>Notre Siège Social</h2>
-          <p><i class="fa fa-map-marker-alt"></i> 63 rue Iran 1002, Tunis</p>
-          <p><i class="fa fa-phone-alt"></i> +216 28 391 000</p>
-          <p><i class="fa fa-envelope"></i> contact&#64;tunisiacharity.org</p>
-          <div class="footer-social">
-            <a class="btn btn-custom" href="#"><i class="fab fa-twitter"></i></a>
-            <a class="btn btn-custom" href="#"><i class="fab fa-facebook-f"></i></a>
-            <a class="btn btn-custom" href="#"><i class="fab fa-youtube"></i></a>
-            <a class="btn btn-custom" href="#"><i class="fab fa-instagram"></i></a>
-            <a class="btn btn-custom" href="#"><i class="fab fa-linkedin-in"></i></a>
-          </div>
-        </div>
+      <div>
+        <h4 class="text-cream text-sm font-semibold uppercase tracking-wider">
+          Navigation
+        </h4>
+        <ul class="mt-4 space-y-2 text-sm text-cream/70">
+          <li>
+            <a routerLink="/" class="hover:text-primary transition">Accueil</a>
+          </li>
+          <li>
+            <a routerLink="/rapports" class="hover:text-primary transition"
+              >Rapports</a
+            >
+          </li>
+          <li>
+            <a routerLink="/benevolat" class="hover:text-primary transition"
+              >Rejoignez-nous</a
+            >
+          </li>
+          <li>
+            <a routerLink="/login" class="hover:text-primary transition"
+              >Se connecter</a
+            >
+          </li>
+          <li>
+            <a routerLink="/register" class="hover:text-primary transition"
+              >S'inscrire</a
+            >
+          </li>
+        </ul>
       </div>
 
-      <!-- Popular Links -->
-      <div class="col-lg-3 col-md-6">
-        <div class="footer-link">
-          <h2>Popular Links</h2>
-          <a routerLink="/">A propos de nous</a>
-          <a routerLink="/contact">Contact Us</a>
-          <a href="#">Popular Causes</a>
-          <a href="#">Upcoming Events</a>
-          <a href="#">Latest Blog</a>
-        </div>
+      <div>
+        <h4 class="text-cream text-sm font-semibold uppercase tracking-wider">
+          Contact
+        </h4>
+        <ul class="mt-4 space-y-2 text-sm text-cream/70">
+          <li>contact&#64;tunisiacharity.org</li>
+          <li>+216 28 391 000</li>
+          <li>63 rue Iran 1002, Tunis, Tunisie</li>
+        </ul>
       </div>
-
-      <!-- Useful Links -->
-      <div class="col-lg-3 col-md-6">
-        <div class="footer-link">
-          <h2>Useful Links</h2>
-          <a href="#">Terms of use</a>
-          <a href="#">Privacy policy</a>
-          <a href="#">Cookies</a>
-          <a href="#">Help</a>
-          <a href="#">FAQs</a>
-        </div>
-      </div>
-
     </div>
 
-    <!-- Copyright Section -->
-    <div class="container copyright">
-      <div class="row">
-        <div class="col-md-6">
-          <p>&copy; {{ currentYear }} <a href="#">Your Site Name</a>, All Rights Reserved.</p>
-        </div>
-        <div class="col-md-6">
-          <p>Designed By Aziz Belkhir et Amal Ghazouani</p>
-        </div>
+    <div class="border-t border-cream/10">
+      <div
+        class="container-x py-5 flex flex-wrap justify-between gap-3 text-xs text-cream/60"
+      >
+        <span
+          >© {{ currentYear }} Association Tunisia Charity. Tous droits
+          réservés.</span
+        >
+        <span>Site conçu avec ❤️ pour un monde plus solidaire.</span>
       </div>
     </div>
-  </div>
-</div>
-<!-- Footer End -->
-
+  </footer>

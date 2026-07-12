@@ -1,209 +1,688 @@
-<!-- Navbar Start -->
-<nav class="navbar navbar-expand-lg bg-dark navbar-dark">
-  <div class="container-fluid">
-    <a routerLink="/" class="navbar-brand">
-      <img src="assets/logo2.png" alt="Logo">
-    </a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
-      <span class="navbar-toggler-icon"></span>
-    </button>
+<div class="min-h-screen bg-background text-foreground">
+  <header
+    class="sticky top-0 z-50 transition-all"
+    [ngClass]="
+      scrolled
+        ? 'bg-background/85 backdrop-blur-md border-b border-border'
+        : 'bg-transparent'
+    "
+  >
+    <div class="container-x flex items-center justify-between h-18 py-3">
+      <a
+        routerLink="/"
+        class="flex items-center gap-3"
+        aria-label="Accueil Tunisia Charity"
+      >
+        <img
+          [src]="logoAssetUrl"
+          alt="Tunisia Charity"
+          class="h-12 w-12 rounded-full object-contain bg-white"
+        />
+        <span
+          class="font-display text-xl font-semibold text-primary hidden sm:inline"
+        >
+          Tunisia Charity
+        </span>
+      </a>
 
-    <div class="collapse navbar-collapse justify-content-center" id="navbarCollapse">
-      <div class="navbar-nav">
-        <a routerLink="/" routerLinkActive="active" class="nav-item nav-link">{{ 'NAV.HOME' | translate }}</a>
-        <a routerLink="/contact" routerLinkActive="active" class="nav-item nav-link">{{ 'NAV.CONTACT' | translate }}</a>
-        <a routerLink="/rapports" routerLinkActive="active" class="nav-item nav-link">{{ 'NAV.Rapports' | translate }}</a>
-        <a routerLink="/benevolat" routerLinkActive="active" class="nav-item nav-link">{{ 'NAV.Rejoignez-nous' | translate }}</a>
+      <nav
+        class="hidden md:flex items-center gap-8"
+        aria-label="Navigation principale"
+      >
+        <a
+          routerLink="/"
+          routerLinkActive="active"
+          [routerLinkActiveOptions]="{ exact: true }"
+          ariaCurrentWhenActive="page"
+          class="nav-link text-sm font-medium text-foreground/80 transition-colors"
+        >
+          Accueil
+        </a>
+
+        <a
+          routerLink="/rapports"
+          routerLinkActive="active"
+          ariaCurrentWhenActive="page"
+          class="nav-link text-sm font-medium text-foreground/80 transition-colors"
+        >
+          Rapports
+        </a>
+
+        <a
+          routerLink="/benevolat"
+          routerLinkActive="active"
+          ariaCurrentWhenActive="page"
+          class="nav-link text-sm font-medium text-foreground/80 transition-colors"
+        >
+          Rejoignez-nous
+        </a>
+      </nav>
+
+      <div class="hidden md:flex items-center gap-2">
+        <!-- Login -->
+        <a
+          routerLink="/login"
+          routerLinkActive="active"
+          class="auth-login inline-flex items-center gap-2 rounded-full px-4 py-2.5 text-sm font-semibold text-secondary transition"
+        >
+          <i-lucide name="log-in" class="w-4 h-4"></i-lucide>
+          Se connecter
+        </a>
+
+        <!-- Register -->
+        <a
+          routerLink="/register"
+          routerLinkActive="active"
+          class="auth-register inline-flex items-center gap-2 rounded-full border border-primary px-4 py-2.5 text-sm font-semibold text-primary transition"
+        >
+          <i-lucide name="user-plus" class="w-4 h-4"></i-lucide>
+          S'inscrire
+        </a>
+
+        <!-- Donation -->
+        <a
+          routerLink="/payment"
+          fragment="feedback"
+          class="donate-button inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition"
+        >
+          <i-lucide name="heart" class="w-4 h-4" fill="currentColor"></i-lucide>
+
+          Faire un don
+        </a>
       </div>
 
-      <div class="navbar-nav login">
-        <a routerLink="/login" routerLinkActive="active" class="nav-link">{{ 'NAV.LOGIN' | translate }}</a>
-        <a routerLink="/register" routerLinkActive="active" class="nav-link">{{ 'NAV.REGISTER' | translate }}</a>
-        <a routerLink="/payment" class="btn btn-custom">{{ 'NAV.DONATE' | translate }}</a>
-      </div>
-      <!-- Dans votre navbar -->
-<div class="dropdown ms-3">
-  <button class="btn  dropdown-toggle" type="button" id="langDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-    <i class="fas fa-language"></i> {{ 'NAV.Langue' | translate }}
-  </button>
-  <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="langDropdown">
-    <li><a class="dropdown-item" (click)="translatePage('fr')"><i class="flag-icon flag-icon-fr"></i> Français</a></li>
-    <li><a class="dropdown-item" (click)="translatePage('en')"><i class="flag-icon flag-icon-gb"></i> English</a></li>
-    <li><a class="dropdown-item" (click)="translatePage('ar')"><i class="flag-icon flag-icon-sa"></i> العربية</a></li>
-  </ul>
-</div>
+      <button
+        type="button"
+        class="md:hidden p-2 rounded-md hover:bg-muted"
+        (click)="toggleMenu()"
+        [attr.aria-expanded]="open"
+        aria-label="Ouvrir le menu"
+      >
+        <i-lucide
+          *ngIf="open; else menuIcon"
+          name="x"
+          class="w-6 h-6"
+        ></i-lucide>
+        <ng-template #menuIcon>
+          <i-lucide name="menu" class="w-6 h-6"></i-lucide>
+        </ng-template>
+      </button>
     </div>
-  </div>
-</nav>
-<!-- Navbar End -->
 
+    <div *ngIf="open" class="md:hidden border-t border-border bg-background">
+      <div class="container-x py-4 flex flex-col gap-2">
+        <a
+          routerLink="/"
+          routerLinkActive="active"
+          [routerLinkActiveOptions]="{ exact: true }"
+          ariaCurrentWhenActive="page"
+          (click)="closeMenu()"
+          class="mobile-nav-link"
+        >
+          Accueil
+        </a>
 
+        <a
+          routerLink="/rapports"
+          routerLinkActive="active"
+          ariaCurrentWhenActive="page"
+          (click)="closeMenu()"
+          class="mobile-nav-link"
+        >
+          Rapports
+        </a>
 
-<!-- Banner Section -->
-<!-- Banner Section -->
-<div class="banner-container">
-  <img src="assets/banner.jpg" alt="Banner" class="banner-image">
-  <div class="banner-caption">
-    <p class="banner-text">{{ 'BANNER.TEXT' | translate }}</p>
-    <div class="btn-don-container">
-      <a routerLink="/payment" class=" btn-don">{{ 'BANNER.DONATE_BTN' | translate }}</a>
-  </div></div>
-</div>
- fff 
-<!-- About Start -->
-<div class="about">
-  <div class="container">
-    <div class="row align-items-center">
-      <div class="col-lg-6">
-        <div class="about-img" [style.backgroundImage]="'url(assets/aboutR.jpg)'" data-parallax="scroll"></div>
-      </div>
-      <div class="col-lg-6">
-        <div class="section-header">
-          <p>{{ 'ABOUT.SUBTITLE' | translate }}</p>
-          <h2>{{ 'ABOUT.TITLE' | translate }}</h2>
+        <a
+          routerLink="/benevolat"
+          routerLinkActive="active"
+          ariaCurrentWhenActive="page"
+          (click)="closeMenu()"
+          class="mobile-nav-link"
+        >
+          Rejoignez-nous
+        </a>
+
+        <div class="mobile-auth-actions">
+          <a
+            routerLink="/login"
+            routerLinkActive="active"
+            ariaCurrentWhenActive="page"
+            (click)="closeMenu()"
+            class="mobile-login-button"
+          >
+            <i-lucide name="log-in" class="w-4 h-4"></i-lucide>
+            Se connecter
+          </a>
+
+          <a
+            routerLink="/register"
+            routerLinkActive="active"
+            ariaCurrentWhenActive="page"
+            (click)="closeMenu()"
+            class="mobile-register-button"
+          >
+            <i-lucide name="user-plus" class="w-4 h-4"></i-lucide>
+            S'inscrire
+          </a>
         </div>
-        <div class="about-text">
-          <p>
-            {{ 'ABOUT.TEXT1' | translate }}
-            <br><br>
-            {{ 'ABOUT.TEXT2' | translate }}
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section id="accueil" class="relative overflow-hidden">
+      <div
+        class="container-x grid lg:grid-cols-2 gap-12 items-center py-16 lg:py-24"
+      >
+        <div>
+          <span
+            class="inline-flex items-center gap-2 rounded-full bg-accent/50 border border-accent px-4 py-1.5 text-sm font-medium text-accent-foreground"
+          >
+            <i-lucide name="sparkles" class="w-4 h-4"></i-lucide>
+            Association reconnue d'intérêt général
+          </span>
+          <h1
+            class="mt-6 text-5xl md:text-6xl lg:text-7xl leading-[1.05] text-ink"
+          >
+            Chaque geste <em class="text-primary not-italic">compte</em>,
+            <br />
+            chaque vie <em class="text-secondary not-italic">change</em>.
+          </h1>
+          <p class="mt-6 text-lg text-muted-foreground max-w-xl">
+            Depuis 2010, Espoir agit auprès des familles vulnérables —
+            éducation, santé, accès à l'eau et abri d'urgence. Ensemble,
+            construisons un monde plus juste.
+          </p>
+          <div class="mt-8 flex flex-wrap gap-3">
+            <a
+              routerLink="/payment"
+              class="inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3.5 text-base font-semibold text-primary-foreground hover:opacity-90 transition"
+            >
+              <i-lucide
+                name="heart"
+                class="w-5 h-5"
+                fill="currentColor"
+              ></i-lucide>
+              Faire un don
+            </a>
+            <a
+              href="#actions"
+              class="inline-flex items-center gap-2 rounded-full border border-border bg-card px-6 py-3.5 text-base font-semibold hover:bg-muted transition"
+            >
+              Découvrir nos actions
+              <i-lucide name="arrow-right" class="w-4 h-4"></i-lucide>
+            </a>
+          </div>
+        </div>
+
+        <div class="relative hero-image-column">
+          <div
+            class="absolute -top-6 -left-6 w-40 h-40 rounded-full bg-accent/60 blur-2xl"
+          ></div>
+          <div
+            class="absolute -bottom-6 -right-6 w-56 h-56 rounded-full bg-primary/20 blur-3xl"
+          ></div>
+          <div
+            class="hero-image-container relative overflow-hidden rounded-3xl border border-border shadow-2xl"
+          >
+            <img
+              [src]="heroImg"
+              alt="Bénévoles et familles soutenues par l'association Espoir"
+              width="1600"
+              height="1100"
+              class="hero-image"
+            />
+          </div>
+          <div
+            class="absolute -bottom-6 left-6 rounded-2xl bg-card border border-border p-4 shadow-xl flex items-center gap-3"
+          >
+            <div
+              class="grid place-items-center w-11 h-11 rounded-full bg-secondary text-secondary-foreground"
+            >
+              <i-lucide name="hand-heart" class="w-5 h-5"></i-lucide>
+            </div>
+            <div>
+              <div class="text-sm font-semibold">+12 000 familles</div>
+              <div class="text-xs text-muted-foreground">
+                soutenues cette année
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="a-propos" class="py-20 lg:py-28">
+      <div class="container-x grid lg:grid-cols-2 gap-14 items-start">
+        <div>
+          <p
+            class="uppercase tracking-[0.2em] text-xs font-semibold text-primary"
+          >
+            À propos de nous
+          </p>
+          <h2 class="mt-3 text-4xl md:text-5xl text-ink">
+            Une association humaine, des actions concrètes.
+          </h2>
+          <p class="mt-6 text-lg text-muted-foreground">
+            Espoir est née d'une conviction : personne ne devrait être laissé de
+            côté. Nous accompagnons enfants, femmes et familles à travers des
+            programmes durables construits main dans la main avec les
+            communautés locales.
+          </p>
+          <p class="mt-4 text-muted-foreground">
+            Grâce à nos donateurs et à nos 850 bénévoles, nous transformons
+            chaque euro en un impact réel : une école qui ouvre, un puits qui
+            coule, un enfant qui sourit.
           </p>
         </div>
-      </div>
-    </div>
-  </div>
-</div>
-<!-- About End -->
 
-<!-- Service Start -->
-<div class="service">
-  <div class="container">
-    <div class="section-header text-center">
-      <p>{{ 'SERVICE.SUBTITLE' | translate }}</p>
-      <h2>{{ 'SERVICE.TITLE' | translate }}</h2>
-    </div>
-    <div class="row">
-      <div class="col-lg-4 col-md-6" *ngFor="let service of services">
-        <div class="service-item">
-          <div class="service-icon">
-            <i [class]="service.icon"></i>
-          </div>
-          <div class="service-text">
-            <h3>{{ service.title | translate }}</h3>
-            <p>{{ service.description | translate }}</p>
+        <div class="grid sm:grid-cols-1 gap-4">
+          <div
+            *ngFor="let item of aboutItems"
+            class="flex items-start gap-4 rounded-2xl bg-card border border-border p-6 hover:shadow-lg transition"
+          >
+            <div
+              class="grid place-items-center w-12 h-12 rounded-xl bg-primary/10 text-primary shrink-0"
+            >
+              <i-lucide [name]="item.icon" class="w-6 h-6"></i-lucide>
+            </div>
+            <div>
+              <h3 class="text-xl font-semibold">{{ item.title }}</h3>
+              <p class="mt-1 text-muted-foreground">{{ item.text }}</p>
+            </div>
           </div>
         </div>
       </div>
-    </div>
-  </div>
-</div>
-<!-- Service End -->
+    </section>
 
-<!-- Facts Start -->
-<div class="facts" style="background-image: url('assets/facts.jpg');">
-  <div class="container">
-    <div class="row">
-      <div class="col-lg-3 col-md-6" *ngFor="let fact of facts">
-        <div class="facts-item">
-          <div class="facts-text">
-            <h3>{{ fact.value }}</h3>
-            <p>{{ fact.text | translate }}</p>
+    <section id="actions" class="py-20 lg:py-28 bg-muted/40">
+      <div class="container-x">
+        <div class="max-w-2xl">
+          <p
+            class="uppercase tracking-[0.2em] text-xs font-semibold text-primary"
+          >
+            Nos actions
+          </p>
+          <h2 class="mt-3 text-4xl md:text-5xl text-ink">
+            Sur le terrain, chaque jour.
+          </h2>
+          <p class="mt-4 text-muted-foreground text-lg">
+            Trois grands piliers guident notre engagement pour un impact
+            durable.
+          </p>
+        </div>
+
+        <div class="mt-12 grid md:grid-cols-3 gap-6">
+          <article
+            *ngFor="let action of actions"
+            class="group rounded-3xl overflow-hidden bg-card border border-border hover:shadow-xl transition"
+          >
+            <div class="action-image-container relative overflow-hidden">
+              <img
+                [src]="action.img"
+                [alt]="action.title"
+                loading="lazy"
+                class="action-image group-hover:scale-105 transition duration-500"
+              />
+              <div
+                class="absolute top-4 left-4 grid place-items-center w-11 h-11 rounded-full bg-card/95 text-primary"
+              >
+                <i-lucide [name]="action.icon" class="w-5 h-5"></i-lucide>
+              </div>
+            </div>
+            <div class="p-6">
+              <h3 class="text-xl font-semibold">{{ action.title }}</h3>
+              <p class="mt-2 text-muted-foreground">{{ action.text }}</p>
+              <a
+                href="#projets"
+                class="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-primary hover:gap-3 transition-all"
+              >
+                En savoir plus
+                <i-lucide name="arrow-right" class="w-4 h-4"></i-lucide>
+              </a>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="impact-section py-20 lg:py-24 text-secondary-foreground">
+      <div class="container-x">
+        <div class="max-w-2xl">
+          <p
+            class="uppercase tracking-[0.2em] text-xs font-semibold text-accent"
+          >
+            Notre impact
+          </p>
+          <h2 class="mt-3 text-4xl md:text-5xl">
+            Des chiffres qui parlent d'eux-mêmes.
+          </h2>
+        </div>
+
+        <div class="mt-12 grid grid-cols-2 md:grid-cols-4 gap-6">
+          <div
+            *ngFor="let stat of stats; let i = index"
+            #statCard
+            class="rounded-3xl bg-secondary-foreground/5 border border-secondary-foreground/10 p-6 text-center"
+            [attr.data-stat-index]="i"
+          >
+            <div
+              class="font-display text-5xl md:text-6xl font-semibold tabular-nums text-accent"
+            >
+              {{ formatNumber(stat.display) }}{{ stat.suffix }}
+            </div>
+            <div
+              class="mt-2 text-sm uppercase tracking-wider text-secondary-foreground/80"
+            >
+              {{ stat.label }}
+            </div>
           </div>
         </div>
       </div>
-    </div>
-  </div>
-</div>
-<!-- Facts End -->
+    </section>
 
-<!-- Causes Start -->
-<div class="causes">
-  <div class="container">
-    <div class="section-header text-center">
-      <p>{{ 'CAUSES.SUBTITLE' | translate }}</p>
-      <h2>{{ 'CAUSES.TITLE' | translate }}</h2>
-    </div>
+    <section id="projets" class="py-20 lg:py-28">
+      <div class="container-x">
+        <div class="flex flex-wrap items-end justify-between gap-6">
+          <div class="max-w-2xl">
+            <p
+              class="uppercase tracking-[0.2em] text-xs font-semibold text-primary"
+            >
+              Projets en cours
+            </p>
 
-    <div class="causes-carousel">
-      <div class="causes-item" *ngFor="let projet of projets">
-        <div class="causes-img">
-          <img [src]="projet.imageUrl || 'assets/default-image.jpg'" alt="Image">
-        </div>
-        <div class="causes-progress">
-
-          <div class="progress-text">
-            <p><strong>Montant soutenu:</strong> {{ projet.montantSoutenu }}</p>
-            <p><strong>Statut:</strong> {{ projet.statut }}</p>
+            <h2 class="mt-3 text-4xl md:text-5xl text-ink">
+              Aidez-nous à les faire aboutir.
+            </h2>
           </div>
         </div>
-        <div class="causes-text">
-          <h3>{{ projet.titre }}</h3>
-          <p>{{ projet.description }}</p>
-        </div>
-        <div class="causes-btn">
 
-          <a class="btn btn-custom" routerLink="/payment">Faire un don</a>
+        <div class="mt-12 grid md:grid-cols-3 gap-6">
+          <article
+            *ngFor="let project of visibleProjects"
+            class="rounded-3xl overflow-hidden bg-card border border-border flex flex-col hover:shadow-xl transition"
+          >
+            <div class="project-image-container relative overflow-hidden">
+              <img
+                [src]="project.img"
+                [alt]="project.title"
+                loading="lazy"
+                class="project-image"
+              />
+
+              <span
+                class="absolute top-4 left-4 rounded-full bg-primary text-primary-foreground text-xs font-semibold px-3 py-1"
+              >
+                {{ project.tag }}
+              </span>
+            </div>
+
+            <div class="p-6 flex flex-col gap-4 flex-1">
+              <h3 class="text-xl font-semibold">
+                {{ project.title }}
+              </h3>
+
+              <p class="text-muted-foreground text-sm">
+                {{ project.text }}
+              </p>
+
+              <div class="mt-auto">
+                <div class="flex justify-between text-xs font-medium mb-2">
+                  <span>Financement</span>
+                  <span class="text-primary"> {{ project.progress }}% </span>
+                </div>
+
+                <div class="h-2 rounded-full bg-muted overflow-hidden">
+                  <div
+                    class="h-full bg-primary rounded-full transition-all"
+                    [style.width.%]="project.progress"
+                  ></div>
+                </div>
+
+                <button
+                  type="button"
+                  class="mt-5 w-full rounded-full bg-secondary text-secondary-foreground py-2.5 text-sm font-semibold hover:opacity-90 transition"
+                >
+                  Soutenir ce projet
+                </button>
+              </div>
+            </div>
+          </article>
+        </div>
+
+        <
+        <div *ngIf="projects.length > 3" class="mt-10 flex justify-center">
+          <button
+            type="button"
+            (click)="toggleProjects()"
+            class="group inline-flex items-center justify-center gap-2 rounded-full border border-border bg-card px-6 py-3 text-sm font-semibold text-foreground shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:bg-muted hover:shadow-md"
+            [attr.aria-expanded]="showAllProjects"
+          >
+            {{ showAllProjects ? "Voir moins" : "Voir plus" }}
+
+            <i-lucide
+              [name]="showAllProjects ? 'chevron-up' : 'chevron-down'"
+              class="w-4 h-4 text-primary transition-transform duration-300 group-hover:translate-y-0.5"
+            ></i-lucide>
+          </button>
         </div>
       </div>
-    </div>
+    </section>
 
-  </div>
-</div>
-<!-- Causes End -->
-
-<!-- Contact Start -->
-<div class="contact">
-  <div class="container">
-    <div class="section-header text-center">
-      <p>{{ 'CONTACT.SUBTITLE' | translate }}</p>
-      <h2>{{ 'CONTACT.TITLE' | translate }}</h2>
-    </div>
-
-    <div class="contact-img">
-      <img src="assets/contact.jpg" alt="Contact Image">
-    </div>
-
-    <div class="contact-form">
-      <div *ngIf="successMessage" class="alert alert-success">
-        {{ successMessage }}
-      </div>
-
-      <form [formGroup]="contactForm" (ngSubmit)="onSubmitForm()">
-        <div class="control-group">
-          <input type="text" class="form-control" placeholder="{{ 'CONTACT.NAME' | translate }}" formControlName="name" required />
-          <p *ngIf="contactForm.controls['name'].invalid && contactForm.controls['name'].touched" class="text-danger">{{ 'CONTACT.NAME' | translate }}</p>
-        </div>
-        <div class="control-group">
-          <input type="email" class="form-control" placeholder="{{ 'CONTACT.EMAIL' | translate }}" formControlName="email" required />
-          <p *ngIf="contactForm.controls['email'].invalid && contactForm.controls['email'].touched" class="text-danger">{{ 'CONTACT.EMAIL' | translate }}</p>
-        </div>
-        <div class="control-group">
-          <input type="text" class="form-control" placeholder="{{ 'CONTACT.SUBJECT' | translate }}" formControlName="subject" required />
-          <p *ngIf="contactForm.controls['subject'].invalid && contactForm.controls['subject'].touched" class="text-danger">{{ 'CONTACT.SUBJECT' | translate }}</p>
-        </div>
-        <div class="control-group">
-          <textarea class="form-control" placeholder="{{ 'CONTACT.MESSAGE' | translate }}" formControlName="message" required></textarea>
-          <p *ngIf="contactForm.controls['message'].invalid && contactForm.controls['message'].touched" class="text-danger">{{ 'CONTACT.MESSAGE' | translate }}</p>
-        </div>
+    <section id="feedback" class="py-20 lg:py-28 bg-muted/40">
+      <div class="container-x grid lg:grid-cols-2 gap-14 items-start">
         <div>
-          <button class="btn btn-custom" type="submit" [disabled]="contactForm.invalid">{{ 'CONTACT.SEND' | translate }}</button>
+          <p
+            class="uppercase tracking-[0.2em] text-xs font-semibold text-primary"
+          >
+            Votre avis compte
+          </p>
+          <h2 class="mt-3 text-4xl md:text-5xl text-ink">
+            Partagez votre retour avec nous.
+          </h2>
+          <p class="mt-4 text-muted-foreground text-lg">
+            Une question, une idée, un message d'encouragement ? Nous lisons
+            chaque témoignage et vous répondons dans les 48h.
+          </p>
+          <div class="mt-8 space-y-4 text-sm">
+            <div class="flex items-center gap-3">
+              <span
+                class="grid place-items-center w-10 h-10 rounded-full bg-primary/10 text-primary"
+              >
+                <i-lucide name="mail" class="w-4 h-4"></i-lucide>
+              </span>
+              contact&#64;tunisiacharity.org
+            </div>
+            <div class="flex items-center gap-3">
+              <span
+                class="grid place-items-center w-10 h-10 rounded-full bg-primary/10 text-primary"
+              >
+                <i-lucide name="phone" class="w-4 h-4"></i-lucide>
+              </span>
+              +216 28 391 000
+            </div>
+            <div class="flex items-center gap-3">
+              <span
+                class="grid place-items-center w-10 h-10 rounded-full bg-primary/10 text-primary"
+              >
+                <i-lucide name="map-pin" class="w-4 h-4"></i-lucide>
+              </span>
+              63 rue Iran, 1002 Tunis, Tunisie
+            </div>
+          </div>
         </div>
-      </form>
+
+        <form
+          (ngSubmit)="onSubmit()"
+          class="rounded-3xl bg-card border border-border p-6 md:p-8 shadow-sm space-y-4"
+        >
+          <div class="grid sm:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium mb-1.5">Votre nom</label>
+              <input
+                type="text"
+                name="name"
+                [(ngModel)]="form.name"
+                placeholder="Marie Dupont"
+                required
+                maxlength="80"
+                class="w-full rounded-xl border border-input bg-background px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-ring"
+              />
+            </div>
+            <div>
+              <label class="block text-sm font-medium mb-1.5">Email</label>
+              <input
+                type="email"
+                name="email"
+                [(ngModel)]="form.email"
+                placeholder="marie&#64;exemple.com"
+                required
+                maxlength="120"
+                class="w-full rounded-xl border border-input bg-background px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-ring"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium mb-1.5">Sujet</label>
+            <input
+              type="text"
+              name="subject"
+              [(ngModel)]="form.subject"
+              placeholder="À propos d'un projet…"
+              maxlength="120"
+              class="w-full rounded-xl border border-input bg-background px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-ring"
+            />
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium mb-1.5"
+              >Votre message</label
+            >
+            <textarea
+              name="message"
+              [(ngModel)]="form.message"
+              required
+              maxlength="1000"
+              rows="5"
+              placeholder="Partagez votre témoignage, question ou suggestion…"
+              class="w-full rounded-xl border border-input bg-background px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-ring resize-none"
+            ></textarea>
+          </div>
+
+          <button
+            type="submit"
+            [disabled]="isSubmittingContact"
+            class="w-full rounded-full bg-primary text-primary-foreground py-3.5 font-semibold hover:opacity-90 transition disabled:opacity-60 disabled:cursor-not-allowed"
+          >
+            <span *ngIf="!isSubmittingContact"> Envoyer mon message </span>
+
+            <span
+              *ngIf="isSubmittingContact"
+              class="flex items-center justify-center gap-2"
+            >
+              <span
+                class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"
+              ></span>
+
+              Envoi en cours...
+            </span>
+          </button>
+
+          <p
+            *ngIf="status === 'sent'"
+            class="text-sm text-center text-secondary font-medium"
+          >
+            Merci ! Votre message a bien été envoyé.
+          </p>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <footer class="bg-ink text-cream">
+    <div class="container-x py-14 grid md:grid-cols-4 gap-10">
+      <div class="md:col-span-2">
+        <div class="flex items-center gap-3">
+          <img
+            [src]="logoAssetUrl"
+            alt="Tunisia Charity"
+            class="h-12 w-12 rounded-full object-contain bg-white p-1"
+          />
+          <span class="font-display text-2xl font-semibold"
+            >Tunisia Charity</span
+          >
+        </div>
+
+        <p class="mt-4 text-cream/70 max-w-md">
+          Une association reconnue d'intérêt général. Vos dons sont déductibles
+          à 66% de vos impôts.
+        </p>
+        <div class="mt-6 flex items-center gap-3">
+          <a
+            *ngFor="let icon of socialIcons"
+            href="#"
+            class="grid place-items-center w-10 h-10 rounded-full bg-cream/10 hover:bg-primary transition"
+            aria-label="Réseau social"
+          >
+            <i-lucide [name]="icon" class="w-4 h-4"></i-lucide>
+          </a>
+        </div>
+      </div>
+
+      <div>
+        <h4 class="text-cream text-sm font-semibold uppercase tracking-wider">
+          Navigation
+        </h4>
+        <ul class="mt-4 space-y-2 text-sm text-cream/70">
+          <li>
+            <a routerLink="/" class="hover:text-primary transition">Accueil</a>
+          </li>
+          <li>
+            <a routerLink="/rapports" class="hover:text-primary transition"
+              >Rapports</a
+            >
+          </li>
+          <li>
+            <a routerLink="/benevolat" class="hover:text-primary transition"
+              >Rejoignez-nous</a
+            >
+          </li>
+          <li>
+            <a routerLink="/login" class="hover:text-primary transition"
+              >Se connecter</a
+            >
+          </li>
+          <li>
+            <a routerLink="/register" class="hover:text-primary transition"
+              >S'inscrire</a
+            >
+          </li>
+        </ul>
+      </div>
+
+      <div>
+        <h4 class="text-cream text-sm font-semibold uppercase tracking-wider">
+          Contact
+        </h4>
+        <ul class="mt-4 space-y-2 text-sm text-cream/70">
+          <li>contact&#64;tunisiacharity.org</li>
+          <li>+216 28 391 000</li>
+          <li>63 rue Iran 1002, Tunis, Tunisie</li>
+        </ul>
+      </div>
     </div>
-  </div>
+
+    <div class="border-t border-cream/10">
+      <div
+        class="container-x py-5 flex flex-wrap justify-between gap-3 text-xs text-cream/60"
+      >
+        <span
+          >© {{ currentYear }} Association Tunisia Charity. Tous droits
+          réservés.</span
+        >
+        <span>Site conçu avec ❤️ pour un monde plus solidaire.</span>
+      </div>
+    </div>
+  </footer>
 </div>
-<!-- Contact End -->
-
-
-
-<link href="https://cdn.jsdelivr.net/npm/@n8n/chat/dist/style.css" rel="stylesheet" />
-<script type="module">
-	import { createChat } from 'https://cdn.jsdelivr.net/npm/@n8n/chat/dist/chat.bundle.es.js';
-
-	createChat({
-		webhookUrl: 'https://azizbelkhir562.app.n8n.cloud/webhook/9a2a284e-92e0-4cd2-af6e-bc43b821ba6f/chat'
-	});
-</script>
-
-
-<app-footer></app-footer>
