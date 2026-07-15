@@ -117,74 +117,141 @@ exports.registerAdmin = async (req, res) => {
 
 exports.forgotPassword = async (req, res) => {
   const { email, userType } = req.body;
+
   const JWT_SECRET = process.env.JWT_SECRET;
-  const JWT_EXPIRES_IN = '1h'; // Token expires in 1 hour
+  const JWT_EXPIRES_IN = '1h';
 
   try {
-    // Validate userType
-    const validTypes = ['admin', 'beneficiary', 'volunteer', 'donor'];
+    const validTypes = [
+      'admin',
+      'beneficiary',
+      'volunteer',
+      'donor'
+    ];
+
     if (!validTypes.includes(userType)) {
-      return res.status(400).json({ message: 'Type d\'utilisateur invalide.' });
+      return res.status(400).json({
+        message: "Type d'utilisateur invalide."
+      });
     }
 
-    // Get the correct model
     const Models = {
       admin: Admin,
       beneficiary: Beneficiary,
       volunteer: Volunteer,
       donor: Donor
     };
+
     const Model = Models[userType];
 
-    // Find user
     const user = await Model.findOne({ email });
+
     if (!user) {
-      return res.status(404).json({ message: 'Utilisateur non trouvé.' });
+      return res.status(404).json({
+        message: 'Utilisateur non trouvé.'
+      });
     }
 
-    // Create signed token
+    if (!JWT_SECRET) {
+      throw new Error('JWT_SECRET is not configured');
+    }
+
     const token = jwt.sign(
-      { 
-        email: user.email, 
-        userType, 
+      {
+        email: user.email,
+        userType,
         id: user._id,
-        purpose: 'password_reset' // Add purpose to prevent token misuse
+        purpose: 'password_reset'
       },
       JWT_SECRET,
-      { expiresIn: JWT_EXPIRES_IN }
+      {
+        expiresIn: JWT_EXPIRES_IN
+      }
     );
 
-    // URL encode the token for safety
     const encodedToken = encodeURIComponent(token);
-    const resetUrl = `${process.env.FRONTEND_URL}/reset-password?token=${encodedToken}`;
-    
-    // Send email
+
+    const resetUrl =
+      `${process.env.FRONTEND_URL}/reset-password?token=${encodedToken}`;
+
     const transporter = nodemailer.createTransport({
       host: process.env.EMAIL_HOST,
-      port: parseInt(process.env.EMAIL_PORT, 10),
-      secure: false,
+      port: Number(process.env.EMAIL_PORT),
+      secure: process.env.EMAIL_SECURE === 'true',
       auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS
       }
     });
 
-    await transporter.sendMail({
-      from: `"Support" <${process.env.EMAIL_USER}>`,
+    const emailResult = await transporter.sendMail({
+      from: process.env.EMAIL_FROM,
       to: user.email,
-      subject: 'Réinitialisation de mot de passe',
-      html: `<p>Cliquez sur ce lien pour réinitialiser votre mot de passe (valable 1 heure):</p>
-             <a href="${resetUrl}">Réinitialiser mon mot de passe</a>
-             <p>Si vous n'avez pas demandé cette réinitialisation, ignorez cet email.</p>`
+      subject: 'Réinitialisation de votre mot de passe',
+      html: `
+        <div style="font-family: Arial, sans-serif; line-height: 1.6;">
+          <h2>Réinitialisation du mot de passe</h2>
+
+          <p>
+            Vous avez demandé la réinitialisation de votre mot de passe.
+          </p>
+
+          <p>
+            Cliquez sur le bouton ci-dessous pour créer un nouveau mot de passe.
+            Ce lien est valable pendant une heure.
+          </p>
+
+          <p style="margin: 30px 0;">
+            <a
+              href="${resetUrl}"
+              style="
+                display: inline-block;
+                padding: 12px 20px;
+                background-color: #1677ff;
+                color: #ffffff;
+                text-decoration: none;
+                border-radius: 8px;
+                font-weight: bold;
+              "
+            >
+              Réinitialiser mon mot de passe
+            </a>
+          </p>
+
+          <p>
+            Si vous n'avez pas demandé cette réinitialisation,
+            vous pouvez ignorer cet email.
+          </p>
+
+          <p>
+            Si le bouton ne fonctionne pas, copiez ce lien :
+          </p>
+
+          <p style="word-break: break-all;">
+            ${resetUrl}
+          </p>
+        </div>
+      `
     });
 
-    res.status(200).json({ message: 'Email envoyé avec instructions.' });
+    console.log('Email sent successfully:', emailResult.messageId);
+
+    return res.status(200).json({
+      message: 'Email envoyé avec les instructions.'
+    });
   } catch (error) {
-    console.error('Forgot Password Error:', error);
-    res.status(500).json({ message: 'Erreur du serveur.' });
+    console.error('Forgot Password Error:', {
+      message: error.message,
+      code: error.code,
+      command: error.command,
+      response: error.response
+    });
+
+    return res.status(500).json({
+      message: "Impossible d'envoyer l'email de réinitialisation."
+    });
   }
 };
-
 exports.resetPassword = async (req, res) => {
   // Get token from either body or query
   const token = req.body.token || req.query.token;

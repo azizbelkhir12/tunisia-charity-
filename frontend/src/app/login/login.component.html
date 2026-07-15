@@ -1,103 +1,245 @@
-<app-navbar></app-navbar>
+<div class="connexion-page">
+  <app-navbar></app-navbar>
 
-<div class="about">
-  <div class="container">
-    <div class="row align-items-center">
-      <!-- Tabs -->
-      <ul class="nav nav-pills nav-justified">
-        <li class="nav-item" *ngFor="let tab of tabs; let i = index">
-          <a class="nav-link"
-            [ngClass]="{ active: activeTab === i }"
-            (click)="setActiveTab(i)">
-            {{ ('TABS.' + tab.title) | translate }}
-          </a>
-        </li>
-      </ul>
+  <main class="container-x main-content">
+    <!-- Role selection -->
+    <section *ngIf="!selectedRole" class="role-picker">
+      <div class="role-header">
+        <span class="member-badge">
+          Espace membre
+        </span>
 
-      <!-- Tab Content -->
-      <div class="tab-content">
-        <ng-container *ngFor="let tab of tabs; let i = index">
-          <div *ngIf="activeTab === i" class="container tab-pane" [ngClass]="{ active: activeTab === i, fade: activeTab !== i }">
+        <h1>
+          Bienvenue.
+          <em>Qui êtes-vous ?</em>
+        </h1>
 
-            <!-- Volunteer Login Tab -->
-            <ng-container *ngIf="tab.userType === 'volunteer'">
-              <h3 class="login-title">{{ 'LOGIN.VOLUNTEER_TITLE' | translate }}</h3>
-              <section class="login-section">
-                <div class="row login-container">
-                  <div class="col-md-6 form-column">
-                    <form #loginForm="ngForm" (ngSubmit)="submitLogin()" class="login-form">
-                      <input type="email" [placeholder]="'LOGIN.EMAIL_PLACEHOLDER' | translate" class="form-input" [(ngModel)]="loginData.email" name="email" required />
-                      <input type="password" [placeholder]="'LOGIN.PASSWORD_PLACEHOLDER' | translate" class="form-input" [(ngModel)]="loginData.password" name="password" required />
-                      <button type="submit" class="submit-btn" [disabled]="loginForm.invalid">{{ 'LOGIN.LOGIN_BTN' | translate }}</button>
-                      <div class="error-message">{{ loginErrorMsg }}</div>
-                      <a routerLink="/forgot-password">{{ 'LOGIN.FORGOT_PASSWORD' | translate }}</a>
-                    </form>
-                  </div>
-                  <div class="col-md-6 info-column">
-                    <div class="login-info">
-                      <h4>{{ 'LOGIN.NEW_HERE' | translate }}</h4>
-                      <p>{{ 'LOGIN.JOIN_VOLUNTEERS' | translate }}</p>
-                      <a routerLink="/benevolat" class="info-btn">{{ 'LOGIN.SIGNUP' | translate }}</a>
-                    </div>
-                  </div>
-                </div>
-              </section>
-            </ng-container>
+        <p>
+          Choisissez votre profil pour accéder à l'espace qui vous correspond.
+        </p>
+      </div>
 
-            <!-- Donor Login Tab -->
-            <ng-container *ngIf="tab.userType === 'donor'">
-              <h3 class="login-title">{{ 'LOGIN.DONOR_TITLE' | translate }}</h3>
-              <section class="login-section">
-                <div class="row login-container">
-                  <div class="col-md-6 form-column">
-                    <form #donationForm="ngForm" (ngSubmit)="submitLogin()" class="login-form">
-                      <input type="email" [placeholder]="'LOGIN.EMAIL_PLACEHOLDER' | translate" class="form-input" [(ngModel)]="loginData.email" name="email" required />
-                      <input type="password" [placeholder]="'LOGIN.PASSWORD_PLACEHOLDER' | translate" class="form-input" [(ngModel)]="loginData.password" name="password" required />
-                      <button type="submit" class="submit-btn" [disabled]="donationForm.invalid">{{ 'LOGIN.LOGIN_BTN' | translate }}</button>
-                      <div class="error-message">{{ loginErrorMsg }}</div>
-                      <a routerLink="/forgot-password">{{ 'LOGIN.FORGOT_PASSWORD' | translate }}</a>
-                    </form>
-                  </div>
-                  <div class="col-md-6 info-column">
-                    <div class="login-info">
-                      <h4>{{ 'LOGIN.MAKE_DIFFERENCE' | translate }}</h4>
-                      <p>{{ 'LOGIN.DONOR_TEXT' | translate }}</p>
-                      <a routerLink="/register" class="info-btn">{{ 'LOGIN.SIGNUP' | translate }}</a>
-                    </div>
-                  </div>
-                </div>
-              </section>
-            </ng-container>
-
-            <!-- Beneficiary Login Tab -->
-            <ng-container *ngIf="tab.userType === 'beneficiary'">
-              <h3 class="login-title">{{ 'LOGIN.BENEFICIARY_TITLE' | translate }}</h3>
-              <section class="login-section">
-                <div class="row login-container">
-                  <div class="col-md-6 form-column">
-                    <form #contactForm="ngForm" (ngSubmit)="submitLogin()" class="login-form">
-                      <input type="email" [placeholder]="'LOGIN.EMAIL_PLACEHOLDER' | translate" class="form-input" [(ngModel)]="loginData.email" name="email" required />
-                      <input type="password" [placeholder]="'LOGIN.PASSWORD_PLACEHOLDER' | translate" class="form-input" [(ngModel)]="loginData.password" name="password" required />
-                      <button type="submit" class="submit-btn" [disabled]="contactForm.invalid">{{ 'LOGIN.LOGIN_BTN' | translate }}</button>
-                      <div class="error-message">{{ loginErrorMsg }}</div>
-                      <a routerLink="/forgot-password">{{ 'LOGIN.FORGOT_PASSWORD' | translate }}</a>
-                    </form>
-                  </div>
-                  <div class="col-md-6 info-column">
-                    <div class="login-info">
-                      <h4>{{ 'LOGIN.NEED_HELP' | translate }}</h4>
-                      <p>{{ 'LOGIN.BENEFICIARY_TEXT' | translate }}</p>
-                    </div>
-                  </div>
-                </div>
-              </section>
-            </ng-container>
-
+      <div class="roles-grid">
+        <button
+          *ngFor="let role of roles; trackBy: trackRoleById"
+          type="button"
+          class="role-card"
+          (click)="selectRole(role)"
+        >
+          <div class="role-icon-container">
+            <i-lucide
+              [name]="role.icon"
+              class="icon-28"
+            ></i-lucide>
           </div>
-        </ng-container>
+
+          <h2>
+            {{ role.title }}
+          </h2>
+
+          <p class="role-description">
+            {{ role.description }}
+          </p>
+
+          <ul class="role-perks">
+            <li
+              *ngFor="let perk of role.perks; trackBy: trackPerk"
+            >
+              <span class="perk-dot"></span>
+              <span>{{ perk }}</span>
+            </li>
+          </ul>
+
+          <div class="role-action">
+            <span>Se connecter</span>
+            <span class="role-arrow">→</span>
+          </div>
+        </button>
+      </div>
+
+      <p class="register-text">
+        Pas encore de compte ?
+
+        <a routerLink="/register">
+          Créer un compte
+        </a>
+      </p>
+    </section>
+
+    <!-- Login form -->
+    <section
+  *ngIf="selectedRole as role"
+  class="login-section"
+>
+  <button
+    type="button"
+    class="change-role-button"
+    (click)="changeRole()"
+  >
+    <i-lucide
+      name="arrow-left"
+      class="icon-16"
+    ></i-lucide>
+
+    <span>Changer de profil</span>
+  </button>
+
+  <div class="login-card">
+    <div class="login-card-header">
+      <div class="login-role-icon">
+        <i-lucide
+          [name]="role.icon"
+          class="icon-28"
+        ></i-lucide>
+      </div>
+
+      <div>
+        <p class="login-label">
+          Connexion
+        </p>
+
+        <h2>
+          Espace {{ role.title }}
+        </h2>
       </div>
     </div>
-  </div>
-</div>
 
-<app-footer></app-footer>
+    <div
+      *ngIf="submitted"
+      class="success-message"
+    >
+      <p class="success-title">
+        Connexion simulée ✓
+      </p>
+
+      <p>
+        Ceci est une maquette. L'authentification réelle n'est pas activée.
+      </p>
+    </div>
+
+    <form
+  class="login-form"
+  #loginForm="ngForm"
+  (ngSubmit)="onSubmit()"
+>
+  <label class="form-field">
+    <span class="field-label">
+      Email
+    </span>
+
+    <div class="input-container">
+      <i-lucide
+        name="mail"
+        class="input-left-icon"
+      ></i-lucide>
+
+      <input
+        type="email"
+        name="email"
+        [(ngModel)]="email"
+        required
+        email
+        autocomplete="email"
+        placeholder="vous@exemple.com"
+      />
+    </div>
+  </label>
+
+  <label class="form-field">
+    <span class="field-label">
+      Mot de passe
+    </span>
+
+    <div class="input-container">
+      <i-lucide
+        name="lock"
+        class="input-left-icon"
+      ></i-lucide>
+
+      <input
+        [type]="showPassword ? 'text' : 'password'"
+        name="password"
+        [(ngModel)]="password"
+        required
+        autocomplete="current-password"
+        placeholder="••••••••"
+        class="password-input"
+      />
+
+      <button
+        type="button"
+        class="password-toggle"
+        (click)="togglePasswordVisibility()"
+      >
+        <i-lucide
+          [name]="showPassword ? 'eye-off' : 'eye'"
+          class="icon-16"
+        ></i-lucide>
+      </button>
+    </div>
+  </label>
+
+  <div class="form-options">
+    <label class="remember-me">
+      <input
+        type="checkbox"
+        name="rememberMe"
+        [(ngModel)]="rememberMe"
+      />
+
+      <span>Se souvenir de moi</span>
+    </label>
+
+    <a
+      routerLink="/forgot-password"
+      class="forgot-password"
+    >
+      Mot de passe oublié ?
+    </a>
+  </div>
+
+  <div
+    *ngIf="errorMessage"
+    class="login-error"
+  >
+    {{ errorMessage }}
+  </div>
+
+  <button
+    type="submit"
+    class="submit-button"
+    [disabled]="
+      isLoading ||
+      loginForm.invalid
+    "
+  >
+    <span *ngIf="!isLoading">
+      Se connecter en tant que
+      {{ role.title.toLowerCase() }}
+    </span>
+
+    <span *ngIf="isLoading">
+      Connexion en cours...
+    </span>
+  </button>
+
+  <p class="new-account-text">
+    Nouveau ici ?
+
+    <a
+      routerLink="/register"
+      [queryParams]="{
+        role: role.id
+      }"
+    >
+      Créer un compte
+      {{ role.title.toLowerCase() }}
+    </a>
+  </p>
+</form>
+  </div>
+</section>
+  </main>
+
+  <app-footer></app-footer>
+</div>

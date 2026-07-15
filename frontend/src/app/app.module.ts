@@ -17,12 +17,16 @@ import { MatOptionModule } from '@angular/material/core';
 import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import {
+  ArrowLeft,
   ArrowRight,
   BookOpen,
+  Eye,
+  EyeOff,
   Facebook,
   HandHeart,
   Heart,
   Instagram,
+  Lock,
   LogIn,
   LucideAngularModule,
   Mail,
@@ -36,8 +40,9 @@ import {
   Users,
   Utensils,
   X,
+  ShieldCheck,
+  CircleCheckBig
 } from 'lucide-angular';
-
 
 import { AppComponent } from './app.component';
 
@@ -170,12 +175,16 @@ export function HttpLoaderFactory(http: HttpClient) {
     MatButtonModule,
     MatOptionModule,
    LucideAngularModule.pick({
+  ArrowLeft,
   ArrowRight,
   BookOpen,
+  Eye,
+  EyeOff,
   Facebook,
   HandHeart,
   Heart,
   Instagram,
+  Lock,
   LogIn,
   Mail,
   MapPin,
@@ -188,6 +197,8 @@ export function HttpLoaderFactory(http: HttpClient) {
   Users,
   Utensils,
   X,
+  ShieldCheck,
+  CircleCheckBig
 }),
     TranslateModule.forRoot({
       loader: {

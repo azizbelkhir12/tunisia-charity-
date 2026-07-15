@@ -47,36 +47,16 @@ export class AuthService {
 
   // Register a new donor
   register(donorData: any): Observable<any> {
-    return this.http.post(`${this.apiUrl}/donors/register`, donorData);
-  }
-
-  // Login method
-  login(credentials: any): Observable<any> {
-    return this.http.post(`${this.apiUrl}/auth/login`, credentials).pipe(
-      tap((response: any) => {
-        if (response.token && response.data.user) {
-          localStorage.setItem('token', response.token);
-
-          // Decode token to extract user info
-          const decodedToken: any = jwtDecode(response.token);
-
-          const user = {
-            id: decodedToken.userId || response.data.user._id,
-            userType: decodedToken.userType || response.data.user.userType,
-            email: decodedToken.email || response.data.user.email,
-            nom: decodedToken.nom || response.data.user.nom || ''
-          };
-
-          localStorage.setItem('currentUser', JSON.stringify(user));
-          this.currentUserSubject.next(user);
-        }
-      }),
-      catchError(error => {
-        console.error('Login error:', error);
-        return throwError(() => error);
-      })
+    return this.http.post(
+      `${this.apiUrl}/donors/register`,
+      donorData,
     );
   }
+
+  login(credentials: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}/auth/login`,credentials,);
+  }
+
 
   forgotPassword(email: string, userType: string) {
     return this.http.post(`${this.apiUrl}/auth/forgot-password`, { email, userType });

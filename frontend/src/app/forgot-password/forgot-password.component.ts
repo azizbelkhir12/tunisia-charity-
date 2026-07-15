@@ -1,53 +1,107 @@
-import { Component } from '@angular/core';
-import { FormGroup } from '@angular/forms';
-import { AuthService } from '../services/auth/auth.service'
-import { FormBuilder, Validators } from '@angular/forms';
+import { Component, OnInit } from '@angular/core';
+import { Meta, Title } from '@angular/platform-browser';
+import { HttpErrorResponse } from '@angular/common/http';
+import { finalize } from 'rxjs/operators';
 import Swal from 'sweetalert2';
+import { AuthService } from '../services/auth/auth.service';
 
 @Component({
   selector: 'app-forgot-password',
   standalone: false,
   templateUrl: './forgot-password.component.html',
-  styleUrl: './forgot-password.component.css'
+  styleUrl: './forgot-password.component.css',
 })
-export class ForgotPasswordComponent {
+export class ForgotPasswordComponent implements OnInit {
+  email = '';
+  userType = '';
 
-  forgotForm: FormGroup;
-  message: string = '';
-  error: string = '';
+  sent = false;
+  isLoading = false;
 
-  constructor(private authService: AuthService, private fb: FormBuilder) {
-    this.forgotForm = this.fb.group({
-      email: ['', [Validators.required, Validators.email]],
-      userType: ['', Validators.required]
-    });
+  constructor(
+    private titleService: Title,
+    private metaService: Meta,
+    private authService: AuthService
+  ) {}
+
+  ngOnInit(): void {
+    this.configurePageMetadata();
   }
 
-  onSubmit() {
-    if (this.forgotForm.invalid) return;
+  onSubmit(): void {
+    const formattedEmail = this.email.trim().toLowerCase();
 
-    const { email, userType } = this.forgotForm.value;
+    if (!formattedEmail || !this.userType) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Informations manquantes',
+        text: 'Veuillez saisir votre email et sélectionner votre type de compte.',
+        confirmButtonText: 'D’accord',
+        confirmButtonColor: '#235787'
+      });
 
-    this.authService.forgotPassword(email, userType).subscribe({
-      next: res => {
-        this.message = '';
-        this.error = '';
-        Swal.fire({
-          icon: 'success',
-          title: 'Succès',
-          text: 'Email envoyé avec succès.',
-        });
-      },
-      error: err => {
-        this.message = '';
-        this.error = err.error.message || 'Erreur.';
-        Swal.fire({
-          icon: 'error',
-          title: 'Erreur',
-          text: this.error,
-        });
-      }
-    });
+      return;
+    }
+
+    this.isLoading = true;
+    this.sent = false;
+
+    this.authService
+      .forgotPassword(formattedEmail, this.userType)
+      .pipe(
+        finalize(() => {
+          this.isLoading = false;
+        })
+      )
+      .subscribe({
+        next: (response: any) => {
+          this.sent = true;
+
+          Swal.fire({
+            icon: 'success',
+            title: 'Email envoyé',
+            text:
+              response?.message ||
+              'Un lien de réinitialisation vous a été envoyé.',
+            confirmButtonText: 'D’accord',
+            confirmButtonColor: '#235787'
+          });
+        },
+
+        error: (error: HttpErrorResponse) => {
+          Swal.fire({
+            icon: 'error',
+            title: 'Envoi impossible',
+            text:
+              error.error?.message ||
+              "Une erreur est survenue lors de l'envoi de l'email.",
+            confirmButtonText: 'Réessayer',
+            confirmButtonColor: '#235787'
+          });
+        }
+      });
   }
 
+  private configurePageMetadata(): void {
+    this.titleService.setTitle(
+      'Mot de passe oublié — Tunisia Charity'
+    );
+
+    this.metaService.updateTag({
+      name: 'description',
+      content:
+        'Réinitialisez votre mot de passe Tunisia Charity en quelques étapes.'
+    });
+
+    this.metaService.updateTag({
+      property: 'og:title',
+      content: 'Mot de passe oublié — Tunisia Charity'
+    });
+
+    this.metaService.updateTag({
+      property: 'og:description',
+      content:
+        'Recevez un lien pour réinitialiser votre mot de passe.'
+    });
+  }
 }

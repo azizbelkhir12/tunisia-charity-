@@ -17,7 +17,7 @@ type ReportType = 'financier' | 'litteraire';
 type ReportFilter = 'tous' | ReportType;
 
 interface Report {
-  id: string;
+  _id: string;
   titre: string;
   year: string;
   type: ReportType;
@@ -133,7 +133,7 @@ export class RapportsComponent implements OnInit {
   }
 
   onTelechargerRapport(report: Report): void {
-  this.rapportService.telechargerRapport(report.id).subscribe({
+  this.rapportService.telechargerRapport(report._id).subscribe({
     next: (blob: Blob) => {
       const pdfBlob = new Blob([blob], {
         type: 'application/pdf',
@@ -182,7 +182,7 @@ onConsulterRapport(report: Report): void {
     `;
   }
 
-  this.rapportService.consulterRapport(report.id).subscribe({
+  this.rapportService.consulterRapport(report._id).subscribe({
     next: (blob: Blob) => {
       const pdfBlob = new Blob([blob], {
         type: 'application/pdf',
@@ -255,7 +255,7 @@ private getPdfFileName(title: string): string {
   }
 
   trackByReportId(_index: number, report: Report): string {
-    return report.id;
+    return report._id;
   }
   
 }
