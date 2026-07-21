@@ -1,174 +1,747 @@
 <app-navbar></app-navbar>
 
-<div class="about-tab">
-  <!-- Tab Content -->
-  <div class="tab-content">
-    <!-- Tab 1 Content -->
-    <div id="tab-content-1" class="container" >
-        <h1 class="title">{{ 'VOLUNTEER.TITLE' | translate }}</h1>
-    
+<div class="join-page">
+  <main class="container-x main-content">
+    <!-- Choix du profil -->
+    <section *ngIf="currentStep === 'roles'" class="role-selection">
+      <div class="role-introduction">
+        <span class="member-badge">
+          <i-lucide name="hand-heart" class="icon-small"></i-lucide>
 
-      <!-- Signup Section -->
-      <section class="contact login_box_area" id="contact">
-        <div class="row container">
-          <!-- Form -->
-          <form [formGroup]="signupForm" class="form-container">
-            <!-- Name Field -->
-            <input type="text" [placeholder]="'FORM.NAME' | translate" class="box" formControlName="name" />
-            <div *ngIf="signupForm.get('name')?.invalid && (signupForm.get('name')?.dirty || signupForm.get('name')?.touched)" class="errorMsg">
-              <div *ngIf="signupForm.get('name')?.errors?.['required']">Name is required</div>
-              <div *ngIf="signupForm.get('name')?.errors?.['minlength']">Must be at least 3 characters</div>
-              <div *ngIf="signupForm.get('name')?.errors?.['maxlength']">Must be at most 50 characters</div>
-            </div> <br>
+          Devenir membre
+        </span>
 
-            <!-- First Name Field -->
-            <input type="text" [placeholder]="'FORM.FIRSTNAME' | translate" class="box" formControlName="Prenom">
-            <div *ngIf="signupForm.get('Prenom')?.invalid && (signupForm.get('Prenom')?.dirty || signupForm.get('Prenom')?.touched)" class="errorMsg">
-              <div *ngIf="signupForm.get('Prenom')?.errors?.['required']">Prénom is required</div>
-              <div *ngIf="signupForm.get('Prenom')?.errors?.['minlength']">Must be at least 3 characters</div>
-              <div *ngIf="signupForm.get('Prenom')?.errors?.['maxlength']">Must be at most 50 characters</div>
-            </div> <br>
+        <h1 class="page-title">
+          Rejoignez
+          <em>Tunisia Charity</em>
+        </h1>
 
-            <!-- Age Field -->
-            <input type="number" [placeholder]="'FORM.AGE' | translate" class="box" formControlName="age" min="18" max="99">
-            <div *ngIf="signupForm.get('age')?.invalid && (signupForm.get('age')?.dirty || signupForm.get('age')?.touched)" class="errorMsg">
-              <div *ngIf="signupForm.get('age')?.errors?.['required']">Age is required</div>
-              <div *ngIf="signupForm.get('age')?.errors?.['min']">You must be at least 18 years old</div>
-             <div *ngIf="signupForm.get('age')?.errors?.['max']">Age cannot exceed 99</div>
-            </div> <br>
+        <p class="page-description">
+          Choisissez le profil qui vous correspond et complétez votre demande
+          d'adhésion.
+        </p>
+      </div>
 
-            <!-- Email Field -->
-            <input type="email" [placeholder]="'FORM.EMAIL' | translate" formControlName="email" class="box">
-            <span class="errorMsg">{{errorMsg}}</span>
-            <div *ngIf="signupForm.get('email')?.invalid && (signupForm.get('email')?.dirty || signupForm.get('email')?.touched)" class="errorMsg">
-              <div *ngIf="signupForm.get('email')?.errors?.['required']">Email is required</div>
-              <div *ngIf="signupForm.get('email')?.errors?.['pattern']">Invalid email format</div>
-            </div> <br>
+      <div class="role-grid">
+        <button
+          *ngFor="let role of roles; trackBy: trackRoleById"
+          type="button"
+          class="role-card"
+          (click)="selectRole(role.id)"
+        >
+          <div class="role-icon">
+            <i-lucide [name]="role.icon" class="icon-large"></i-lucide>
+          </div>
 
-            <!-- Password Field -->
-            <input type="password" [placeholder]="'FORM.PASSWORD' | translate" class="box" formControlName="password">
-            <div class="form-group" *ngIf="signupForm.get('password')?.invalid && (signupForm.get('password')?.dirty || signupForm.get('password')?.touched)">
-              <label class="col invalid_msg" [ngClass]="signupForm.get('password')?.errors?.['required'] && signupForm.get('password')?.touched ? 'text-danger': 'text-success'">
-                <i class="material-icons">{{ signupForm.get('password')?.errors?.['required'] && signupForm.get('password')?.touched ? 'cancel': 'check_circle' }}</i>
-                Password is required!
-              </label>
-              <label class="col invalid_msg" [ngClass]="signupForm.get('password')?.errors?.['required'] || signupForm.get('password')?.errors?.['minlength'] ? 'text-danger': 'text-success'">
-                <i class="material-icons">{{ signupForm.get('password')?.errors?.['required'] || signupForm.get('password')?.errors?.['minlength'] ? 'cancel': 'check_circle' }}</i>
-                Must be at least 8 characters!
-              </label>
-              <label class="col invalid_msg" [ngClass]="signupForm.get('password')?.errors?.['required'] || signupForm.get('password')?.errors?.['hasNumber'] ? 'text-danger': 'text-success'">
-                <i class="material-icons">{{ signupForm.get('password')?.errors?.['required'] || signupForm.get('password')?.errors?.['hasNumber'] ? 'cancel': 'check_circle' }}</i>
-                Must contain at least 1 number!
-              </label>
-              <label class="col invalid_msg" [ngClass]="signupForm.get('password')?.errors?.['required'] || signupForm.get('password')?.errors?.['hasCapitalCase'] ? 'text-danger': 'text-success'">
-                <i class="material-icons">{{ signupForm.get('password')?.errors?.['required'] || signupForm.get('password')?.errors?.['hasCapitalCase'] ? 'cancel': 'check_circle' }}</i>
-                Must contain at least 1 uppercase letter!
-              </label>
-              <label class="col invalid_msg" [ngClass]="signupForm.get('password')?.errors?.['required'] || signupForm.get('password')?.errors?.['hasSmallCase'] ? 'text-danger': 'text-success'">
-                <i class="material-icons">{{ signupForm.get('password')?.errors?.['required'] || signupForm.get('password')?.errors?.['hasSmallCase'] ? 'cancel': 'check_circle' }}</i>
-                Must contain at least 1 lowercase letter!
-              </label>
-              <label class="col invalid_msg" [ngClass]="signupForm.get('password')?.errors?.['required'] || signupForm.get('password')?.errors?.['hasSpecialCharacters'] ? 'text-danger': 'text-success'">
-                <i class="material-icons">{{ signupForm.get('password')?.errors?.['required'] || signupForm.get('password')?.errors?.['hasSpecialCharacters'] ? 'cancel': 'check_circle' }}</i>
-                Must contain at least 1 special character!
-              </label>
-            </div> <br>
+          <h3 class="role-title">
+            {{ role.title }}
+          </h3>
 
-            <!-- Confirm Password Field -->
-            <input type="password" [placeholder]="'FORM.CONFIRM_PASSWORD' | translate" class="box" formControlName="confirmPassword">
-            <div *ngIf="signupForm.get('confirmPassword')?.invalid && (signupForm.get('confirmPassword')?.dirty || signupForm.get('confirmPassword')?.touched)" class="errorMsg">
-              <div *ngIf="signupForm.get('confirmPassword')?.errors?.['required']">Confirm Password is required</div>
-              <div *ngIf="signupForm.get('confirmPassword')?.errors?.['notMatching']">Passwords do not match</div>
-            </div> <br>
+          <p class="role-description">
+            {{ role.description }}
+          </p>
 
+          <div class="role-action">
+            S'inscrire
+            <span class="role-arrow">→</span>
+          </div>
+        </button>
+      </div>
 
+      <p class="login-message">
+        Vous avez déjà un compte ?
 
+        <a routerLink="/connexion" class="login-link"> Se connecter </a>
+      </p>
+    </section>
 
-            <!-- Address Field -->
-            <input type="text" [placeholder]="'FORM.ADDRESS' | translate" class="box" formControlName="address">
-            <div *ngIf="signupForm.get('address')?.invalid && (signupForm.get('address')?.dirty || signupForm.get('address')?.touched)" class="errorMsg">
-              <div *ngIf="signupForm.get('address')?.errors?.['required']">Address is required</div>
-              <div *ngIf="signupForm.get('address')?.errors?.['minlength']">Address must be at least 5 characters</div>
-              <div *ngIf="signupForm.get('address')?.errors?.['maxlength']">Address cannot exceed 100 characters</div>
-            </div> <br>
+    <!-- Formulaire bénévole -->
+    <section
+      *ngIf="currentStep === 'form' && selectedRole === 'benevole'"
+      class="form-section"
+    >
+      <button type="button" class="change-role-button" (click)="changeRole()">
+        <i-lucide name="arrow-left" class="icon-small"></i-lucide>
 
-            <!-- GOUVERNORAT -->
-            <!--<label for="gouvernorat">Gouvernorat</label><br>-->
-            <select formControlName="gouvernorat">
-              <option value="" disabled selected>Choose a governorate</option>
-              <option *ngFor="let gov of gouvernorats" [value]="gov">{{ gov }}</option>
-            </select>
+        Changer de profil
+      </button>
 
+      <div class="form-card">
+        <div class="form-header">
+          <div class="form-header-icon">
+            <i-lucide name="hand-heart" class="icon-large"></i-lucide>
+          </div>
 
-            <div *ngIf="signupForm.get('gouvernorat')?.invalid && (signupForm.get('gouvernorat')?.dirty || signupForm.get('gouvernorat')?.touched)" class="errorMsg">
-              <div *ngIf="signupForm.get('gouvernorat')?.errors?.['required']">Gouvernorat is required</div>
-            </div> <br>
+          <div>
+            <p class="form-eyebrow">Inscription</p>
 
-            <!-- Phone Field -->
-            <input type="tel" [placeholder]="'FORM.PHONE' | translate" class="box" formControlName="phone">
-            <div *ngIf="signupForm.get('phone')?.invalid && (signupForm.get('phone')?.dirty || signupForm.get('phone')?.touched)" class="errorMsg">
-              <div *ngIf="signupForm.get('phone')?.errors?.['required']">Phone number is required</div>
-              <div *ngIf="signupForm.get('phone')?.errors?.['pattern']">Invalid phone number (must start with +216 and have 8 digits)</div>
-            </div> <br>
-
-            <form *ngIf="signupForm" [formGroup]="signupForm">
-              <textarea formControlName="reason" [placeholder]="'FORM.REASON' | translate" rows="3" class="textarea-box"></textarea>
-              <div *ngIf="signupForm.get('reason')?.invalid && (signupForm.get('reason')?.dirty || signupForm.get('reason')?.touched)" class="errorMsg">
-                <div *ngIf="signupForm.get('reason')?.errors?.['required']">This field is required</div>
-                <div *ngIf="signupForm.get('reason')?.errors?.['minlength']">Must be at least 10 characters</div>
-                <div *ngIf="signupForm.get('reason')?.errors?.['maxlength']">Cannot exceed 300 characters</div>
-              </div>
-            </form>
-
-
-
-
-            <!-- Submit Button -->
-            <button type="submit" class="btn-Flower"  [ngClass]="{'no-hover': signupForm.invalid}" (click)="submit()">Signup</button>
-
-          </form>
-
-         <!-- OTP Modal -->
-<div class="otp-modal" *ngIf="showOtpModal">
-  <div class="otp-modal-content">
-    <h2>{{ 'OTP.TITLE' | translate }}</h2>
-    <p>{{ 'OTP.SENT' | translate }} <strong>{{ userEmail }}</strong>.</p>
-    <p>{{ 'OTP.INSTRUCTION' | translate }}</p>
-
-    <input
-      type="text"
-      maxlength="6"
-      [placeholder]="'OTP.PLACEHOLDER' | translate"
-      [(ngModel)]="otpCode"
-      class="otp-input"
-    />
-
-    <div class="otp-buttons">
-      <button class="btn-verify" (click)="verifyOtp()">Vérifier</button>
-      <button class="btn-cancel" (click)="cancelOtp()">Annuler</button>
-    </div>
-  </div>
-</div>
-
-
-
-          <!-- Side Image (Permanently on the Right Side) -->
-          <div class="image-container">
-            <div class="login_box_img">
-              <img class="img-fluid" src="assets/register.png" alt="">
-              <div class="hover">
-                <h4>{{ 'VOLUNTEER.NEW_HERE' | translate }}</h4>
-                <p>
-                  {{ 'VOLUNTEER.NEW_HERE_TEXT' | translate }}
-                </p>
-                <span><a routerLink="/login" class="btn-Flower">{{ 'VOLUNTEER.LOGIN' | translate }}</a></span>
-              </div>
-            </div>
+            <h2 class="form-title">Rejoindre en tant que bénévole</h2>
           </div>
         </div>
-      </section>
-    </div>
-  </div>
-</div>
 
-<app-footer></app-footer>
+        <form
+          class="registration-form"
+          (ngSubmit)="submitVolunteer()"
+          novalidate
+        >
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="volunteerNom">Nom</label>
+
+              <div class="control-wrapper">
+                <i-lucide name="user" class="control-icon"></i-lucide>
+
+                <input
+                  id="volunteerNom"
+                  name="volunteerNom"
+                  type="text"
+                  [(ngModel)]="volunteerForm.nom"
+                  placeholder="Votre nom"
+                  maxlength="80"
+                  class="form-control has-left-icon"
+                  [class.control-error]="volunteerErrors['nom']"
+                />
+              </div>
+
+              <p *ngIf="volunteerErrors['nom']" class="error-message">
+                {{ volunteerErrors["nom"] }}
+              </p>
+            </div>
+
+            <div class="form-group">
+              <label for="volunteerPrenom"> Prénom </label>
+
+              <div class="control-wrapper">
+                <i-lucide name="user" class="control-icon"></i-lucide>
+
+                <input
+                  id="volunteerPrenom"
+                  name="volunteerPrenom"
+                  type="text"
+                  [(ngModel)]="volunteerForm.prenom"
+                  placeholder="Votre prénom"
+                  maxlength="80"
+                  class="form-control has-left-icon"
+                  [class.control-error]="volunteerErrors['prenom']"
+                />
+              </div>
+
+              <p *ngIf="volunteerErrors['prenom']" class="error-message">
+                {{ volunteerErrors["prenom"] }}
+              </p>
+            </div>
+          </div>
+
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="volunteerAge">Âge</label>
+
+              <div class="control-wrapper">
+                <i-lucide name="calendar" class="control-icon"></i-lucide>
+
+                <input
+                  id="volunteerAge"
+                  name="volunteerAge"
+                  type="number"
+                  min="16"
+                  max="100"
+                  [(ngModel)]="volunteerForm.age"
+                  placeholder="Ex. 28"
+                  class="form-control has-left-icon"
+                  [class.control-error]="volunteerErrors['age']"
+                />
+              </div>
+
+              <p *ngIf="volunteerErrors['age']" class="error-message">
+                {{ volunteerErrors["age"] }}
+              </p>
+            </div>
+
+            <div class="form-group">
+              <label for="volunteerEmail"> Adresse email </label>
+
+              <div class="control-wrapper">
+                <i-lucide name="mail" class="control-icon"></i-lucide>
+
+                <input
+                  id="volunteerEmail"
+                  name="volunteerEmail"
+                  type="email"
+                  [(ngModel)]="volunteerForm.email"
+                  placeholder="vous@exemple.com"
+                  maxlength="120"
+                  autocomplete="email"
+                  class="form-control has-left-icon"
+                  [class.control-error]="volunteerErrors['email']"
+                />
+              </div>
+
+              <p *ngIf="volunteerErrors['email']" class="error-message">
+                {{ volunteerErrors["email"] }}
+              </p>
+            </div>
+          </div>
+
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="volunteerPassword"> Mot de passe </label>
+
+              <div class="control-wrapper">
+                <i-lucide name="lock" class="control-icon"></i-lucide>
+
+                <input
+                  id="volunteerPassword"
+                  name="volunteerPassword"
+                  [type]="showVolunteerPassword ? 'text' : 'password'"
+                  [(ngModel)]="volunteerForm.motDePasse"
+                  placeholder="••••••••"
+                  autocomplete="new-password"
+                  class="form-control has-left-icon has-right-icon"
+                  [class.control-error]="volunteerErrors['motDePasse']"
+                />
+
+                <button
+                  type="button"
+                  class="password-toggle"
+                  (click)="toggleVolunteerPassword()"
+                  aria-label="Afficher ou masquer le mot de passe"
+                >
+                  <i-lucide
+                    [name]="showVolunteerPassword ? 'eye-off' : 'eye'"
+                    class="icon-small"
+                  ></i-lucide>
+                </button>
+              </div>
+
+              <p *ngIf="volunteerErrors['motDePasse']" class="error-message">
+                {{ volunteerErrors["motDePasse"] }}
+              </p>
+            </div>
+
+            <div class="form-group">
+              <label for="volunteerConfirmation">
+                Confirmer le mot de passe
+              </label>
+
+              <div class="control-wrapper">
+                <i-lucide name="lock" class="control-icon"></i-lucide>
+
+                <input
+                  id="volunteerConfirmation"
+                  name="volunteerConfirmation"
+                  [type]="showVolunteerConfirmation ? 'text' : 'password'"
+                  [(ngModel)]="volunteerForm.confirmation"
+                  placeholder="••••••••"
+                  autocomplete="new-password"
+                  class="form-control has-left-icon has-right-icon"
+                  [class.control-error]="volunteerErrors['confirmation']"
+                />
+
+                <button
+                  type="button"
+                  class="password-toggle"
+                  (click)="toggleVolunteerConfirmation()"
+                  aria-label="Afficher ou masquer la confirmation"
+                >
+                  <i-lucide
+                    [name]="showVolunteerConfirmation ? 'eye-off' : 'eye'"
+                    class="icon-small"
+                  ></i-lucide>
+                </button>
+              </div>
+
+              <p *ngIf="volunteerErrors['confirmation']" class="error-message">
+                {{ volunteerErrors["confirmation"] }}
+              </p>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="volunteerAdresse"> Adresse </label>
+
+            <div class="control-wrapper">
+              <i-lucide name="map-pin" class="control-icon"></i-lucide>
+
+              <input
+                id="volunteerAdresse"
+                name="volunteerAdresse"
+                type="text"
+                [(ngModel)]="volunteerForm.adresse"
+                placeholder="Rue, ville, code postal"
+                maxlength="200"
+                class="form-control has-left-icon"
+                [class.control-error]="volunteerErrors['adresse']"
+              />
+            </div>
+
+            <p *ngIf="volunteerErrors['adresse']" class="error-message">
+              {{ volunteerErrors["adresse"] }}
+            </p>
+          </div>
+
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="volunteerGouvernorat"> Gouvernorat </label>
+
+              <select
+                id="volunteerGouvernorat"
+                name="volunteerGouvernorat"
+                [(ngModel)]="volunteerForm.gouvernorat"
+                class="form-control select-control"
+                [class.control-error]="volunteerErrors['gouvernorat']"
+              >
+                <option value="" disabled>Choisir un gouvernorat</option>
+
+                <option
+                  *ngFor="
+                    let gouvernorat of gouvernorats;
+                    trackBy: trackGouvernorat
+                  "
+                  [value]="gouvernorat"
+                >
+                  {{ gouvernorat }}
+                </option>
+              </select>
+
+              <p *ngIf="volunteerErrors['gouvernorat']" class="error-message">
+                {{ volunteerErrors["gouvernorat"] }}
+              </p>
+            </div>
+
+            <div class="form-group">
+              <label for="volunteerTelephone"> Numéro de téléphone </label>
+
+              <div class="control-wrapper">
+                <i-lucide name="phone" class="control-icon"></i-lucide>
+
+                <input
+                  id="volunteerTelephone"
+                  name="volunteerTelephone"
+                  type="tel"
+                  [(ngModel)]="volunteerForm.telephone"
+                  placeholder="+216 20 123 456"
+                  maxlength="20"
+                  autocomplete="tel"
+                  class="form-control has-left-icon"
+                  [class.control-error]="volunteerErrors['telephone']"
+                />
+              </div>
+
+              <p *ngIf="volunteerErrors['telephone']" class="error-message">
+                {{ volunteerErrors["telephone"] }}
+              </p>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="volunteerMotivation">
+              Pourquoi voulez-vous rejoindre Tunisia Charity ?
+            </label>
+
+            <div class="control-wrapper textarea-wrapper">
+              <i-lucide name="file-text" class="textarea-icon"></i-lucide>
+
+              <textarea
+                id="volunteerMotivation"
+                name="volunteerMotivation"
+                [(ngModel)]="volunteerForm.motivation"
+                placeholder="Partagez votre motivation en quelques lignes…"
+                maxlength="1000"
+                rows="4"
+                class="form-control textarea-control"
+                [class.control-error]="volunteerErrors['motivation']"
+              ></textarea>
+            </div>
+
+            <p *ngIf="volunteerErrors['motivation']" class="error-message">
+              {{ volunteerErrors["motivation"] }}
+            </p>
+
+            <p class="character-count">
+              {{ volunteerForm.motivation.length }}/1000
+            </p>
+          </div>
+
+          <p *ngIf="apiError" class="error-message">
+            {{ apiError }}
+          </p>
+
+          <button type="submit" class="submit-button" [disabled]="isSubmitting">
+            <span *ngIf="!isSubmitting"> Continuer </span>
+
+            <span *ngIf="isSubmitting" class="button-loading">
+              <span class="button-spinner"></span>
+              Envoi du code...
+            </span>
+          </button>
+
+          <p class="form-login-message">
+            Déjà membre ?
+
+            <a routerLink="/connexion" class="login-link"> Se connecter </a>
+          </p>
+        </form>
+      </div>
+    </section>
+
+    <!-- Formulaire donateur -->
+    <section
+      *ngIf="currentStep === 'form' && selectedRole === 'donateur'"
+      class="form-section"
+    >
+      <button type="button" class="change-role-button" (click)="changeRole()">
+        <i-lucide name="arrow-left" class="icon-small"></i-lucide>
+
+        Changer de profil
+      </button>
+
+      <div class="form-card">
+        <div class="form-header">
+          <div class="form-header-icon">
+            <i-lucide name="heart" class="icon-large"></i-lucide>
+          </div>
+
+          <div>
+            <p class="form-eyebrow">Inscription</p>
+
+            <h2 class="form-title">Rejoindre en tant que donateur</h2>
+          </div>
+        </div>
+
+        <form class="registration-form" (ngSubmit)="submitDonor()" novalidate>
+          <div class="form-group">
+            <label for="donorNomComplet"> Nom complet </label>
+
+            <div class="control-wrapper">
+              <i-lucide name="user" class="control-icon"></i-lucide>
+
+              <input
+                id="donorNomComplet"
+                name="donorNomComplet"
+                type="text"
+                [(ngModel)]="donorForm.nomComplet"
+                placeholder="Prénom et nom"
+                maxlength="120"
+                class="form-control has-left-icon"
+                [class.control-error]="donorErrors['nomComplet']"
+              />
+            </div>
+
+            <p *ngIf="donorErrors['nomComplet']" class="error-message">
+              {{ donorErrors["nomComplet"] }}
+            </p>
+          </div>
+
+          <div class="form-group">
+            <label for="donorEmail"> Adresse email </label>
+
+            <div class="control-wrapper">
+              <i-lucide name="mail" class="control-icon"></i-lucide>
+
+              <input
+                id="donorEmail"
+                name="donorEmail"
+                type="email"
+                [(ngModel)]="donorForm.email"
+                placeholder="vous@exemple.com"
+                maxlength="120"
+                autocomplete="email"
+                class="form-control has-left-icon"
+                [class.control-error]="donorErrors['email']"
+              />
+            </div>
+
+            <p *ngIf="donorErrors['email']" class="error-message">
+              {{ donorErrors["email"] }}
+            </p>
+          </div>
+
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="donorPassword"> Mot de passe </label>
+
+              <div class="control-wrapper">
+                <i-lucide name="lock" class="control-icon"></i-lucide>
+
+                <input
+                  id="donorPassword"
+                  name="donorPassword"
+                  [type]="showDonorPassword ? 'text' : 'password'"
+                  [(ngModel)]="donorForm.motDePasse"
+                  placeholder="••••••••"
+                  autocomplete="new-password"
+                  class="form-control has-left-icon has-right-icon"
+                  [class.control-error]="donorErrors['motDePasse']"
+                />
+
+                <button
+                  type="button"
+                  class="password-toggle"
+                  (click)="toggleDonorPassword()"
+                >
+                  <i-lucide
+                    [name]="showDonorPassword ? 'eye-off' : 'eye'"
+                    class="icon-small"
+                  ></i-lucide>
+                </button>
+              </div>
+
+              <p *ngIf="donorErrors['motDePasse']" class="error-message">
+                {{ donorErrors["motDePasse"] }}
+              </p>
+            </div>
+
+            <div class="form-group">
+              <label for="donorConfirmation"> Confirmer le mot de passe </label>
+
+              <div class="control-wrapper">
+                <i-lucide name="lock" class="control-icon"></i-lucide>
+
+                <input
+                  id="donorConfirmation"
+                  name="donorConfirmation"
+                  [type]="showDonorConfirmation ? 'text' : 'password'"
+                  [(ngModel)]="donorForm.confirmation"
+                  placeholder="••••••••"
+                  autocomplete="new-password"
+                  class="form-control has-left-icon has-right-icon"
+                  [class.control-error]="donorErrors['confirmation']"
+                />
+
+                <button
+                  type="button"
+                  class="password-toggle"
+                  (click)="toggleDonorConfirmation()"
+                >
+                  <i-lucide
+                    [name]="showDonorConfirmation ? 'eye-off' : 'eye'"
+                    class="icon-small"
+                  ></i-lucide>
+                </button>
+              </div>
+
+              <p *ngIf="donorErrors['confirmation']" class="error-message">
+                {{ donorErrors["confirmation"] }}
+              </p>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="donorAdresse"> Adresse </label>
+
+            <div class="control-wrapper">
+              <i-lucide name="map-pin" class="control-icon"></i-lucide>
+
+              <input
+                id="donorAdresse"
+                name="donorAdresse"
+                type="text"
+                [(ngModel)]="donorForm.adresse"
+                placeholder="Rue, ville"
+                maxlength="200"
+                class="form-control has-left-icon"
+                [class.control-error]="donorErrors['adresse']"
+              />
+            </div>
+
+            <p *ngIf="donorErrors['adresse']" class="error-message">
+              {{ donorErrors["adresse"] }}
+            </p>
+          </div>
+
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="donorCodePostal"> Code postal </label>
+
+              <div class="control-wrapper">
+                <i-lucide name="map-pin" class="control-icon"></i-lucide>
+
+                <input
+                  id="donorCodePostal"
+                  name="donorCodePostal"
+                  type="text"
+                  inputmode="numeric"
+                  [(ngModel)]="donorForm.codePostal"
+                  placeholder="Ex. 1000"
+                  maxlength="5"
+                  class="form-control has-left-icon"
+                  [class.control-error]="donorErrors['codePostal']"
+                />
+              </div>
+
+              <p *ngIf="donorErrors['codePostal']" class="error-message">
+                {{ donorErrors["codePostal"] }}
+              </p>
+            </div>
+
+            <div class="form-group">
+              <label for="donorTelephone"> Numéro de téléphone </label>
+
+              <div class="control-wrapper">
+                <i-lucide name="phone" class="control-icon"></i-lucide>
+
+                <input
+                  id="donorTelephone"
+                  name="donorTelephone"
+                  type="tel"
+                  [(ngModel)]="donorForm.telephone"
+                  placeholder="+216 20 123 456"
+                  maxlength="20"
+                  autocomplete="tel"
+                  class="form-control has-left-icon"
+                  [class.control-error]="donorErrors['telephone']"
+                />
+              </div>
+
+              <p *ngIf="donorErrors['telephone']" class="error-message">
+                {{ donorErrors["telephone"] }}
+              </p>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="donor-type-label"> Type de donateur </label>
+
+            <div class="donor-type-grid">
+              <button
+                *ngFor="let option of donorTypes; trackBy: trackDonorTypeById"
+                type="button"
+                class="donor-type-card"
+                [class.active]="donorForm.type === option.id"
+                (click)="selectDonorType(option.id)"
+              >
+                <div class="donor-type-header">
+                  <span class="donor-type-title">
+                    {{ option.title }}
+                  </span>
+
+                  <span
+                    class="radio-indicator"
+                    [class.active]="donorForm.type === option.id"
+                  ></span>
+                </div>
+
+                <p class="donor-type-description">
+                  {{ option.description }}
+                </p>
+              </button>
+            </div>
+
+            <p *ngIf="donorErrors['type']" class="error-message">
+              {{ donorErrors["type"] }}
+            </p>
+          </div>
+
+          <button type="submit" class="submit-button">Continuer</button>
+
+          <p class="form-login-message">
+            Déjà membre ?
+
+            <a routerLink="/connexion" class="login-link"> Se connecter </a>
+          </p>
+        </form>
+      </div>
+    </section>
+
+    <!-- Étape OTP -->
+    <section *ngIf="currentStep === 'otp'" class="otp-section">
+      <button
+        type="button"
+        class="change-role-button"
+        (click)="backToForm()"
+        [disabled]="isSubmitting"
+      >
+        <i-lucide name="arrow-left" class="icon-small"></i-lucide>
+
+        Modifier mes informations
+      </button>
+
+      <div class="otp-card">
+        <div class="otp-icon">
+          <i-lucide name="shield-check" class="otp-main-icon"></i-lucide>
+        </div>
+
+        <p class="otp-eyebrow">Vérification</p>
+
+        <h2 class="otp-title">Entrez votre code OTP</h2>
+
+        <p class="otp-description">Saisissez le code à 6 chiffres envoyé à</p>
+
+        <p class="otp-email">
+          {{ otpEmail }}
+        </p>
+
+        <form class="otp-form" (ngSubmit)="verifyVolunteerOtp()" novalidate>
+          <div class="otp-inputs" (paste)="handleOtpPaste($event)">
+            <input
+              *ngFor="
+                let digit of otpDigits;
+                let index = index;
+                trackBy: trackOtpByIndex
+              "
+              #otpInput
+              type="text"
+              inputmode="numeric"
+              maxlength="1"
+              class="otp-input"
+              [class.otp-input-error]="otpError"
+              [ngModel]="otpDigits[index]"
+              [name]="'otpDigit' + index"
+              [disabled]="isSubmitting"
+              [attr.autocomplete]="index === 0 ? 'one-time-code' : 'off'"
+              [attr.aria-label]="'Chiffre ' + (index + 1)"
+              (ngModelChange)="handleOtpChange($event, index)"
+              (keydown)="handleOtpKeydown($event, index)"
+            />
+          </div>
+
+          <p *ngIf="otpError" class="error-message otp-message">
+            {{ otpError }}
+          </p>
+
+          <p *ngIf="apiError" class="error-message otp-message">
+            {{ apiError }}
+          </p>
+
+          <button type="submit" class="submit-button" [disabled]="isSubmitting">
+            <span *ngIf="!isSubmitting"> Envoyer ma demande </span>
+
+            <span *ngIf="isSubmitting" class="button-loading">
+              <span class="button-spinner"></span>
+              Inscription...
+            </span>
+          </button>
+        </form>
+
+        <p class="otp-help">
+          Votre demande ne sera enregistrée qu'après la validation de ce code.
+        </p>
+      </div>
+    </section>
+
+    <!-- Succès -->
+    <section *ngIf="currentStep === 'success'" class="success-section">
+      <div class="success-card">
+        <div class="success-icon">
+          <i-lucide name="check-circle-2" class="success-check-icon"></i-lucide>
+        </div>
+
+        <h2 class="success-title">Demande envoyée !</h2>
+
+        <p class="success-description">
+          {{ successMessage }}
+        </p>
+
+        <div class="success-actions">
+          <a routerLink="/" class="primary-action"> Retour à l'accueil </a>
+
+          <button type="button" class="secondary-action" (click)="changeRole()">
+            Nouvelle demande
+          </button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <app-footer></app-footer>
+</div>

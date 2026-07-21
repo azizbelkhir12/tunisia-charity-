@@ -47,10 +47,7 @@ export class AuthService {
 
   // Register a new donor
   register(donorData: any): Observable<any> {
-    return this.http.post(
-      `${this.apiUrl}/donors/register`,
-      donorData,
-    );
+    return this.http.post(`${this.apiUrl}/donors/register`,donorData,);
   }
 
   login(credentials: any): Observable<any> {

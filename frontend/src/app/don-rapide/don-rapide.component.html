@@ -1,74 +1,307 @@
 <app-navbar></app-navbar>
 
-<div class="payment-container">
-  <div class="form-section">
-    <h2 class="title">Effectuer le paiement</h2>
-    <form [formGroup]="paymentForm" (ngSubmit)="onSubmit()">
-      <label>Prix (TND)</label>
-      <input formControlName="amount" type="number" placeholder="Entrer le prix" />
-      <div *ngIf="paymentForm.get('amount')?.touched && paymentForm.get('amount')?.invalid" class="error">
-        <p *ngIf="paymentForm.get('amount')?.errors?.['required']">Le prix est requis.<p>
-        <p *ngIf="paymentForm.get('amount')?.errors?.['min']">Le prix doit être supérieur à 0.</p>
-      </div>
-    
-      <label>Méthode de paiement</label>
-      <select formControlName="paymentMethod">
-        <option value="credit_card">Carte Bancaire</option>
-        <option value="bank_transfer">Virement Bancaire</option>
-        <option value="cash">Cash</option>
-      </select>
-      <div *ngIf="paymentForm.get('paymentMethod')?.touched && paymentForm.get('paymentMethod')?.invalid" class="error">
-        <p *ngIf="paymentForm.get('paymentMethod')?.errors?.['required']">La méthode de paiement est requise.</p>
-      </div>
-    
-      <label>Nom complet</label>
-      <input formControlName="guestName" type="text" placeholder="Votre nom" />
-      <div *ngIf="paymentForm.get('guestName')?.touched && paymentForm.get('guestName')?.invalid" class="error">
-        <p *ngIf="paymentForm.get('guestName')?.errors?.['required']">Le nom est requis.</p>
-      </div>
-      
-      <label>Email</label>
-      <input formControlName="guestEmail" type="email" placeholder="Votre email" />
-      <div *ngIf="paymentForm.get('guestEmail')?.touched && paymentForm.get('guestEmail')?.invalid" class="error">
-        <p *ngIf="paymentForm.get('guestEmail')?.errors?.['required']">L'email est requis.</p>
-        <p *ngIf="paymentForm.get('guestEmail')?.errors?.['email']">L'email n'est pas valide.</p>
-      </div>
+<div class="donation-page">
+  
+  <!-- Contenu principal -->
+  <main class="page-container main-content">
+    <div class="donation-wrapper">
 
-      <label>Projet</label>
-        <select formControlName="project" required>
-          <option value="" disabled selected>-- Sélectionnez un projet --</option>
-          <option value="Parrainage enfant">Parrainage d'enfant</option>
-          <option value="Rentrée scolaire">Rentrée scolaire</option>
-          <option value="Ramadan">Ramadan</option>
-          <option value="Aid Idh'ha">Aid Idh'ha</option>
-          <option value="Aid Fiter">Aid Fiter</option>
-        </select>
-        <div *ngIf="paymentForm.get('project')?.touched && paymentForm.get('project')?.invalid" class="error">
-          <p>Le projet est requis.</p>
-        </div>
+      <!-- Formulaire -->
+      <ng-container *ngIf="!submitted; else successTemplate">
+        <section class="hero-section">
+          <span class="hero-badge">
+            <i-lucide
+              name="heart"
+              class="badge-icon"
+            ></i-lucide>
 
-    
-      <button type="submit" [disabled]="paymentForm.invalid || isLoading">
-        {{ isLoading ? 'Traitement...' : 'Payer Maintenant' }}
-      </button>
-    
-      <p *ngIf="message">{{ message }}</p>
-    </form>
-  </div>
+            Soutenir nos actions
+          </span>
 
-  <div class="info-section">
-    <div class="info-box login-box">
-      <h2 class="title">Déjà inscrit ?</h2>
-      <p>Si vous avez déjà un compte,<br>connectez-vous ici.</p>
-      <button routerLink="/login">Se connecter</button>
+          <h1>Faire un don</h1>
+
+          <p>
+            Chaque contribution compte. Choisissez le projet
+            que vous souhaitez soutenir et la méthode de
+            paiement qui vous convient.
+          </p>
+        </section>
+
+        <form
+          class="donation-form"
+          (ngSubmit)="handleSubmit()"
+          novalidate
+        >
+          <div class="form-fields">
+
+            <!-- Nom complet -->
+            <div class="form-group">
+              <label for="fullName">
+                Nom complet
+              </label>
+
+              <input
+                id="fullName"
+                name="fullName"
+                type="text"
+                placeholder="Votre nom et prénom"
+                autocomplete="name"
+                [(ngModel)]="form.fullName"
+                (input)="clearError('fullName')"
+                [class.input-error]="errors.fullName"
+              />
+
+              <p
+                *ngIf="errors.fullName"
+                class="error-message"
+              >
+                {{ errors.fullName }}
+              </p>
+            </div>
+
+            <!-- Montant -->
+            <div class="form-group">
+              <label for="amount">
+                Montant du don (TND)
+              </label>
+
+              <div class="input-with-suffix">
+                <input
+                  id="amount"
+                  name="amount"
+                  type="number"
+                  min="1"
+                  max="1000000"
+                  step="0.01"
+                  placeholder="Ex. 100"
+                  inputmode="decimal"
+                  [(ngModel)]="form.amount"
+                  (input)="clearError('amount')"
+                  [class.input-error]="errors.amount"
+                />
+
+                <span class="input-suffix">
+                  TND
+                </span>
+              </div>
+
+              <p
+                *ngIf="errors.amount"
+                class="error-message"
+              >
+                {{ errors.amount }}
+              </p>
+            </div>
+
+            <!-- Méthodes de paiement -->
+            <fieldset class="payment-fieldset">
+              <legend>Méthode de paiement</legend>
+
+              <div class="payment-methods">
+                <label
+                  *ngFor="let method of paymentMethods"
+                  class="payment-method"
+                  [class.selected]="isMethodSelected(method.id)"
+                >
+                  <input
+                    type="radio"
+                    name="method"
+                    [value]="method.id"
+                    [checked]="isMethodSelected(method.id)"
+                    (change)="selectPaymentMethod(method.id)"
+                  />
+
+                  <i-lucide
+                    [name]="method.icon"
+                    class="payment-icon"
+                  ></i-lucide>
+
+                  <span>
+                    {{ method.label }}
+                  </span>
+
+                  <span
+                    *ngIf="isMethodSelected(method.id)"
+                    class="selected-indicator"
+                  >
+                    <i-lucide
+                      name="check"
+                      class="check-icon"
+                    ></i-lucide>
+                  </span>
+                </label>
+              </div>
+
+              <p
+                *ngIf="errors.method"
+                class="error-message"
+              >
+                {{ errors.method }}
+              </p>
+            </fieldset>
+
+            <!-- Projet -->
+            <div class="form-group">
+              <label for="project">
+                Projet à soutenir
+              </label>
+
+              <div class="select-wrapper">
+                <select
+                  id="project"
+                  name="project"
+                  [(ngModel)]="form.project"
+                  (change)="clearError('project')"
+                  [class.input-error]="errors.project"
+                >
+                  <option
+                    value=""
+                    disabled
+                  >
+                    Sélectionnez un projet
+                  </option>
+
+                  <option
+                    *ngFor="let project of projects"
+                    [value]="project.value"
+                  >
+                    {{ project.label }}
+                  </option>
+                </select>
+
+                <i-lucide
+                  name="wallet"
+                  class="select-icon"
+                ></i-lucide>
+              </div>
+
+              <p
+                *ngIf="errors.project"
+                class="error-message"
+              >
+                {{ errors.project }}
+              </p>
+            </div>
+          </div>
+
+          <!-- Bouton d'envoi -->
+          <button
+            type="submit"
+            class="submit-button"
+            [disabled]="loading"
+          >
+            <ng-container *ngIf="loading; else submitContent">
+              <span
+                class="spinner"
+                aria-hidden="true"
+              ></span>
+
+              <span>Traitement en cours…</span>
+            </ng-container>
+
+            <ng-template #submitContent>
+              <i-lucide
+                name="heart"
+                class="button-icon"
+              ></i-lucide>
+
+              <span>Confirmer mon don</span>
+            </ng-template>
+          </button>
+
+          <p class="security-text">
+            Vos informations sont sécurisées et ne seront
+            jamais partagées.
+          </p>
+        </form>
+      </ng-container>
+
+      <!-- Message de succès -->
+      <ng-template #successTemplate>
+        <section class="success-card">
+          <div class="success-icon-container">
+            <i-lucide
+              name="circle-check-big"
+              class="success-icon"
+            ></i-lucide>
+          </div>
+
+          <h2>Merci pour votre générosité !</h2>
+
+          <p class="success-description">
+            Votre don a été enregistré. Notre équipe vous
+            contactera sous peu pour finaliser le paiement.
+          </p>
+
+          <div class="donation-summary">
+            <div class="summary-row">
+              <span class="summary-label">
+                Donateur
+              </span>
+
+              <span class="summary-value">
+                {{ form.fullName }}
+              </span>
+            </div>
+
+            <div class="summary-row">
+              <span class="summary-label">
+                Montant
+              </span>
+
+              <span class="summary-value">
+                {{ form.amount | number:'1.0-2' }} TND
+              </span>
+            </div>
+
+            <div class="summary-row">
+              <span class="summary-label">
+                Méthode
+              </span>
+
+              <span class="summary-value">
+                {{ selectedMethodLabel }}
+              </span>
+            </div>
+
+            <div class="summary-row">
+              <span class="summary-label">
+                Projet
+              </span>
+
+              <span class="summary-value">
+                {{ selectedProjectLabel }}
+              </span>
+            </div>
+          </div>
+
+          <div class="success-actions">
+            <a
+              routerLink="/"
+              class="primary-link-button"
+            >
+              Retour à l'accueil
+            </a>
+
+            <a
+              routerLink="/rapports"
+              class="secondary-link-button"
+            >
+              Voir nos rapports
+            </a>
+          </div>
+
+          <button
+            type="button"
+            class="another-donation-button"
+            (click)="makeAnotherDonation()"
+          >
+            Faire un autre don
+          </button>
+        </section>
+      </ng-template>
     </div>
-
-    <div class="info-box signup-box">
-      <h2 class="title">Nouveau ici ?</h2>
-      <p>Si vous souhaitez devenir un donateur professionnel,<br>inscrivez-vous en quelques minutes seulement.</p>
-      <button routerLink="/register" class="secondary">Créer un compte</button>
-    </div>
-  </div>
+  </main>
 </div>
 
 <app-footer></app-footer>

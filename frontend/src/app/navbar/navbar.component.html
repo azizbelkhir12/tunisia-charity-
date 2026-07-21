@@ -1,169 +1,153 @@
 <header
-    class="sticky top-0 z-50 transition-all"
-    [ngClass]="
-      scrolled
-        ? 'bg-background/85 backdrop-blur-md border-b border-border'
-        : 'bg-transparent'
-    "
-  >
-    <div class="container-x flex items-center justify-between h-18 py-3">
+  class="sticky top-0 z-50 transition-all"
+  [ngClass]="
+    scrolled
+      ? 'bg-background/85 backdrop-blur-md border-b border-border'
+      : 'bg-transparent'
+  "
+>
+  <div class="container-x flex items-center justify-between h-18 py-3">
+    <a
+      routerLink="/"
+      class="flex items-center gap-3"
+      aria-label="Accueil Tunisia Charity"
+    >
+      <img
+        [src]="logoAssetUrl"
+        alt="Tunisia Charity"
+        class="h-12 w-12 rounded-full object-contain bg-white"
+      />
+      <span
+        class="font-display text-xl font-semibold text-primary hidden sm:inline"
+      >
+        Tunisia Charity
+      </span>
+    </a>
+
+    <nav
+      class="hidden md:flex items-center gap-8"
+      aria-label="Navigation principale"
+    >
       <a
         routerLink="/"
-        class="flex items-center gap-3"
-        aria-label="Accueil Tunisia Charity"
+        routerLinkActive="active"
+        [routerLinkActiveOptions]="{ exact: true }"
+        ariaCurrentWhenActive="page"
+        class="nav-link text-sm font-medium text-foreground/80 transition-colors"
       >
-        <img
-          [src]="logoAssetUrl"
-          alt="Tunisia Charity"
-          class="h-12 w-12 rounded-full object-contain bg-white"
-        />
-        <span
-          class="font-display text-xl font-semibold text-primary hidden sm:inline"
-        >
-          Tunisia Charity
-        </span>
+        Accueil
       </a>
 
-      <nav
-        class="hidden md:flex items-center gap-8"
-        aria-label="Navigation principale"
+      <a
+        routerLink="/rapports"
+        routerLinkActive="active"
+        ariaCurrentWhenActive="page"
+        class="nav-link text-sm font-medium text-foreground/80 transition-colors"
       >
-        <a
-          routerLink="/"
-          routerLinkActive="active"
-          [routerLinkActiveOptions]="{ exact: true }"
-          ariaCurrentWhenActive="page"
-          class="nav-link text-sm font-medium text-foreground/80 transition-colors"
-        >
-          Accueil
-        </a>
+        Rapports
+      </a>
 
-        <a
-          routerLink="/rapports"
-          routerLinkActive="active"
-          ariaCurrentWhenActive="page"
-          class="nav-link text-sm font-medium text-foreground/80 transition-colors"
-        >
-          Rapports
-        </a>
+      <a
+        routerLink="/benevolat"
+        routerLinkActive="active"
+        ariaCurrentWhenActive="page"
+        class="nav-link text-sm font-medium text-foreground/80 transition-colors"
+      >
+        Rejoignez-nous
+      </a>
+    </nav>
 
-        <a
-          routerLink="/benevolat"
-          routerLinkActive="active"
-          ariaCurrentWhenActive="page"
-          class="nav-link text-sm font-medium text-foreground/80 transition-colors"
-        >
-          Rejoignez-nous
-        </a>
-      </nav>
+    <div class="hidden md:flex items-center gap-2">
+      <a
+        routerLink="/login"
+        routerLinkActive="active"
+        ariaCurrentWhenActive="page"
+        class="auth-login inline-flex items-center gap-2 rounded-full border border-primary px-4 py-2.5 text-sm font-semibold text-primary transition"
+      >
+        <i-lucide name="log-in" class="w-4 h-4"></i-lucide>
+        Se connecter
+      </a>
 
-      <div class="hidden md:flex items-center gap-2">
-        <!-- Login -->
+      <a
+        routerLink="/payment"
+        fragment="feedback"
+        class="donate-button inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition"
+      >
+        <i-lucide name="heart" class="w-4 h-4" fill="currentColor"></i-lucide>
+        Faire un don
+      </a>
+    </div>
+
+    <button
+      type="button"
+      class="md:hidden p-2 rounded-md hover:bg-muted"
+      (click)="toggleMenu()"
+      [attr.aria-expanded]="open"
+      aria-label="Ouvrir le menu"
+    >
+      <i-lucide *ngIf="open; else menuIcon" name="x" class="w-6 h-6"></i-lucide>
+      <ng-template #menuIcon>
+        <i-lucide name="menu" class="w-6 h-6"></i-lucide>
+      </ng-template>
+    </button>
+  </div>
+
+  <div *ngIf="open" class="md:hidden border-t border-border bg-background">
+    <div class="container-x py-4 flex flex-col gap-2">
+      <a
+        routerLink="/"
+        routerLinkActive="active"
+        [routerLinkActiveOptions]="{ exact: true }"
+        ariaCurrentWhenActive="page"
+        (click)="closeMenu()"
+        class="mobile-nav-link"
+      >
+        Accueil
+      </a>
+
+      <a
+        routerLink="/rapports"
+        routerLinkActive="active"
+        ariaCurrentWhenActive="page"
+        (click)="closeMenu()"
+        class="mobile-nav-link"
+      >
+        Rapports
+      </a>
+
+      <a
+        routerLink="/benevolat"
+        routerLinkActive="active"
+        ariaCurrentWhenActive="page"
+        (click)="closeMenu()"
+        class="mobile-nav-link"
+      >
+        Rejoignez-nous
+      </a>
+
+      <div class="mobile-auth-actions">
         <a
           routerLink="/login"
           routerLinkActive="active"
-          class="auth-login inline-flex items-center gap-2 rounded-full px-4 py-2.5 text-sm font-semibold text-secondary transition"
+          ariaCurrentWhenActive="page"
+          (click)="closeMenu()"
+          class="mobile-login-button"
         >
           <i-lucide name="log-in" class="w-4 h-4"></i-lucide>
           Se connecter
         </a>
 
-        <!-- Register -->
         <a
           routerLink="/register"
           routerLinkActive="active"
-          class="auth-register inline-flex items-center gap-2 rounded-full border border-primary px-4 py-2.5 text-sm font-semibold text-primary transition"
+          ariaCurrentWhenActive="page"
+          (click)="closeMenu()"
+          class="mobile-register-button"
         >
           <i-lucide name="user-plus" class="w-4 h-4"></i-lucide>
           S'inscrire
         </a>
-
-        <!-- Donation -->
-        <a
-          routerLink="/payment"
-          fragment="feedback"
-          class="donate-button inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition"
-        >
-          <i-lucide name="heart" class="w-4 h-4" fill="currentColor"></i-lucide>
-
-          Faire un don
-        </a>
-      </div>
-
-      <button
-        type="button"
-        class="md:hidden p-2 rounded-md hover:bg-muted"
-        (click)="toggleMenu()"
-        [attr.aria-expanded]="open"
-        aria-label="Ouvrir le menu"
-      >
-        <i-lucide
-          *ngIf="open; else menuIcon"
-          name="x"
-          class="w-6 h-6"
-        ></i-lucide>
-        <ng-template #menuIcon>
-          <i-lucide name="menu" class="w-6 h-6"></i-lucide>
-        </ng-template>
-      </button>
-    </div>
-
-    <div *ngIf="open" class="md:hidden border-t border-border bg-background">
-      <div class="container-x py-4 flex flex-col gap-2">
-        <a
-          routerLink="/"
-          routerLinkActive="active"
-          [routerLinkActiveOptions]="{ exact: true }"
-          ariaCurrentWhenActive="page"
-          (click)="closeMenu()"
-          class="mobile-nav-link"
-        >
-          Accueil
-        </a>
-
-        <a
-          routerLink="/rapports"
-          routerLinkActive="active"
-          ariaCurrentWhenActive="page"
-          (click)="closeMenu()"
-          class="mobile-nav-link"
-        >
-          Rapports
-        </a>
-
-        <a
-          routerLink="/benevolat"
-          routerLinkActive="active"
-          ariaCurrentWhenActive="page"
-          (click)="closeMenu()"
-          class="mobile-nav-link"
-        >
-          Rejoignez-nous
-        </a>
-
-        <div class="mobile-auth-actions">
-          <a
-            routerLink="/login"
-            routerLinkActive="active"
-            ariaCurrentWhenActive="page"
-            (click)="closeMenu()"
-            class="mobile-login-button"
-          >
-            <i-lucide name="log-in" class="w-4 h-4"></i-lucide>
-            Se connecter
-          </a>
-
-          <a
-            routerLink="/register"
-            routerLinkActive="active"
-            ariaCurrentWhenActive="page"
-            (click)="closeMenu()"
-            class="mobile-register-button"
-          >
-            <i-lucide name="user-plus" class="w-4 h-4"></i-lucide>
-            S'inscrire
-          </a>
-        </div>
       </div>
     </div>
-  </header>
+  </div>
+</header>

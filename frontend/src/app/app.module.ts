@@ -41,7 +41,12 @@ import {
   Utensils,
   X,
   ShieldCheck,
-  CircleCheckBig
+  Landmark,
+  CreditCard,
+  Banknote,
+  Wallet,
+  CircleCheckBig,
+  Check,
 } from 'lucide-angular';
 
 import { AppComponent } from './app.component';
@@ -96,13 +101,10 @@ import { ChatAdminComponent } from './chat-admin/chat-admin.component';
 import { ForgotPasswordComponent } from './forgot-password/forgot-password.component';
 import { ResetPasswordComponent } from './reset-password/reset-password.component';
 
-
-
 // AoT requires an exported function for factories
 export function HttpLoaderFactory(http: HttpClient) {
   return new TranslateHttpLoader(http, './assets/i18n/', '.json');
 }
-
 
 @NgModule({
   declarations: [
@@ -134,28 +136,28 @@ export function HttpLoaderFactory(http: HttpClient) {
     PaymentFailComponent,
 
     GestionDesProjetsComponent,
-      VoirDocumentsBeneficiaireComponent,
-      ModifierInfosBeneficiaireComponent,
-      VoirNotificationsBeneficiaireComponent,
-      AjouterDesDocumentsBeneficiaireComponent,
-      NavBarMembreComponent,
-      FooterMembreComponent,
-      RapportsComponent,
-      ChatComponent,
-      DonateurCompteComponent,
-      ProfileDonateurComponent,
-      EffectuerDonComponent,
-      HistoriquePaiementComponent,
-      ParinnageEnfantsComponent,
-      RapportsDonnateurStandardComponent,
-      ProfilBenevoleComponent,
-      AbonnementBenevoleComponent,
-      HistoriquePaiementsComponent,
-      ChatAdminComponent,
-      ForgotPasswordComponent,
-      ResetPasswordComponent,
+    VoirDocumentsBeneficiaireComponent,
+    ModifierInfosBeneficiaireComponent,
+    VoirNotificationsBeneficiaireComponent,
+    AjouterDesDocumentsBeneficiaireComponent,
+    NavBarMembreComponent,
+    FooterMembreComponent,
+    RapportsComponent,
+    ChatComponent,
+    DonateurCompteComponent,
+    ProfileDonateurComponent,
+    EffectuerDonComponent,
+    HistoriquePaiementComponent,
+    ParinnageEnfantsComponent,
+    RapportsDonnateurStandardComponent,
+    ProfilBenevoleComponent,
+    AbonnementBenevoleComponent,
+    HistoriquePaiementsComponent,
+    ChatAdminComponent,
+    ForgotPasswordComponent,
+    ResetPasswordComponent,
   ],
-  
+
   imports: [
     BrowserModule,
     AppRoutingModule,
@@ -174,39 +176,44 @@ export function HttpLoaderFactory(http: HttpClient) {
     MatFormFieldModule,
     MatButtonModule,
     MatOptionModule,
-   LucideAngularModule.pick({
-  ArrowLeft,
-  ArrowRight,
-  BookOpen,
-  Eye,
-  EyeOff,
-  Facebook,
-  HandHeart,
-  Heart,
-  Instagram,
-  Lock,
-  LogIn,
-  Mail,
-  MapPin,
-  Menu,
-  Phone,
-  Sparkles,
-  Stethoscope,
-  Twitter,
-  UserPlus,
-  Users,
-  Utensils,
-  X,
-  ShieldCheck,
-  CircleCheckBig
-}),
+    LucideAngularModule.pick({
+      ArrowLeft,
+      ArrowRight,
+      BookOpen,
+      Eye,
+      EyeOff,
+      Facebook,
+      HandHeart,
+      Heart,
+      Instagram,
+      Lock,
+      LogIn,
+      Mail,
+      MapPin,
+      Menu,
+      Phone,
+      Sparkles,
+      Stethoscope,
+      Twitter,
+      UserPlus,
+      Users,
+      Utensils,
+      X,
+      ShieldCheck,
+      CircleCheckBig,
+      Landmark,
+      CreditCard,
+      Banknote,
+      Wallet,
+      Check,
+    }),
     TranslateModule.forRoot({
       loader: {
         provide: TranslateLoader,
         useFactory: HttpLoaderFactory,
-        deps: [HttpClient]
-      }
-    })
+        deps: [HttpClient],
+      },
+    }),
   ],
   providers: [],
   bootstrap: [AppComponent],

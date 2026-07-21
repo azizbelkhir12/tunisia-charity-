@@ -59,38 +59,25 @@
       </nav>
 
       <div class="hidden md:flex items-center gap-2">
-        <!-- Login -->
-        <a
-          routerLink="/login"
-          routerLinkActive="active"
-          class="auth-login inline-flex items-center gap-2 rounded-full px-4 py-2.5 text-sm font-semibold text-secondary transition"
-        >
-          <i-lucide name="log-in" class="w-4 h-4"></i-lucide>
-          Se connecter
-        </a>
+  <a
+    routerLink="/login"
+    routerLinkActive="active"
+    ariaCurrentWhenActive="page"
+    class="auth-login inline-flex items-center gap-2 rounded-full border border-primary px-4 py-2.5 text-sm font-semibold text-primary transition"
+  >
+    <i-lucide name="log-in" class="w-4 h-4"></i-lucide>
+    Se connecter
+  </a>
 
-        <!-- Register -->
-        <a
-          routerLink="/register"
-          routerLinkActive="active"
-          class="auth-register inline-flex items-center gap-2 rounded-full border border-primary px-4 py-2.5 text-sm font-semibold text-primary transition"
-        >
-          <i-lucide name="user-plus" class="w-4 h-4"></i-lucide>
-          S'inscrire
-        </a>
-
-        <!-- Donation -->
-        <a
-          routerLink="/payment"
-          fragment="feedback"
-          class="donate-button inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition"
-        >
-          <i-lucide name="heart" class="w-4 h-4" fill="currentColor"></i-lucide>
-
-          Faire un don
-        </a>
-      </div>
-
+  <a
+    routerLink="/payment"
+    fragment="feedback"
+    class="donate-button inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition"
+  >
+    <i-lucide name="heart" class="w-4 h-4" fill="currentColor"></i-lucide>
+    Faire un don
+  </a>
+</div>
       <button
         type="button"
         class="md:hidden p-2 rounded-md hover:bg-muted"
@@ -143,28 +130,28 @@
         </a>
 
         <div class="mobile-auth-actions">
-          <a
-            routerLink="/login"
-            routerLinkActive="active"
-            ariaCurrentWhenActive="page"
-            (click)="closeMenu()"
-            class="mobile-login-button"
-          >
-            <i-lucide name="log-in" class="w-4 h-4"></i-lucide>
-            Se connecter
-          </a>
+  <a
+    routerLink="/login"
+    routerLinkActive="active"
+    ariaCurrentWhenActive="page"
+    (click)="closeMenu()"
+    class="mobile-login-button"
+  >
+    <i-lucide name="log-in" class="w-4 h-4"></i-lucide>
+    Se connecter
+  </a>
 
-          <a
-            routerLink="/register"
-            routerLinkActive="active"
-            ariaCurrentWhenActive="page"
-            (click)="closeMenu()"
-            class="mobile-register-button"
-          >
-            <i-lucide name="user-plus" class="w-4 h-4"></i-lucide>
-            S'inscrire
-          </a>
-        </div>
+  <a
+    routerLink="/register"
+    routerLinkActive="active"
+    ariaCurrentWhenActive="page"
+    (click)="closeMenu()"
+    class="mobile-register-button"
+  >
+    <i-lucide name="user-plus" class="w-4 h-4"></i-lucide>
+    S'inscrire
+  </a>
+</div>
       </div>
     </div>
   </header>
@@ -450,7 +437,7 @@
           </article>
         </div>
 
-        <
+        
         <div *ngIf="projects.length > 3" class="mt-10 flex justify-center">
           <button
             type="button"

@@ -2,6 +2,18 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
+export interface VolunteerPayload {
+  name: string;
+  Prenom: string;
+  age: number;
+  email: string;
+  password: string;
+  address: string;
+  phone: string;
+  gouvernorat: string;
+  reason: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -11,8 +23,13 @@ export class DemandeService {
 
   constructor( private http : HttpClient) { }
 
-  Demande(formData: FormData) {
-    return this.http.post(`${this.apiUrl}/demande`, formData);
+  Demande(
+    data: VolunteerPayload
+  ): Observable<any> {
+    return this.http.post(
+      `${this.apiUrl}/demande`,
+      data
+    );
   }
 
   verifyOtp(email: string, otp: string) {

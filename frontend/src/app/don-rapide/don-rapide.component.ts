@@ -1,10 +1,39 @@
-import { Component } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { HttpClient } from '@angular/common/http';
-import { PaymentService } from '../services/payment/payment.service';
-import { DonationService } from '../services/donation/donation.service';
-import Swal from 'sweetalert2';
+import { Component, OnInit } from '@angular/core';
+import { Meta, Title } from '@angular/platform-browser';
+
+type PaymentMethodId =
+  | 'virement'
+  | 'en-ligne'
+  | 'cash'
+  | '';
+
+interface Project {
+  value: string;
+  label: string;
+}
+
+interface PaymentMethod {
+  id: Exclude<PaymentMethodId, ''>;
+  label: string;
+  icon: string;
+}
+
+interface DonationForm {
+  fullName: string;
+  amount: number | null;
+  method: PaymentMethodId;
+  project: string;
+}
+
+interface FormErrors {
+  fullName?: string;
+  amount?: string;
+  method?: string;
+  project?: string;
+}
+
+type FormField = keyof FormErrors;
+
 
 @Component({
   selector: 'app-don-rapide',
@@ -12,235 +41,241 @@ import Swal from 'sweetalert2';
   templateUrl: './don-rapide.component.html',
   styleUrl: './don-rapide.component.css'
 })
-export class DonRapideComponent {
-  paymentForm: FormGroup;
-  isLoading = false;
-  paymentSuccess = false;
-  message: string = '';
-  showPaymentType = false;
+export class DonRapideComponent implements OnInit {
+ readonly projects: Project[] = [
+    {
+      value: 'education',
+      label: 'Éducation pour tous'
+    },
+    {
+      value: 'sante',
+      label: 'Soins de santé primaires'
+    },
+    {
+      value: 'eau',
+      label: 'Accès à l’eau potable'
+    },
+    {
+      value: 'abri',
+      label: 'Abri d’urgence'
+    },
+    {
+      value: 'alimentation',
+      label: 'Aide alimentaire'
+    },
+    {
+      value: 'general',
+      label: 'Fonds généraux'
+    }
+  ];
 
-  // Bank information
-  private bankInfo = {
-    bankName: 'Your Bank Name',
-    accountName: 'Your Organization Name',
-    accountNumber: 'XXXX XXXX XXXX XXXX',
-    iban: 'TNXX XXXX XXXX XXXX XXXX XXXX',
-    rib: 'XXXX XXXX XXXX XXXX XXXX XX',
-    swiftCode: 'XXXXXX'
-  };
+  readonly paymentMethods: PaymentMethod[] = [
+    {
+      id: 'virement',
+      label: 'Virement bancaire',
+      icon: 'landmark'
+    },
+    {
+      id: 'en-ligne',
+      label: 'Paiement en ligne',
+      icon: 'credit-card'
+    },
+    {
+      id: 'cash',
+      label: 'Paiement en espèces',
+      icon: 'banknote'
+    }
+  ];
 
-  // Cash payment information
-  private cashPaymentInfo = {
-    address: '63 rue Iran 1002, Tunis, Tunisia',
-    phoneNumber: '+216 28 391 000',
-    workingHours: 'Lundi - Vendredi: 9:00 - 17:00'
-  };
+
+  form: DonationForm = this.createEmptyForm();
+
+  errors: FormErrors = {};
+
+  submitted = false;
+  loading = false;
 
   constructor(
-    private fb: FormBuilder,
-    private paymentService: PaymentService,
-    private donationService: DonationService,
-    private route: ActivatedRoute
-  ) {
-    this.paymentForm = this.fb.group({
-      amount: [null, [Validators.required, Validators.min(1)]],
-  paymentMethod: ['credit_card', Validators.required], 
-  paymentType: ['local', Validators.required],         
-  guestName: ['', Validators.required],
-  guestEmail: ['', [Validators.required, Validators.email]], 
-  project: ['', Validators.required]  
-    });
+    private readonly titleService: Title,
+    private readonly metaService: Meta
+  ) {}
 
-    // Watch for payment method changes
-    this.paymentForm.get('paymentMethod')?.valueChanges.subscribe(method => {
-      this.showPaymentType = method === 'credit_card';
-      if (!this.showPaymentType) {
-        this.paymentForm.patchValue({ paymentType: 'local' });
-      }
-      if (method === 'bank_transfer') {
-        this.showBankInformation();
-      } else if (method === 'cash') {
-        this.showCashPaymentInformation();
-      }
-    });
+  ngOnInit(): void {
+    this.configurePageMetadata();
   }
 
-  ngOnInit() {
-    this.checkPaymentReturn();
+  /**
+   * Nom du projet sélectionné.
+   */
+  get selectedProjectLabel(): string {
+    return (
+      this.projects.find(
+        project => project.value === this.form.project
+      )?.label ?? ''
+    );
   }
 
-  showBankInformation() {
-    Swal.fire({
-      title: 'Informations de Virement Bancaire',
-      html: `
-        <div style="text-align: left;">
-          <p><strong>Nom de la Banque :</strong> ${this.bankInfo.bankName}</p>
-          <p><strong>Nom du Compte :</strong> ${this.bankInfo.accountName}</p>
-          <p><strong>Numéro de Compte :</strong> ${this.bankInfo.accountNumber}</p>
-          <p><strong>IBAN :</strong> ${this.bankInfo.iban}</p>
-          <p><strong>RIB :</strong> ${this.bankInfo.rib}</p>
-          <p><strong>Code SWIFT :</strong> ${this.bankInfo.swiftCode}</p>
-        </div>
-      `,
-      icon: 'info',
-      confirmButtonText: 'Je Comprends',
-      footer: 'Veuillez utiliser votre nom comme référence de paiement'
-    });
+  /**
+   * Nom de la méthode de paiement sélectionnée.
+   */
+  get selectedMethodLabel(): string {
+    return (
+      this.paymentMethods.find(
+        method => method.id === this.form.method
+      )?.label ?? ''
+    );
   }
 
-  showCashPaymentInformation() {
-    Swal.fire({
-      title: 'Informations de Paiement en Espèces',
-      html: `
-        <div style="text-align: left;">
-          <p><strong>Adresse :</strong> ${this.cashPaymentInfo.address}</p>
-          <p><strong>Numéro de Téléphone :</strong> ${this.cashPaymentInfo.phoneNumber}</p>
-          <p><strong>Heures de Travail :</strong></p>
-          <p style="white-space: pre-line;">${this.cashPaymentInfo.workingHours}</p>
-        </div>
-      `,
-      icon: 'info',
-      confirmButtonText: 'Je Comprends',
-      footer: 'Veuillez apporter le montant exact si possible'
-    });
+  /**
+   * Vérifie si une méthode de paiement est sélectionnée.
+   */
+  isMethodSelected(methodId: PaymentMethod['id']): boolean {
+    return this.form.method === methodId;
   }
 
-  checkPaymentReturn() {
-    this.route.queryParams.subscribe(params => {
-      const paymentId = params['payment_id'];
-      if (paymentId) {
-        const pendingDonationStr = sessionStorage.getItem('pendingDonation');
-        if (pendingDonationStr) {
-          const pendingDonation = JSON.parse(pendingDonationStr);
-          if (pendingDonation.paymentMethod === 'credit_card' || pendingDonation.paymentMethod === 'flouci') {
-            this.handlePaymentCallback(paymentId);
-          } else {
-            sessionStorage.removeItem('pendingDonation');
-          }
-        }
-      }
-    });
+  /**
+   * Sélectionne une méthode de paiement.
+   */
+  selectPaymentMethod(methodId: PaymentMethod['id']): void {
+    this.form.method = methodId;
+    this.clearError('method');
   }
 
-  onSubmit() {
-    if (this.paymentForm.invalid) return;
-  
-    this.isLoading = true;
-    const formData = this.paymentForm.value;
-  
-    // Determine payment method based on type selection
-    if (formData.paymentMethod === 'credit_card' && formData.paymentType === 'flouci') {
-      formData.paymentType = 'local';  // Keep paymentType separately
-    }
-  
-    console.log('Form Data:', formData); // Ensure it has paymentType
-  
-    if (formData.paymentMethod === 'bank_transfer' || formData.paymentMethod === 'cash') {
-      // Handle bank transfer or cash payment (add your Swal logic here)
-      this.handleBankOrCashPayment(formData);
-    } else {
-      // For Credit card or Flouci payment, store data in session and redirect
-      sessionStorage.setItem('pendingDonation', JSON.stringify(formData));
-      this.initiatePaymentFlow(formData);
-    }
-  }
-  
-  handleBankOrCashPayment(formData: any) {
-    Swal.fire({
-      title: 'Rappel Important',
-      html: formData.paymentMethod === 'bank_transfer'
-        ? 'Veuillez inclure votre nom dans la référence de virement bancaire.'
-        : 'Veuillez apporter le montant exact à notre bureau pendant les heures de travail.',
-      icon: 'warning',
-      confirmButtonText: 'Je Comprends',
-      showCancelButton: true,
-      cancelButtonText: 'Annuler'
-    }).then((result) => {
-      if (result.isConfirmed) {
-        this.createDonation(formData);
-      } else {
-        this.isLoading = false;
-      }
-    });
-  }
-  
-  initiatePaymentFlow(formData: any) {
-    // Ensure paymentType is set
-    if (!formData.paymentType) {
-      formData.paymentType = 'local'; // default value
-    }
-    this.paymentService.makePayment(formData).subscribe({
-      next: (res: any) => {
-        if (res?.result?.link) {
-          window.location.href = res.result.link; // Redirect to Flouci
-        } else {
-          Swal.fire('Erreur', 'Lien de paiement non reçu', 'error');
-          this.isLoading = false;
-        }
-      },
-      error: (error) => {
-        Swal.fire('Erreur', error.error?.message || 'Échec de l\'initialisation du paiement', 'error');
-        this.isLoading = false;
-      }
-    });
-  }
-  
-
-  handlePaymentCallback(paymentId: string) {
-    this.isLoading = true;
-    const pendingDonation = JSON.parse(sessionStorage.getItem('pendingDonation') || '{}');
-  
-    if (!pendingDonation.amount) {
-      Swal.fire('Erreur', 'Informations de don non trouvées', 'error');
-      this.isLoading = false;
+  /**
+   * Supprime l'erreur d'un champ après modification.
+   */
+  clearError(field: FormField): void {
+    if (!this.errors[field]) {
       return;
     }
-  
-    this.paymentService.verifyPayment(paymentId, pendingDonation).subscribe({
-      next: (verification: any) => {
-        if (verification.success) {
-          const donationData = {
-            ...pendingDonation,
-            paymentId: paymentId,
-            paymentDetails: verification.paymentDetails,
-            status: 'completed'
-          };
-          this.createDonation(donationData);
-        } else {
-          this.handlePaymentError('Échec de la vérification du paiement');
-        }
-      },
-      error: (error) => {
-        this.handlePaymentError(error.error?.message || 'Erreur de vérification du paiement');
-      }
-    });
-  }
-  
-  private createDonation(donationData: any) {
-    // Ensure paymentType is included
-    const completeDonationData = {
-      ...donationData,
-      paymentType: donationData.paymentType || 'local' // default to 'local' if not provided
+
+    this.errors = {
+      ...this.errors,
+      [field]: undefined
     };
-  
-    this.donationService.createDonation(completeDonationData).subscribe({
-      next: () => {
-        Swal.fire('Succès', 'Merci pour votre don!', 'success');
-        this.paymentSuccess = true;
-        sessionStorage.removeItem('pendingDonation');
-        this.isLoading = false;
-      },
-      error: (err) => {
-        this.handlePaymentError(err.error?.message || err.message || 'Erreur lors de l\'enregistrement du don');
-      }
+  }
+
+  /**
+   * Validation complète du formulaire.
+   */
+  validateForm(): boolean {
+    const validationErrors: FormErrors = {};
+    const fullName = this.form.fullName.trim();
+    const amount = Number(this.form.amount);
+
+    if (!fullName) {
+      validationErrors.fullName =
+        'Le nom complet est requis.';
+    } else if (fullName.length < 3) {
+      validationErrors.fullName =
+        'Le nom complet doit contenir au moins 3 caractères.';
+    } else if (fullName.length > 100) {
+      validationErrors.fullName =
+        'Le nom complet ne doit pas dépasser 100 caractères.';
+    }
+
+    if (
+      this.form.amount === null ||
+      this.form.amount === undefined ||
+      Number.isNaN(amount)
+    ) {
+      validationErrors.amount =
+        'Veuillez indiquer un montant valide.';
+    } else if (amount <= 0) {
+      validationErrors.amount =
+        'Le montant doit être supérieur à 0.';
+    } else if (amount > 1_000_000) {
+      validationErrors.amount =
+        'Le montant semble trop élevé.';
+    }
+
+    if (!this.form.method) {
+      validationErrors.method =
+        'Veuillez choisir une méthode de paiement.';
+    }
+
+    if (!this.form.project) {
+      validationErrors.project =
+        'Veuillez choisir un projet.';
+    }
+
+    this.errors = validationErrors;
+
+    return Object.keys(validationErrors).length === 0;
+  }
+
+  /**
+   * Envoi du formulaire.
+   */
+  handleSubmit(): void {
+    if (this.loading || !this.validateForm()) {
+      return;
+    }
+
+    this.loading = true;
+
+    /*
+     * Simulation d'un appel API.
+     * Cette partie pourra ensuite être remplacée
+     * par un appel à DonationService.
+     */
+    window.setTimeout(() => {
+      this.loading = false;
+      this.submitted = true;
+
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
+    }, 1200);
+  }
+
+  /**
+   * Permet de recommencer un nouveau don.
+   */
+  makeAnotherDonation(): void {
+    this.form = this.createEmptyForm();
+    this.errors = {};
+    this.submitted = false;
+    this.loading = false;
+
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
     });
   }
-  
-  private handlePaymentError(errorMessage: string) {
-    Swal.fire('Erreur', errorMessage, 'error');
-    this.isLoading = false;
-    sessionStorage.removeItem('pendingDonation');
-    console.error(errorMessage);
-    
+
+  private createEmptyForm(): DonationForm {
+    return {
+      fullName: '',
+      amount: null,
+      method: '',
+      project: ''
+    };
+  }
+
+  private configurePageMetadata(): void {
+    const description =
+      'Soutenez Tunisia Charity par un don unique ou régulier. ' +
+      'Choisissez votre projet et votre mode de paiement.';
+
+    this.titleService.setTitle(
+      'Faire un don — Tunisia Charity'
+    );
+
+    this.metaService.updateTag({
+      name: 'description',
+      content: description
+    });
+
+    this.metaService.updateTag({
+      property: 'og:title',
+      content: 'Faire un don — Tunisia Charity'
+    });
+
+    this.metaService.updateTag({
+      property: 'og:description',
+      content: description
+    });
   }
 }
