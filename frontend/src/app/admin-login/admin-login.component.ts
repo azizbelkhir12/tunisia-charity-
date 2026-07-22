@@ -9,52 +9,88 @@ import { AuthService } from '../services/auth/auth.service';
   styleUrls: ['./admin-login.component.css'],
 })
 export class AdminLoginComponent {
-  loginData = { 
-    email: '', 
+  loginData = {
+    email: '',
     password: '',
     userType: 'admin'
   };
-  loginErrorMsg = ' veuillez remplir les champs';
+
+  loginErrorMsg = '';
   loginSuccessMsg = 'Connexion réussie';
   isLoading = false;
 
-  constructor(private router: Router, private authService : AuthService ) {}
+  constructor(
+    private router: Router,
+    private authService: AuthService
+  ) {}
 
+  submitLogin(): void {
+    if (
+      !this.loginData.email.trim() ||
+      !this.loginData.password
+    ) {
+      this.loginErrorMsg = 'Veuillez remplir les champs.';
+      return;
+    }
 
-  submitLogin() {
     this.isLoading = true;
     this.loginErrorMsg = '';
 
     this.authService.login(this.loginData).subscribe({
-      next: (response) => {
+      next: response => {
 
-        console.log('Login response:', response); // Add check
-        console.log('Login successful, user:', response.data.user); // Add check
-    
-        if (response && response.token) {
-          localStorage.setItem('token', response.token);
-          console.log(localStorage.getItem('currentUser'));
-          this.authService.currentUser.next(response.data.user);
-    
-          this.router.navigate(['/admin-compte']).then(success => {
-            if (!success) {
-              console.error('Navigation to /admin-compte failed.');
-            }
-          });
-        } else {
-          console.error('Invalid login response structure:', response);
-          this.loginErrorMsg = 'Réponse invalide du serveur.';
+        if (
+          !response?.token ||
+          !response?.data?.user
+        ) {
+          this.loginErrorMsg =
+            'Réponse invalide du serveur.';
+
+          this.isLoading = false;
+          return;
         }
-    
+
+        const authenticatedUser = {
+          ...response.data.user,
+
+          id:
+            response.data.user.id ||
+            response.data.user._id,
+
+          userType:
+            response.data.userType ||
+            this.loginData.userType
+        };
+
+        localStorage.setItem(
+          'token',
+          response.token
+        );
+
+        localStorage.setItem(
+          'currentUser',
+          JSON.stringify(authenticatedUser)
+        );
+
+        this.authService.currentUser.next(
+          authenticatedUser
+        );
+
         this.isLoading = false;
+
+        this.router.navigate(['/admin-compte']);
       },
-      error: (error) => {
+
+      error: error => {
         console.error('Login error:', error);
-        this.loginErrorMsg = error.error?.message || 'Échec de connexion';
+
+        this.loginErrorMsg =
+          error.error?.message ||
+          'Échec de connexion';
+
         this.isLoading = false;
       }
     });
-    
   }
 }
 

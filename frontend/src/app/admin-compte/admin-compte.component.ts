@@ -92,7 +92,7 @@ constructor(private donorsService: DonorsService,
       const total = this.donations.reduce((sum, donation) => sum + (donation.amount || 0), 0);
       this.statistics.totalDons = total;
 
-      this.createMonthlyComparisonChart(); // <- Add this here
+      this.createMonthlyComparisonChart(); 
     },
     error: (err) => {
       console.error('Failed to fetch donations:', err);
@@ -106,8 +106,6 @@ constructor(private donorsService: DonorsService,
     next: (response) => {
       this.beneficiaries = response.data.beneficiaries;
       this.statistics.totalBeneficiaires = this.beneficiaries.length;
-
-      console.log('Beneficiaries fetched:', this.beneficiaries);
     },
     error: (error) => {
       console.error('Erreur lors du chargement des bénéficiaires :', error);
@@ -122,8 +120,6 @@ constructor(private donorsService: DonorsService,
       this.volunteers = data;
       this.benevoles = data;
       this.statistics.totalBenevoles = this.volunteers.length;
-
-      console.log('Volunteers fetched:', this.volunteers);
     },
     (error) => {
       console.error('Error fetching volunteers:', error);
