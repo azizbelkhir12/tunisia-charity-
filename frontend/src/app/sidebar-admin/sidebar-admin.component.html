@@ -1,72 +1,76 @@
-<!-- Sidebar with toggle class 'open' -->
-<div class="sidebar" [class.open]="isSidebarOpen">
-  <button class="close-sidebar" (click)="closeSidebar()">
-    <fa-icon [icon]="faTimes"></fa-icon>
-  </button>
-  
-  <ul>
-    <!-- Gestion des Bénévoles -->
-    <li routerLinkActive="active">
-      <a routerLink="/admin-compte/gestion-benevoles" (click)="closeSidebar()">
-        <fa-icon [icon]="faUsers"></fa-icon> Gestion des Bénévoles
+<div class="admin-layout">
+  <!-- Sidebar -->
+  <aside class="admin-sidebar">
+    <div class="sidebar-header">
+      <img src="assets/logo2.png" alt="Tunisia Charity" class="sidebar-logo" />
+
+      <div class="sidebar-brand">
+        <div class="sidebar-title">Tunisia Charity</div>
+        <div class="sidebar-subtitle">Espace Admin</div>
+      </div>
+    </div>
+
+    <nav class="sidebar-navigation">
+      <a
+        *ngFor="let item of navigationItems"
+        [routerLink]="item.to"
+        routerLinkActive="active"
+        [routerLinkActiveOptions]="{ exact: item.exact === true }"
+        class="navigation-link"
+      >
+        <i-lucide [name]="item.icon" class="navigation-icon"></i-lucide>
+
+        <span>{{ item.label }}</span>
       </a>
-    </li>
+    </nav>
 
-    <!-- Gestion des Bénéficiaires -->
-    <li routerLinkActive="active">
-      <a routerLink="/admin-compte/gestion-beneficiaires" (click)="closeSidebar()">
-        <fa-icon [icon]="faHandHoldingHeart"></fa-icon> Gestion des Bénéficiaires
+    <div class="sidebar-footer">
+      <a routerLink="/" class="navigation-link return-link">
+        <i-lucide name="log-out" class="navigation-icon"></i-lucide>
+
+        <span>Retour au site</span>
       </a>
-    </li>
+    </div>
+  </aside>
 
-    <!-- Gestion des Dons -->
-    <li routerLinkActive="active">
-      <a routerLink="/admin-compte/gestion-des-dons" (click)="closeSidebar()">
-        <fa-icon [icon]="faDonate"></fa-icon> Gestion des Dons
-      </a>
-    </li>
+  <!-- Main -->
+  <div class="admin-main">
+    <header class="admin-topbar">
+      <div class="admin-topbar-search">
+        <i-lucide name="search" class="admin-topbar-search-icon"></i-lucide>
 
-    <!-- Gestion des Notifications -->
-    <li routerLinkActive="active">
-      <a routerLink="/admin-compte/gestion-notification" (click)="closeSidebar()">
-        <fa-icon [icon]="faBell"></fa-icon> Gestion des Notifications
-      </a>
-    </li>
+        <input
+          type="search"
+          class="admin-topbar-search-input"
+          placeholder="Rechercher..."
+          aria-label="Rechercher"
+        />
+      </div>
 
-    <!-- Gestion des Rapports -->
-    <li routerLinkActive="active">
-      <a routerLink="/admin-compte/gestion-des-rapports" (click)="closeSidebar()">
-        <fa-icon [icon]="faChartBar"></fa-icon> Gestion des Rapports
-      </a>
-    </li>
+      <div class="admin-topbar-actions">
+        <button
+          type="button"
+          class="admin-notification-button"
+          aria-label="Notifications"
+        >
+          <i-lucide name="bell" class="admin-notification-icon"></i-lucide>
 
-    <!-- Gestion des documents -->
-    <li routerLinkActive="active">
-      <a routerLink="/admin-compte/voir-documents-beneficiaire" (click)="closeSidebar()">
-        <fa-icon [icon]="faNewspaper"></fa-icon> voir Documents
-      </a>
-    </li>
+          <span class="admin-notification-dot"></span>
+        </button>
 
-    <!-- Gestion des Projets -->
-    <li routerLinkActive="active">
-      <a routerLink="/admin-compte/gestion-des-projets" (click)="closeSidebar()">
-        <fa-icon [icon]="faProjectDiagram"></fa-icon> Gestion des Projets
-      </a>
-    </li>
+        <div class="admin-user-profile">
+          <div class="admin-user-avatar">A</div>
 
-    <!-- Gestion des Feedback -->
-    <li routerLinkActive="active">
-      <a routerLink="/admin-compte/gestion-feedback" (click)="closeSidebar()">
-        <fa-icon [icon]="faComments"></fa-icon> Gestion des Feedback
-      </a>
-    </li>
-  </ul>
-</div>
+          <div class="admin-user-details">
+            <span class="admin-user-name">Admin</span>
 
-<!-- Overlay for mobile -->
-<div class="sidebar-overlay" [class.open]="isSidebarOpen" (click)="closeSidebar()"></div>
-
-<!-- Main content area -->
-<div class="main-content" [class.sidebar-open]="isSidebarOpen">
-  <router-outlet></router-outlet>
+            <span class="admin-user-email"> admin&#64;tunisiacharity.org </span>
+          </div>
+        </div>
+      </div>
+    </header>
+    <main class="admin-content">
+      <ng-content></ng-content>
+    </main>
+  </div>
 </div>

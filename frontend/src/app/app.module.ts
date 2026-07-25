@@ -47,6 +47,18 @@ import {
   Wallet,
   CircleCheckBig,
   Check,
+  LayoutDashboard,
+  FolderKanban,
+  FileText,
+  Settings,
+  LogOut,
+  Bell,
+  Search,
+  HeartHandshake,
+  TrendingUp,
+  TrendingDown,
+  BarChart3,
+  ChevronUp,
 } from 'lucide-angular';
 
 import { AppComponent } from './app.component';
@@ -206,6 +218,18 @@ export function HttpLoaderFactory(http: HttpClient) {
       Banknote,
       Wallet,
       Check,
+      LayoutDashboard,
+      FolderKanban,
+      FileText,
+      Settings,
+      LogOut,
+      Bell,
+      Search,
+      HeartHandshake,
+      TrendingUp,
+      TrendingDown,
+      BarChart3,
+      ChevronUp,
     }),
     TranslateModule.forRoot({
       loader: {

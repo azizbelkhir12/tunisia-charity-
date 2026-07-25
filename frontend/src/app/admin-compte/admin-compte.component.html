@@ -1,79 +1,363 @@
-<app-navbarcompte-admin></app-navbarcompte-admin>
-<app-sidebar-admin></app-sidebar-admin>
+<app-sidebar-admin>
 
 <div class="dashboard">
+  <!-- En-tête -->
+  <header class="dashboard-header">
+    <div class="dashboard-heading">
+      <h1 class="dashboard-title">
+        Tableau de bord
+      </h1>
 
-  <!-- Cartes des statistiques -->
-  <div class="stat-cards">
-    <div class="card">
-      <i class="fas fa-donate"></i>
-      <h3>Total Dons</h3>
-      <p>{{ statistics.totalDons }} TND</p>
-    </div>
-    <div class="card">
-      <i class="fas fa-users"></i>
-      <h3>Total Bénéficiaires</h3>
-      <p>{{ statistics.totalBeneficiaires }}</p>
-    </div>
-    <div class="card">
-      <i class="fas fa-hands-helping"></i>
-      <h3>Total Bénévoles</h3>
-      <p>{{ statistics.totalBenevoles }}</p>
-    </div>
-    <div class="card">
-      <i class="fas fa-user-friends"></i>
-      <h3>Total Donateurs</h3>
-      <p>{{ statistics.totalDonateurs }}</p>
-    </div>
-    <div class="card">
-      <i class="fas fa-user-shield"></i>
-      <h3>Donateurs Parrains</h3>
-      <p>{{ statistics.totalParrains }}</p>
-    </div>
-    <div class="card">
-      <i class="fas fa-user"></i>
-      <h3>Donateurs Standards</h3>
-      <p>{{ statistics.totalStandardDonateurs }}</p>
-    </div>
-  </div>
-
-  <!-- Graphiques -->
-  <div class="charts-grid">
-    <div class="chart-container">
-      <h3>Évolution des dons</h3>
-      <canvas id="donationChart"></canvas>
+      <p class="dashboard-subtitle">
+        Bienvenue dans l'espace administrateur.
+      </p>
     </div>
 
-    <div class="chart-container">
-      <h3>Statistiques des utilisateurs</h3>
-      <canvas id="barChart"></canvas>
-    </div>
+    <button
+      type="button"
+      class="statistics-toggle"
+      (click)="toggleStatistics()"
+    >
+      <i-lucide
+        [name]="showStats ? 'chevron-up' : 'bar-chart-3'"
+        class="statistics-toggle-icon"
+      ></i-lucide>
 
-    <div class="chart-container">
-      <h3>Répartition des donateurs</h3>
-      <canvas id="pieChart"></canvas>
-    </div>
+      <span>
+        {{
+          showStats
+            ? 'Masquer les statistiques'
+            : 'Voir les statistiques'
+        }}
+      </span>
+    </button>
+  </header>
 
-    <div class="chart-container">
-  <div class="year-selector">
-    <label for="yearSelect">Année:</label>
-    <select id="yearSelect" [(ngModel)]="selectedYear" (change)="onYearChange()">
-      <option *ngFor="let year of availableYears" [value]="year">{{ year }}</option>
-    </select>
-  </div>
-  <canvas id="monthlyComparisonChart"></canvas>
+  <!-- Indicateurs -->
+  <section class="kpi-grid">
+    <article
+      *ngFor="
+        let kpi of kpis;
+        trackBy: trackByLabel
+      "
+      class="dashboard-card kpi-card"
+    >
+      <div class="kpi-card-header">
+        <div class="kpi-icon-container">
+          <i-lucide
+            [name]="kpi.icon"
+            class="kpi-icon"
+          ></i-lucide>
+        </div>
+
+        <span
+          class="kpi-trend"
+          [class.kpi-trend-up]="kpi.up"
+          [class.kpi-trend-down]="!kpi.up"
+        >
+          <i-lucide
+            [name]="
+              kpi.up
+                ? 'trending-up'
+                : 'trending-down'
+            "
+            class="kpi-trend-icon"
+          ></i-lucide>
+
+          <span>
+            {{ kpi.up ? '+' : '' }}{{ kpi.delta }}%
+          </span>
+        </span>
+      </div>
+
+      <div class="kpi-value">
+        {{ formatNumber(kpi.value) }}
+      </div>
+
+      <div class="kpi-label">
+        {{ kpi.label }}
+      </div>
+    </article>
+  </section>
+
+  <!-- Activité récente -->
+  <section class="dashboard-card activity-card">
+    <h2 class="section-title activity-title">
+      Activité récente
+    </h2>
+
+    <ul class="activity-list">
+      <li
+        *ngFor="
+          let activity of recentActivities;
+          trackBy: trackByActivity
+        "
+        class="activity-item"
+      >
+        <span class="activity-description">
+          {{ activity.title }}
+        </span>
+
+        <span class="activity-date">
+          {{ activity.date }}
+        </span>
+      </li>
+    </ul>
+  </section>
+
+  <!-- Statistiques -->
+  <ng-container *ngIf="showStats">
+    <!-- Graphique des dons et paiements -->
+    <section class="statistics-main-grid">
+      <article
+        class="dashboard-card donations-card"
+      >
+        <div class="donations-header">
+          <div>
+            <h2 class="section-title">
+              Dons collectés
+            </h2>
+
+            <p class="section-description">
+              Évolution mensuelle (TND)
+            </p>
+          </div>
+
+          <div class="range-selector">
+            <button
+              *ngFor="
+                let range of ranges;
+                trackBy: trackByRange
+              "
+              type="button"
+              class="range-button"
+              [class.range-button-active]="
+                selectedRange === range
+              "
+              (click)="selectRange(range)"
+            >
+              {{ getRangeLabel(range) }}
+            </button>
+          </div>
+        </div>
+
+        <!-- Graphique -->
+        <div class="chart">
+          <div
+            *ngFor="
+              let donation of donations12m;
+              trackBy: trackByMonth
+            "
+            class="chart-column"
+          >
+            <div class="chart-bar-area">
+              <div
+                class="chart-bar"
+                [style.height.%]="
+                  getDonationHeight(donation.value)
+                "
+                [attr.title]="
+                  formatNumber(donation.value) +
+                  ' TND'
+                "
+              >
+                <span class="chart-tooltip">
+                  {{ formatNumber(donation.value) }}
+                </span>
+              </div>
+            </div>
+
+            <span class="chart-month">
+              {{ donation.month }}
+            </span>
+          </div>
+        </div>
+
+        <div class="donations-total">
+          <span class="donations-total-label">
+            Total 12 mois
+          </span>
+
+          <strong class="donations-total-value">
+            {{ formatNumber(totalDons) }} TND
+          </strong>
+        </div>
+      </article>
+
+      <!-- Méthodes de paiement -->
+      <article
+        class="dashboard-card payment-card"
+      >
+        <div class="payment-header">
+          <div class="payment-icon-container">
+            <i-lucide
+              name="wallet"
+              class="payment-icon"
+            ></i-lucide>
+          </div>
+
+          <div>
+            <h2 class="section-title">
+              Méthodes de paiement
+            </h2>
+
+            <p class="payment-description">
+              Répartition des dons
+            </p>
+          </div>
+        </div>
+
+        <div class="progress-list">
+          <div
+            *ngFor="
+              let payment of paymentMethods;
+              trackBy: trackByLabel
+            "
+            class="progress-item"
+          >
+            <div class="progress-header">
+              <span class="progress-name">
+                {{ payment.label }}
+              </span>
+
+              <span class="progress-value">
+                {{ payment.value }}%
+              </span>
+            </div>
+
+            <div class="progress-track">
+              <div
+                class="progress-fill"
+                [style.width.%]="payment.value"
+              ></div>
+            </div>
+          </div>
+        </div>
+      </article>
+    </section>
+
+    <!-- Répartition et projets -->
+    <section class="statistics-secondary-grid">
+      <!-- Répartition des projets -->
+      <article
+        class="dashboard-card project-share-card"
+      >
+        <h2 class="section-title">
+          Répartition par domaine
+        </h2>
+
+        <p class="section-description">
+          Part des dons par catégorie
+        </p>
+
+        <div class="project-share-content">
+          <div class="donut-container">
+            <svg
+              viewBox="0 0 160 160"
+              class="donut-chart"
+              aria-label="Répartition des dons par domaine"
+            >
+              <circle
+                cx="80"
+                cy="80"
+                [attr.r]="donutRadius"
+                fill="none"
+                stroke="#f2f5f9"
+                stroke-width="20"
+              ></circle>
+
+              <circle
+                *ngFor="
+                  let segment of donutSegments;
+                  trackBy: trackByLabel
+                "
+                cx="80"
+                cy="80"
+                [attr.r]="donutRadius"
+                fill="none"
+                [attr.stroke]="segment.color"
+                stroke-width="20"
+                [attr.stroke-dasharray]="
+                  segment.dashArray
+                "
+                [attr.stroke-dashoffset]="
+                  segment.dashOffset
+                "
+              ></circle>
+            </svg>
+          </div>
+
+          <ul class="project-share-list">
+            <li
+              *ngFor="
+                let item of projectShare;
+                trackBy: trackByLabel
+              "
+              class="project-share-item"
+            >
+              <span class="project-share-name">
+                <span
+                  class="project-share-color"
+                  [style.backgroundColor]="item.color"
+                ></span>
+
+                {{ item.label }}
+              </span>
+
+              <span class="project-share-value">
+                {{ item.value }}%
+              </span>
+            </li>
+          </ul>
+        </div>
+      </article>
+
+      <!-- Top projets -->
+      <article
+        class="dashboard-card top-projects-card"
+      >
+        <h2 class="section-title">
+          Top projets
+        </h2>
+
+        <p class="section-description">
+          Progression vers l'objectif
+        </p>
+
+        <ul class="top-projects-list">
+          <li
+            *ngFor="
+              let project of topProjects;
+              trackBy: trackByProjectName
+            "
+            class="top-project-item"
+          >
+            <div class="top-project-header">
+              <span class="top-project-name">
+                {{ project.name }}
+              </span>
+
+              <span class="top-project-value">
+                {{ formatNumber(project.raised) }}
+                /
+                {{ formatNumber(project.goal) }}
+                TND
+              </span>
+            </div>
+
+            <div class="progress-track">
+              <div
+                class="progress-fill"
+                [style.width.%]="
+                  getProjectPercentage(project)
+                "
+              ></div>
+            </div>
+          </li>
+        </ul>
+      </article>
+    </section>
+  </ng-container>
 </div>
 
-  </div>
-
-</div>
-
-
-
-
-
-
-
-
-
-
+</app-sidebar-admin>

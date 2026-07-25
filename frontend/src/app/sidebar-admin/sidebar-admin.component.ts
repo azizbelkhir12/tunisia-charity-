@@ -1,16 +1,12 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
-import {
-  faUsers,
-  faHandHoldingHeart,
-  faDonate,
-  faBell,
-  faChartBar,
-  faNewspaper,
-  faProjectDiagram,
-  faComments,
-  faBars,
-  faTimes
-} from '@fortawesome/free-solid-svg-icons';
+import { Component, OnInit } from '@angular/core';
+import { Meta, Title } from '@angular/platform-browser';
+
+interface AdminNavigationItem {
+  to: string;
+  label: string;
+  icon: string;
+  exact?: boolean;
+}
 
 @Component({
   selector: 'app-sidebar-admin',
@@ -18,39 +14,53 @@ import {
   standalone:false,
   styleUrls: ['./sidebar-admin.component.css'],
 })
-export class SidebarAdminComponent {
-  // Icônes principales
-  faUsers = faUsers;
-  faHandHoldingHeart = faHandHoldingHeart;
-  faDonate = faDonate;
-  faBell = faBell;
-  faChartBar = faChartBar;
-  faNewspaper = faNewspaper;
-  faProjectDiagram = faProjectDiagram;
-  faComments = faComments;
-  faBars = faBars;
-  faTimes = faTimes;
+export class SidebarAdminComponent implements OnInit {
+   readonly navigationItems: AdminNavigationItem[] = [
+    {
+      to: '/admin-compte',
+      label: "Vue d'ensemble",
+      icon: 'layout-dashboard',
+      exact: true,
+    },
+    {
+      to: '/admin-compte/gestion-des-dons',
+      label: 'Donateurs',
+      icon: 'hand-heart',
+    },
+    {
+      to: '/admin-compte/gestion-benevoles',
+      label: 'Bénévoles',
+      icon: 'users',
+    },
+    {
+      to: '/admin-compte/gestion-des-projets',
+      label: 'Projets',
+      icon: 'folder-kanban',
+    },
+    {
+      to: '/admin-compte/gestion-des-rapports',
+      label: 'Rapports',
+      icon: 'file-text',
+    },
+    {
+      to: '/admin-compte/gestion-des-parametres',
+      label: 'Paramètres',
+      icon: 'settings',
+    },
+  ];
 
-  @Input() isSidebarOpen = true;
-  @Output() sidebarToggled = new EventEmitter<void>();
+  constructor(
+    private titleService: Title,
+    private metaService: Meta,
+  ) {}
 
-  // Active functionality
-  activeFunctionality: string | null = null;
+  ngOnInit(): void {
+    this.titleService.setTitle('Admin — Tunisia Charity');
 
-  setActiveFunctionality(functionality: string) {
-    this.activeFunctionality = functionality;
-  }
-
-  toggleSidebar() {
-    this.sidebarToggled.emit();
-  }
-
-  closeSidebar() {
-    if (this.isSidebarOpen) {
-      this.isSidebarOpen = false;
-      this.sidebarToggled.emit();
-      console.log('Sidebar closed');
-    }
+    this.metaService.updateTag({
+      name: 'robots',
+      content: 'noindex',
+    });
   }
 }
   

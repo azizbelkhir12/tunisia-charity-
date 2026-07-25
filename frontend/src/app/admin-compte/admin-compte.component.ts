@@ -1,12 +1,60 @@
 import { Component, OnInit } from '@angular/core';
-import { Chart, registerables } from 'chart.js';
-Chart.register(...registerables);
-import { faHome, faUsers } from '@fortawesome/free-solid-svg-icons';
+import { Observable, forkJoin, of } from 'rxjs';
+import { catchError, finalize } from 'rxjs/operators';
+
+// Adapte uniquement les chemins et les noms de ces services
+import { BeneficiaryService } from '../services/beneficiary/beneficiary.service';
 import { DonorsService } from '../services/donors/donors.service';
 import { DonationService } from '../services/donation/donation.service';
-import { BeneficiaryService } from '../services/beneficiary/beneficiary.service';
+import { ProjetService } from '../services/projet/projet.service';
+import { RapportService } from '../services/rapport/rapport.service';
 import { VolunteerService } from '../services/volunteer/volunteer.service';
 
+type DashboardRange = '7j' | '30j' | '12m';
+
+interface DashboardKpi {
+  label: string;
+  value: number;
+  delta: number;
+  up: boolean;
+  icon: string;
+}
+
+interface DonationData {
+  month: string;
+  value: number;
+}
+
+interface ProjectShare {
+  label: string;
+  value: number;
+  color: string;
+}
+
+interface PaymentMethod {
+  label: string;
+  value: number;
+}
+
+interface TopProject {
+  name: string;
+  raised: number;
+  goal: number;
+}
+
+interface RecentActivity {
+  title: string;
+  date: string;
+}
+
+interface DonutSegment extends ProjectShare {
+  dashArray: string;
+  dashOffset: number;
+}
+
+interface DatedActivity extends RecentActivity {
+  rawDate: Date;
+}
 
 @Component({
   selector: 'app-admin-compte',
@@ -14,269 +62,1110 @@ import { VolunteerService } from '../services/volunteer/volunteer.service';
   standalone:false,
   styleUrls: ['./admin-compte.component.css']
 })
-export class AdminCompteComponent implements OnInit {
-  donors: any[] = [];
-  dons: any[] = [];
-  donations: any[] = [];
-  beneficiaries: any[] = [];
-  benevoles: any[] = [];
-  volunteers: any[] = [];
-  selectedYear: number = new Date().getFullYear();
-  availableYears: number[] = [2023, 2024, 2025];
-  monthlyComparisonChart: Chart | null = null;
-  monthNames: string[] = [
-    'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-    'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+export class AdminCompteComponent  {
+  selectedRange: DashboardRange = '12m';
+  showStats = false;
+
+  isLoading = false;
+  loadError = false;
+
+  kpis: DashboardKpi[] = [
+    {
+      label: 'Donateurs',
+      value: 0,
+      delta: 0,
+      up: true,
+      icon: 'hand-heart',
+    },
+    {
+      label: 'Bénévoles',
+      value: 0,
+      delta: 0,
+      up: true,
+      icon: 'users',
+    },
+    {
+      label: 'Bénéficiaires',
+      value: 0,
+      delta: 0,
+      up: true,
+      icon: 'heart-handshake',
+    },
+    {
+      label: 'Projets actifs',
+      value: 0,
+      delta: 0,
+      up: true,
+      icon: 'folder-kanban',
+    },
   ];
 
-  statistics: any = {
-    totalDons: 0,
-    totalBeneficiaires: 0,
-    totalBenevoles: 0,
-    totalDonateurs: 0,
-    totalParrains: 0,
-    totalStandardDonateurs: 0,
-    monthlyDons: []
-  };
-  statisticsService: any;
+  donations12m: DonationData[] = [];
 
-constructor(private donorsService: DonorsService, 
-            private donationService : DonationService,
-            private beneficiaryService : BeneficiaryService, 
-            private volunteerService : VolunteerService) {}
+  projectShare: ProjectShare[] = [];
 
-  ngOnInit() {
-  this.fetchDonors();
-  this.fetchDonations();
-  this.getBeneficiaires();
-  this.fetchVolunteers();
+  paymentMethods: PaymentMethod[] = [];
 
-  // Delay chart creation until data is ready
-  setTimeout(() => {
-    this.createDonationChart();
-    this.createUserStatsChart();
-    this.createDonorPieChart();
-  }, 1500); // Adjust delay based on data load
-}
+  topProjects: TopProject[] = [];
 
+  recentActivities: RecentActivity[] = [];
 
+  readonly ranges: DashboardRange[] = [
+    '7j',
+    '30j',
+    '12m',
+  ];
 
-  fetchDonors() {
-  this.donorsService.getDonors().subscribe({
-    next: (res: any[]) => {
-      this.donors = res;
+  totalDons = 0;
+  maxDonation = 0;
 
-      // Count donor types
-      const parrainCount = this.donors.filter(d => d.status === 'parrain').length;
-      const standardCount = this.donors.filter(d => d.status === 'standard').length;
+  readonly donutRadius = 60;
 
-      this.statistics.totalDonateurs = this.donors.length;
-      this.statistics.totalParrains = parrainCount;
-      this.statistics.totalStandardDonateurs = standardCount;
+  readonly donutCircumference =
+    2 * Math.PI * this.donutRadius;
 
-      console.log("Donors fetched:", this.donors);
-    },
-    error: (err) => {
-      console.error('Failed to fetch donors:', err);
-    }
-  });
-}
+  donutSegments: DonutSegment[] = [];
 
+  constructor(
+    private beneficiaryService: BeneficiaryService,
+    private donorService: DonorsService,
+    private donationService: DonationService,
+    private projectService: ProjetService,
+    private rapportService: RapportService,
+    private volunteerService: VolunteerService,
+  ) {}
 
-  fetchDonations() {
-  this.donationService.getDonations().subscribe({
-    next: (res: any[]) => {
-      this.donations = res;
-
-      // Sum donation amounts
-      const total = this.donations.reduce((sum, donation) => sum + (donation.amount || 0), 0);
-      this.statistics.totalDons = total;
-
-      this.createMonthlyComparisonChart(); // <- Add this here
-    },
-    error: (err) => {
-      console.error('Failed to fetch donations:', err);
-    }
-  });
-}
-
-
-  getBeneficiaires(): void {
-  this.beneficiaryService.getBeneficiaires().subscribe({
-    next: (response) => {
-      this.beneficiaries = response.data.beneficiaries;
-      this.statistics.totalBeneficiaires = this.beneficiaries.length;
-
-      console.log('Beneficiaries fetched:', this.beneficiaries);
-    },
-    error: (error) => {
-      console.error('Erreur lors du chargement des bénéficiaires :', error);
-    }
-  });
-}
-
-
-  fetchVolunteers() {
-  this.volunteerService.getVolunteers().subscribe(
-    (data: any[]) => {
-      this.volunteers = data;
-      this.benevoles = data;
-      this.statistics.totalBenevoles = this.volunteers.length;
-
-      console.log('Volunteers fetched:', this.volunteers);
-    },
-    (error) => {
-      console.error('Error fetching volunteers:', error);
-    }
-  );
-}
-
-createDonationChart() {
-  const monthlySums: { [month: string]: number } = {};
-
-  this.donations.forEach((donation: any) => {
-    const date = new Date(donation.date);
-    const month = date.toLocaleString('default', { month: 'short', year: 'numeric' });
-
-    if (!monthlySums[month]) {
-      monthlySums[month] = 0;
-    }
-    monthlySums[month] += donation.amount || 0;
-  });
-
-  const labels = Object.keys(monthlySums);
-  const data = Object.values(monthlySums);
-
-  new Chart('donationChart', {
-    type: 'line',
-    data: {
-      labels: labels,
-      datasets: [{
-        label: 'Montant des dons (TND)',
-        data: data,
-        borderColor: 'rgba(75,192,192,1)',
-        backgroundColor: 'rgba(75,192,192,0.2)',
-        fill: true,
-        tension: 0.3
-      }]
-    }
-  });
-}
-
-
-createUserStatsChart() {
-  new Chart('barChart', {
-    type: 'pie',
-    data: {
-      labels: ['Bénéficiaires', 'Bénévoles', 'Donateurs'],
-      datasets: [{
-        label: 'Nombre',
-        data: [
-          this.statistics.totalBeneficiaires,
-          this.statistics.totalBenevoles,
-          this.statistics.totalDonateurs
-        ],
-        backgroundColor: ['#36a2eb', '#4bc0c0', '#9966ff']
-      }]
-    }
-  });
-}
-
-createDonorPieChart() {
-  new Chart('pieChart', {
-    type: 'bar',
-    data: {
-      labels: ['Parrains', 'Standards'],
-      datasets: [{
-        data: [
-          this.statistics.totalParrains,
-          this.statistics.totalStandardDonateurs
-        ],
-        backgroundColor: ['#ff6384', '#ffcd56']
-      }]
-    },
-    options: {
-      responsive: true,
-      plugins: {
-        legend: {
-          display: false  // ✅ Hides the legend
-        },
-        title: {
-          display: true,
-          text: 'Répartition des donateurs'
-        }
-      }
-    }
-  });
-}
-
-
-
-createMonthlyComparisonChart() {
-  const canvas = document.getElementById('monthlyComparisonChart') as HTMLCanvasElement;
-  if (!canvas) return;
-
-  // Destroy previous chart if it exists
-  if (this.monthlyComparisonChart) {
-    this.monthlyComparisonChart.destroy();
+  ngOnInit(): void {
+    this.loadDashboardData();
   }
 
-  // Prepare monthly data
-  const monthlyData = Array(12).fill(0);
-  this.donations.forEach(donation => {
-    const date = new Date(donation.date);
-    if (date.getFullYear() === this.selectedYear) {
-      const month = date.getMonth();
-      monthlyData[month] += donation.amount || 0;
-    }
-  });
+  loadDashboardData(): void {
+    this.isLoading = true;
+    this.loadError = false;
 
-  this.monthlyComparisonChart = new Chart(canvas, {
-    type: 'bar',
-    data: {
-      labels: this.monthNames,
-      datasets: [{
-        label: `Dons ${this.selectedYear} (TND)`,
-        data: monthlyData,
-        backgroundColor: 'rgba(54, 162, 235, 0.7)',
-        borderColor: 'rgba(54, 162, 235, 1)',
-        borderWidth: 1
-      }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        title: {
-          display: true,
-          text: `Comparaison mensuelle des dons - ${this.selectedYear}`,
-          font: { size: 16 }
+    forkJoin({
+      beneficiaires: this.safeRequest(
+        this.beneficiaryService.getBeneficiaires(),
+        'bénéficiaires',
+      ),
+
+      donors: this.safeRequest(
+        this.donorService.getDonors(),
+        'donateurs',
+      ),
+
+      donations: this.safeRequest(
+        this.donationService.getDonations(),
+        'dons',
+      ),
+
+      projects: this.safeRequest(
+        this.projectService.getProjects(),
+        'projets',
+      ),
+
+      rapports: this.safeRequest(
+        this.rapportService.getRapports(),
+        'rapports',
+      ),
+
+      volunteers: this.safeRequest(
+        this.volunteerService.getVolunteers(),
+        'bénévoles',
+      ),
+    })
+      .pipe(
+        finalize(() => {
+          this.isLoading = false;
+        }),
+      )
+      .subscribe({
+        next: responses => {
+          const beneficiaires = this.extractArray(
+            responses.beneficiaires,
+            ['beneficiaires', 'beneficiaries', 'data'],
+          );
+
+          const donors = this.extractArray(
+            responses.donors,
+            ['donors', 'donateurs', 'data'],
+          );
+
+          const donations = this.extractArray(
+            responses.donations,
+            ['donations', 'dons', 'data'],
+          );
+
+          const projects = this.extractArray(
+            responses.projects,
+            ['projects', 'projets', 'data'],
+          );
+
+          const rapports = this.extractArray(
+            responses.rapports,
+            ['rapports', 'reports', 'data'],
+          );
+
+          const volunteers = this.extractArray(
+            responses.volunteers,
+            ['volunteers', 'benevoles', 'data'],
+          );
+
+          this.updateKpis(
+            donors,
+            volunteers,
+            beneficiaires,
+            projects,
+          );
+
+          this.updateDonationsChart(donations);
+          this.updatePaymentMethods(donations);
+          this.updateProjectShare(projects);
+          this.updateTopProjects(projects);
+
+          this.updateRecentActivities(
+            donations,
+            volunteers,
+            rapports,
+            projects,
+          );
         },
-        tooltip: {
-          callbacks: {
-            label: (context) => {
-              return `${context.dataset.label}: ${(context.raw as number).toLocaleString()} TND`;
-            }
-          }
-        }
+
+        error: error => {
+          console.error(
+            'Erreur pendant le chargement du dashboard :',
+            error,
+          );
+
+          this.loadError = true;
+        },
+      });
+  }
+
+  private updateKpis(
+    donors: any[],
+    volunteers: any[],
+    beneficiaries: any[],
+    projects: any[],
+  ): void {
+    const activeProjects = this.getActiveProjects(projects);
+
+    const donorsGrowth =
+      this.calculateMonthlyGrowth(donors);
+
+    const volunteersGrowth =
+      this.calculateMonthlyGrowth(volunteers);
+
+    const beneficiariesGrowth =
+      this.calculateMonthlyGrowth(beneficiaries);
+
+    const projectsGrowth =
+      this.calculateMonthlyGrowth(activeProjects);
+
+    this.kpis = [
+      {
+        label: 'Donateurs',
+        value: donors.length,
+        delta: donorsGrowth.delta,
+        up: donorsGrowth.up,
+        icon: 'hand-heart',
       },
-      scales: {
-        y: {
-          beginAtZero: true,
-          ticks: {
-            callback: (value) => {
-              return `${value.toLocaleString()} TND`;
-            }
-          }
+      {
+        label: 'Bénévoles',
+        value: volunteers.length,
+        delta: volunteersGrowth.delta,
+        up: volunteersGrowth.up,
+        icon: 'users',
+      },
+      {
+        label: 'Bénéficiaires',
+        value: beneficiaries.length,
+        delta: beneficiariesGrowth.delta,
+        up: beneficiariesGrowth.up,
+        icon: 'heart-handshake',
+      },
+      {
+        label: 'Projets actifs',
+        value: activeProjects.length,
+        delta: projectsGrowth.delta,
+        up: projectsGrowth.up,
+        icon: 'folder-kanban',
+      },
+    ];
+  }
+
+  private updateDonationsChart(
+    donations: any[],
+  ): void {
+    const today = new Date();
+
+    const buckets = new Map<
+      string,
+      {
+        month: string;
+        value: number;
+      }
+    >();
+
+    for (let index = 11; index >= 0; index--) {
+      const date = new Date(
+        today.getFullYear(),
+        today.getMonth() - index,
+        1,
+      );
+
+      const key = this.getMonthKey(date);
+
+      buckets.set(key, {
+        month: this.getMonthLabel(date),
+        value: 0,
+      });
+    }
+
+    let donationsWithValidDate = 0;
+
+    donations.forEach(donation => {
+      const amount = this.readNumber(donation, [
+        'amount',
+        'montant',
+        'value',
+        'donationAmount',
+        'donation_amount',
+        'total',
+      ]);
+
+      const date = this.readDate(donation);
+
+      if (!date) {
+        return;
+      }
+
+      const key = this.getMonthKey(date);
+      const bucket = buckets.get(key);
+
+      if (!bucket) {
+        return;
+      }
+
+      bucket.value += amount;
+      donationsWithValidDate++;
+    });
+
+    /*
+     * Si le backend ne renvoie aucune date,
+     * le total est placé dans le mois courant.
+     */
+    if (
+      donations.length > 0 &&
+      donationsWithValidDate === 0
+    ) {
+      const currentKey = this.getMonthKey(today);
+      const currentBucket = buckets.get(currentKey);
+
+      if (currentBucket) {
+        currentBucket.value = donations.reduce(
+          (sum, donation) =>
+            sum +
+            this.readNumber(donation, [
+              'amount',
+              'montant',
+              'value',
+              'donationAmount',
+              'donation_amount',
+              'total',
+            ]),
+          0,
+        );
+      }
+    }
+
+    this.donations12m = Array.from(
+      buckets.values(),
+    );
+
+    this.totalDons = this.donations12m.reduce(
+      (sum, donation) => sum + donation.value,
+      0,
+    );
+
+    this.maxDonation = Math.max(
+      0,
+      ...this.donations12m.map(
+        donation => donation.value,
+      ),
+    );
+  }
+
+  private updatePaymentMethods(
+    donations: any[],
+  ): void {
+    const methodCounters = new Map<string, number>();
+
+    donations.forEach(donation => {
+      const rawMethod = this.readString(donation, [
+        'paymentMethod',
+        'payment_method',
+        'modePaiement',
+        'mode_paiement',
+        'method',
+        'methode',
+      ]);
+
+      const method =
+        this.normalizePaymentMethod(rawMethod);
+
+      methodCounters.set(
+        method,
+        (methodCounters.get(method) ?? 0) + 1,
+      );
+    });
+
+    const total = donations.length;
+
+    this.paymentMethods = Array.from(
+      methodCounters.entries(),
+    )
+      .map(([label, count]) => ({
+        label,
+        value:
+          total > 0
+            ? Math.round((count / total) * 100)
+            : 0,
+      }))
+      .sort((first, second) =>
+        second.value - first.value,
+      );
+  }
+
+  private updateProjectShare(
+    projects: any[],
+  ): void {
+    const colors = [
+      '#1C4875',
+      '#4A7BB0',
+      '#7BA6D4',
+      '#A9C6E4',
+      '#D3E0EE',
+    ];
+
+    const categoryTotals = new Map<string, number>();
+
+    projects.forEach(project => {
+      const category =
+        this.readString(project, [
+          'category',
+          'categorie',
+          'domain',
+          'domaine',
+          'type',
+        ]) || 'Autres';
+
+      const collectedAmount =
+        this.readNumber(project, [
+          'raised',
+          'amountRaised',
+          'collectedAmount',
+          'montantCollecte',
+          'montant_collecte',
+          'currentAmount',
+        ]);
+
+      /*
+       * Si le montant collecté n'existe pas,
+       * chaque projet compte pour 1.
+       */
+      const value =
+        collectedAmount > 0
+          ? collectedAmount
+          : 1;
+
+      categoryTotals.set(
+        category,
+        (categoryTotals.get(category) ?? 0) +
+          value,
+      );
+    });
+
+    const total = Array.from(
+      categoryTotals.values(),
+    ).reduce(
+      (sum, value) => sum + value,
+      0,
+    );
+
+    this.projectShare = Array.from(
+      categoryTotals.entries(),
+    )
+      .map(([label, value], index) => ({
+        label,
+        value:
+          total > 0
+            ? Math.round((value / total) * 100)
+            : 0,
+        color: colors[index % colors.length],
+      }))
+      .sort((first, second) =>
+        second.value - first.value,
+      );
+
+    this.donutSegments =
+      this.createDonutSegments();
+  }
+
+  private updateTopProjects(
+    projects: any[],
+  ): void {
+    this.topProjects = projects
+      .map(project => ({
+        name:
+          this.readString(project, [
+            'title',
+            'name',
+            'nom',
+            'projectName',
+            'project_name',
+          ]) || 'Projet sans nom',
+
+        raised: this.readNumber(project, [
+          'raised',
+          'amountRaised',
+          'collectedAmount',
+          'montantCollecte',
+          'montant_collecte',
+          'currentAmount',
+        ]),
+
+        goal: this.readNumber(project, [
+          'goal',
+          'targetAmount',
+          'target_amount',
+          'objectif',
+          'budget',
+          'requiredAmount',
+        ]),
+      }))
+      .filter(project => project.goal > 0)
+      .sort(
+        (first, second) =>
+          second.raised - first.raised,
+      )
+      .slice(0, 4);
+  }
+
+  private updateRecentActivities(
+    donations: any[],
+    volunteers: any[],
+    rapports: any[],
+    projects: any[],
+  ): void {
+    const activities: DatedActivity[] = [];
+
+    donations.forEach(donation => {
+      const date = this.readDate(donation);
+
+      if (!date) {
+        return;
+      }
+
+      const amount = this.readNumber(donation, [
+        'amount',
+        'montant',
+        'value',
+        'donationAmount',
+      ]);
+
+      const projectName = this.readString(
+        donation,
+        [
+          'projectName',
+          'project_name',
+          'projectTitle',
+          'project',
+        ],
+      );
+
+      activities.push({
+        title:
+          `Nouveau don de ${this.formatNumber(amount)} TND` +
+          (projectName
+            ? ` — Projet ${projectName}`
+            : ''),
+        date: this.formatRelativeDate(date),
+        rawDate: date,
+      });
+    });
+
+    volunteers.forEach(volunteer => {
+      const date = this.readDate(volunteer);
+
+      if (!date) {
+        return;
+      }
+
+      const fullName =
+        this.getPersonFullName(volunteer);
+
+      activities.push({
+        title:
+          `Nouvelle inscription bénévole` +
+          (fullName ? ` — ${fullName}` : ''),
+        date: this.formatRelativeDate(date),
+        rawDate: date,
+      });
+    });
+
+    rapports.forEach(rapport => {
+      const date = this.readDate(rapport);
+
+      if (!date) {
+        return;
+      }
+
+      const title = this.readString(rapport, [
+        'title',
+        'titre',
+        'name',
+        'nom',
+      ]);
+
+      activities.push({
+        title: title
+          ? `${title} publié`
+          : 'Nouveau rapport publié',
+        date: this.formatRelativeDate(date),
+        rawDate: date,
+      });
+    });
+
+    projects.forEach(project => {
+      const date = this.readDate(project);
+
+      if (!date) {
+        return;
+      }
+
+      const name = this.readString(project, [
+        'title',
+        'name',
+        'nom',
+      ]);
+
+      activities.push({
+        title: name
+          ? `Projet « ${name} » mis à jour`
+          : 'Projet mis à jour',
+        date: this.formatRelativeDate(date),
+        rawDate: date,
+      });
+    });
+
+    this.recentActivities = activities
+      .sort(
+        (first, second) =>
+          second.rawDate.getTime() -
+          first.rawDate.getTime(),
+      )
+      .slice(0, 4)
+      .map(({ title, date }) => ({
+        title,
+        date,
+      }));
+  }
+
+  private getActiveProjects(
+    projects: any[],
+  ): any[] {
+    const hasStatusInformation = projects.some(
+      project =>
+        project.status !== undefined ||
+        project.statut !== undefined ||
+        project.isActive !== undefined ||
+        project.active !== undefined,
+    );
+
+    if (!hasStatusInformation) {
+      return projects;
+    }
+
+    return projects.filter(project => {
+      if (
+        project.isActive === true ||
+        project.active === true
+      ) {
+        return true;
+      }
+
+      const status = this.readString(project, [
+        'status',
+        'statut',
+        'state',
+        'etat',
+      ])
+        .trim()
+        .toLowerCase();
+
+      return [
+        'active',
+        'actif',
+        'en cours',
+        'ongoing',
+        'published',
+        'publié',
+        'publie',
+      ].includes(status);
+    });
+  }
+
+  private calculateMonthlyGrowth(
+    items: any[],
+  ): {
+    delta: number;
+    up: boolean;
+  } {
+    const now = new Date();
+
+    const currentMonthStart = new Date(
+      now.getFullYear(),
+      now.getMonth(),
+      1,
+    );
+
+    const previousMonthStart = new Date(
+      now.getFullYear(),
+      now.getMonth() - 1,
+      1,
+    );
+
+    const currentMonthCount = items.filter(item => {
+      const date = this.readDate(item);
+
+      return (
+        date !== null &&
+        date >= currentMonthStart &&
+        date <= now
+      );
+    }).length;
+
+    const previousMonthCount = items.filter(item => {
+      const date = this.readDate(item);
+
+      return (
+        date !== null &&
+        date >= previousMonthStart &&
+        date < currentMonthStart
+      );
+    }).length;
+
+    if (
+      currentMonthCount === 0 &&
+      previousMonthCount === 0
+    ) {
+      return {
+        delta: 0,
+        up: true,
+      };
+    }
+
+    if (previousMonthCount === 0) {
+      return {
+        delta: currentMonthCount > 0 ? 100 : 0,
+        up: true,
+      };
+    }
+
+    const delta =
+      ((currentMonthCount - previousMonthCount) /
+        previousMonthCount) *
+      100;
+
+    return {
+      delta: Math.abs(
+        Number(delta.toFixed(1)),
+      ),
+      up: delta >= 0,
+    };
+  }
+
+  private normalizePaymentMethod(
+    method: string,
+  ): string {
+    const normalized = method
+      .trim()
+      .toLowerCase();
+
+    if (
+      normalized.includes('online') ||
+      normalized.includes('ligne') ||
+      normalized.includes('card') ||
+      normalized.includes('carte')
+    ) {
+      return 'En ligne';
+    }
+
+    if (
+      normalized.includes('virement') ||
+      normalized.includes('bank') ||
+      normalized.includes('bancaire')
+    ) {
+      return 'Virement';
+    }
+
+    if (
+      normalized.includes('cash') ||
+      normalized.includes('espèce') ||
+      normalized.includes('espece')
+    ) {
+      return 'Espèces';
+    }
+
+    return method.trim() || 'Non renseigné';
+  }
+
+  private getPersonFullName(
+    person: any,
+  ): string {
+    const firstName = this.readString(person, [
+      'firstName',
+      'firstname',
+      'prenom',
+      'Prenom',
+    ]);
+
+    const lastName = this.readString(person, [
+      'lastName',
+      'lastname',
+      'name',
+      'nom',
+    ]);
+
+    return `${firstName} ${lastName}`.trim();
+  }
+
+  private extractArray(
+    response: any,
+    possibleKeys: string[],
+  ): any[] {
+    if (Array.isArray(response)) {
+      return response;
+    }
+
+    if (!response) {
+      return [];
+    }
+
+    for (const key of possibleKeys) {
+      if (Array.isArray(response[key])) {
+        return response[key];
+      }
+    }
+
+    if (response.data) {
+      if (Array.isArray(response.data)) {
+        return response.data;
+      }
+
+      for (const key of possibleKeys) {
+        if (Array.isArray(response.data[key])) {
+          return response.data[key];
         }
       }
     }
-  });
-}
 
-onYearChange() {
-    this.createMonthlyComparisonChart();
+    return [];
   }
 
+  private readNumber(
+    object: any,
+    keys: string[],
+  ): number {
+    for (const key of keys) {
+      const value = object?.[key];
+
+      if (
+        value !== null &&
+        value !== undefined &&
+        value !== ''
+      ) {
+        const number = Number(value);
+
+        if (!Number.isNaN(number)) {
+          return number;
+        }
+      }
+    }
+
+    return 0;
+  }
+
+  private readString(
+    object: any,
+    keys: string[],
+  ): string {
+    for (const key of keys) {
+      const value = object?.[key];
+
+      if (
+        typeof value === 'string' &&
+        value.trim()
+      ) {
+        return value.trim();
+      }
+    }
+
+    return '';
+  }
+
+  private readDate(
+    object: any,
+  ): Date | null {
+    const dateKeys = [
+      'createdAt',
+      'created_at',
+      'updatedAt',
+      'updated_at',
+      'date',
+      'donationDate',
+      'donation_date',
+      'publishedAt',
+      'published_at',
+      'registrationDate',
+    ];
+
+    for (const key of dateKeys) {
+      const value = object?.[key];
+
+      if (!value) {
+        continue;
+      }
+
+      const date = new Date(value);
+
+      if (!Number.isNaN(date.getTime())) {
+        return date;
+      }
+    }
+
+    return null;
+  }
+
+  private getMonthKey(date: Date): string {
+    return `${date.getFullYear()}-${date.getMonth()}`;
+  }
+
+  private getMonthLabel(date: Date): string {
+    const label = new Intl.DateTimeFormat(
+      'fr-FR',
+      {
+        month: 'short',
+      },
+    )
+      .format(date)
+      .replace('.', '');
+
+    return (
+      label.charAt(0).toUpperCase() +
+      label.slice(1)
+    );
+  }
+
+  private formatRelativeDate(
+    date: Date,
+  ): string {
+    const now = new Date();
+
+    const difference =
+      now.getTime() - date.getTime();
+
+    const minutes = Math.floor(
+      difference / 60000,
+    );
+
+    const hours = Math.floor(
+      difference / 3600000,
+    );
+
+    const days = Math.floor(
+      difference / 86400000,
+    );
+
+    if (minutes < 1) {
+      return "À l'instant";
+    }
+
+    if (minutes < 60) {
+      return `Il y a ${minutes} min`;
+    }
+
+    if (hours < 24) {
+      return `Il y a ${hours} h`;
+    }
+
+    if (days === 1) {
+      return 'Hier';
+    }
+
+    if (days < 7) {
+      return `Il y a ${days} j`;
+    }
+
+    return new Intl.DateTimeFormat(
+      'fr-FR',
+      {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric',
+      },
+    ).format(date);
+  }
+
+  private safeRequest<T>(
+    request: Observable<T>,
+    label: string,
+  ): Observable<T | null> {
+    return request.pipe(
+      catchError(error => {
+        console.error(
+          `Erreur de chargement des ${label} :`,
+          error,
+        );
+
+        this.loadError = true;
+
+        return of(null);
+      }),
+    );
+  }
+
+  toggleStatistics(): void {
+    this.showStats = !this.showStats;
+  }
+
+  selectRange(
+    range: DashboardRange,
+  ): void {
+    this.selectedRange = range;
+  }
+
+  getRangeLabel(
+    range: DashboardRange,
+  ): string {
+    switch (range) {
+      case '7j':
+        return '7 jours';
+
+      case '30j':
+        return '30 jours';
+
+      case '12m':
+        return '12 mois';
+
+      default:
+        return range;
+    }
+  }
+
+  getDonationHeight(
+    value: number,
+  ): number {
+    if (this.maxDonation === 0) {
+      return 0;
+    }
+
+    return (
+      (value / this.maxDonation) *
+      100
+    );
+  }
+
+  getProjectPercentage(
+    project: TopProject,
+  ): number {
+    if (project.goal === 0) {
+      return 0;
+    }
+
+    return Math.min(
+      100,
+      Math.round(
+        (project.raised / project.goal) *
+          100,
+      ),
+    );
+  }
+
+  formatNumber(value: number): string {
+    return new Intl.NumberFormat(
+      'fr-FR',
+    ).format(value);
+  }
+
+  trackByLabel(
+    index: number,
+    item: { label: string },
+  ): string {
+    return item.label;
+  }
+
+  trackByMonth(
+    index: number,
+    item: DonationData,
+  ): string {
+    return item.month;
+  }
+
+  trackByProjectName(
+    index: number,
+    item: TopProject,
+  ): string {
+    return item.name;
+  }
+
+  trackByActivity(
+    index: number,
+    item: RecentActivity,
+  ): string {
+    return item.title;
+  }
+
+  trackByRange(
+    index: number,
+    range: DashboardRange,
+  ): DashboardRange {
+    return range;
+  }
+
+  private createDonutSegments(): DonutSegment[] {
+    const total = this.projectShare.reduce(
+      (sum, item) => sum + item.value,
+      0,
+    );
+
+    let currentOffset = 0;
+
+    return this.projectShare.map(item => {
+      const segmentLength =
+        total > 0
+          ? (item.value / total) *
+            this.donutCircumference
+          : 0;
+
+      const segment: DonutSegment = {
+        ...item,
+
+        dashArray:
+          `${segmentLength} ` +
+          `${
+            this.donutCircumference -
+            segmentLength
+          }`,
+
+        dashOffset: -currentOffset,
+      };
+
+      currentOffset += segmentLength;
+
+      return segment;
+    });
+  }
   
 }
