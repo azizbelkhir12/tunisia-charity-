@@ -305,10 +305,7 @@ export class BenevolatComponent implements OnInit {
         },
       });
   }
-  /**
-   * Cette méthode ne contacte pas encore l'API.
-   * Elle valide le formulaire puis affiche l'étape OTP.
-   */
+ 
   submitDonor(): void {
   this.apiError = '';
 

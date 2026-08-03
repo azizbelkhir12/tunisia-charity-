@@ -1,242 +1,385 @@
-<app-navbarcompte-admin></app-navbarcompte-admin>
-<app-sidebar-admin></app-sidebar-admin>
+<app-sidebar-admin>
 
-<div class="main-container">
+<div class="benevoles-page">
+  <header class="page-header">
+    <h1>Bénévoles</h1>
+
+    <p>
+      Gérez les bénévoles et les demandes d'adhésion.
+    </p>
+  </header>
 
   <!-- Statistiques -->
-  <div class="stats-container row d-flex justify-content-between">
-    <div class="col-lg-3 col-md-5 col-12">
-      <div class="stats-card">
-        <i class="fas fa-users icon-yellow"></i>
-        <h4>Bénévoles Actifs</h4>
-        <p>{{ totalBenevolesActifs }}</p>
-      </div>
-    </div>
-    <div class="col-lg-3 col-md-5 col-12">
-      <div class="stats-card">
-        <i class="fas fa-user-times icon-yellow"></i>
-        <h4>Bénévoles Inactifs</h4>
-        <p>{{ totalBenevolesInactifs }}</p>
-      </div>
-    </div>
-    <div class="col-lg-3 col-md-5 col-12">
-      <div class="stats-card">
-        <i class="fas fa-users icon-yellow"></i>
-        <h4>Total Bénévoles</h4>
-        <p>{{ totalBenevoles }}</p>
-      </div>
-    </div>
-  </div>
+  <section class="stats-grid">
+    <article
+      class="stat-card"
+      *ngFor="
+        let stat of statsCards;
+        trackBy: trackByStatLabel
+      "
+    >
+      <div class="stat-card-content">
+        <div>
+          <div class="stat-label">
+            {{ stat.label }}
+          </div>
 
-  <!-- Boutons de toggle -->
-  <div class="form-toggle-container">
-    <button class="btn-toggle" (click)="afficherFormulaire('listeBenevoles')">Voir Liste des Bénévoles</button>
-    <button class="btn-toggle" (click)="afficherFormulaire('demandes')">Voir Demandes</button>
-  </div>
-
-  <!-- Contenu dynamique -->
-  <div class="forms-container">
-
-    <!--  Demandes de bénévolat -->
-    <div class="col-12" *ngIf="formulaireActif === 'demandes'">
-      <div class="form-card">
-        <h3>Demandes de Bénévolat</h3>
-        <div *ngIf="demandesBenevolat && demandesBenevolat.length > 0; else noDemandesTemplate">
-          <table class="table table-striped">
-            <thead>
-              <tr>
-                <th>Nom</th>
-                <th>Prénom</th>
-                <th>Email</th>
-                <th>Âge</th>
-                <th>Gouvernorat</th>
-                <th>Raison</th>
-                <th>Téléphone</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let demande of demandesBenevolat">
-                <td>{{ demande.name }}</td>
-                <td>{{ demande.Prenom }}</td>
-                <td>{{ demande.email }}</td>
-                <td>{{ demande.age }}</td>
-                <td>{{ demande.gouvernorat }}</td>
-                <td>{{ demande.reason }}</td>
-                <td>{{ demande.phone }}</td>
-                <td>
-                  <button class="btn-accept" (click)="accepterDemande(demande)">
-                    <i class="fas fa-check-circle"></i>
-                  </button>
-                  <button class="btn-reject" (click)="refuserDemande(demande)">
-                    <i class="fas fa-times-circle"></i>
-                  </button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-
-          <div class="export-buttons">
-            <button class="btn-export" (click)="exportToXLSX()">Exporter en XLSX</button>
-            <button class="btn-export" (click)="exportToPDF()">Exporter en PDF</button>
+          <div class="stat-value">
+            {{ formatNumber(stat.value) }}
           </div>
         </div>
-      </div>
-    </div>
 
-    <!--  Liste des bénévoles -->
-    <div class="col-12" *ngIf="formulaireActif === 'listeBenevoles'">
-      <div class="form-card">
-        <h3>Liste des Bénévoles</h3>
-
-        <!-- Filtres -->
-        <div class="filters">
-          <input type="text" placeholder="🔍Rechercher par nom..." [(ngModel)]="searchTerm" />
-<select [(ngModel)]="selectedGouvernorat">
-  <option value="">Tous les gouvernorats</option>
-  <option *ngFor="let gouvernorat of gouvernorats" [value]="gouvernorat">{{ gouvernorat }}</option>
-</select>
-<select [(ngModel)]="selectedStatut">
-  <option value="">Tous les statuts</option>
-  <option value="active">Actif</option>
-  <option value="inactive">Inactif</option>
-</select>
-<input type="number" placeholder="🔍Filtrer par âge..." [(ngModel)]="selectedAge" />
-<input type="text" placeholder="🔍Filtrer par téléphone..." [(ngModel)]="searchTermTelephone" />
-
-        </div>
-
-        <!-- Tableau -->
-        <div class="table-responsive">
-          <table class="table table-striped">
-            <thead>
-              <tr>
-                <th>Nom</th>
-                <th>Prénom</th>
-                <th>Email</th>
-                <th>Âge</th>
-                <th>Téléphone</th>
-                <th>Adresse</th>
-                <th>Gouvernorat</th>
-                <th>Statut</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let benevole of getFilteredBenevoles()">
-                <td>{{ benevole.name }}</td>
-                <td>{{ benevole.lastName }}</td>
-                <td>{{ benevole.email }}</td>
-                <td>{{ benevole.age }}</td>
-                <td>{{ benevole.phone }}</td>
-                <td>{{ benevole.address }}</td>
-                <td>{{ benevole.gouvernorat }}</td>
-                <td>{{ benevole.status }}</td>
-                <td>
-                  <button class="btn btn-warning btn-sm"
-                  (click)="openEditModal(benevole)"
-                  [disabled]="isLoading">
-                  <i class="fas fa-edit"></i>
-                  </button>
-                  <button *ngIf="benevole.status === 'inactive'"
-                          class="btn btn-success btn-sm"
-                          (click)="activateVolunteer(benevole)"
-                          [disabled]="isLoading">
-                    <i class="fas fa-check-circle"></i> Activer
-                  </button>
-                  <button *ngIf="benevole.status === 'active'"
-                          class="btn btn-danger btn-sm"
-                          (click)="deactivateVolunteer(benevole)"
-                          [disabled]="isLoading">
-                    <i class="fas fa-times-circle"></i> Désactiver
-                  </button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-
-        <div class="export-buttons">
-          <button class="btn-export" (click)="exportbenevolesToXLSX()">Exporter en XLSX</button>
-          <button class="btn-export" (click)="exportBenevolesToPDF()">Exporter en PDF</button>
+        <div
+          class="stat-icon"
+          [ngClass]="stat.colorClass"
+        >
+          <i-lucide
+            [name]="stat.icon"
+            class="icon-20"
+          ></i-lucide>
         </div>
       </div>
-    </div>
+    </article>
+  </section>
 
-    <!-- BACKDROP -->
-<div class="modal-backdrop fade show" *ngIf="isEditModalOpen"></div>
+  <!-- Onglets -->
+  <nav class="tabs">
+    <button
+      type="button"
+      class="tab-button"
+      [class.active]="view === 'list'"
+      (click)="changeView('list')"
+    >
+      Voir liste bénévoles
+    </button>
 
-<!-- EDIT MODAL -->
-<div class="modal fade show d-block" *ngIf="isEditModalOpen" style="background: rgba(0,0,0,0.5);">
-  <div class="modal-dialog modal-lg modal-dialog-centered">
-    <div class="modal-content">
+    <button
+      type="button"
+      class="tab-button requests-tab"
+      [class.active]="view === 'requests'"
+      (click)="changeView('requests')"
+    >
+      Voir demandes
 
-      <div class="modal-header">
-        <h5 class="modal-title">
-          <i class="fas fa-user-edit"></i> Modifier Bénévole
-        </h5>
-        <button type="button" class="btn-close" (click)="closeEditModal()"></button>
+      <span
+        *ngIf="stats.pending > 0"
+        class="pending-count"
+      >
+        {{ stats.pending }}
+      </span>
+    </button>
+  </nav>
+
+  <!-- Liste des bénévoles -->
+  <section
+    *ngIf="view === 'list'"
+    class="volunteers-card"
+  >
+    <div class="table-toolbar">
+      <div class="search-container">
+        <i-lucide
+          name="search"
+          class="search-icon"
+        ></i-lucide>
+
+        <input
+          type="search"
+          [(ngModel)]="query"
+          placeholder="Rechercher un bénévole…"
+          aria-label="Rechercher un bénévole"
+        />
       </div>
 
-      <div class="modal-body">
-        <div class="row g-3">
+      <select
+        [(ngModel)]="statusFilter"
+        aria-label="Filtrer les bénévoles par statut"
+      >
+        <option value="all">
+          Tous les statuts
+        </option>
 
-          <div class="col-md-6">
-            <label class="form-label">Nom</label>
-            <input class="form-control" [(ngModel)]="selectedVolunteer.name">
-          </div>
+        <option value="active">
+          Actifs
+        </option>
 
-          <div class="col-md-6">
-            <label class="form-label">Prénom</label>
-            <input class="form-control" [(ngModel)]="selectedVolunteer.lastName">
-          </div>
+        <option value="inactive">
+          Inactifs
+        </option>
+      </select>
 
-          <div class="col-md-6">
-            <label class="form-label">Email</label>
-            <input class="form-control" [(ngModel)]="selectedVolunteer.email">
-          </div>
+      <div class="export-actions">
+        <button
+          type="button"
+          class="export-button xlsx-button"
+          (click)="exportXLSX()"
+        >
+          <i-lucide
+            name="file-spreadsheet"
+            class="icon-16"
+          ></i-lucide>
 
-          <div class="col-md-6">
-            <label class="form-label">Âge</label>
-            <input type="number" class="form-control" [(ngModel)]="selectedVolunteer.age">
-          </div>
+          Export XLSX
+        </button>
 
-          <div class="col-md-6">
-            <label class="form-label">Téléphone</label>
-            <input class="form-control" [(ngModel)]="selectedVolunteer.phone">
-          </div>
+        <button
+          type="button"
+          class="export-button pdf-button"
+          (click)="exportPDF()"
+        >
+          <i-lucide
+            name="file-text"
+            class="icon-16"
+          ></i-lucide>
 
-          <div class="col-md-6">
-            <label class="form-label">Adresse</label>
-            <input class="form-control" [(ngModel)]="selectedVolunteer.address">
-          </div>
-
-          <div class="col-md-6">
-            <label class="form-label">Gouvernorat</label>
-            <input class="form-control" [(ngModel)]="selectedVolunteer.gouvernorat">
-          </div>
-
-        </div>
-      </div>
-
-      <div class="modal-footer">
-        <button class="btn btn-secondary" (click)="closeEditModal()">Annuler</button>
-        <button class="btn btn-primary"
-                (click)="updateVolunteer()"
-                [disabled]="isLoading">
-          <i class="fas fa-save"></i> Enregistrer
+          Export PDF
         </button>
       </div>
-
     </div>
-  </div>
+
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>Nom</th>
+            <th>Prénom</th>
+            <th>Âge</th>
+            <th>Email</th>
+            <th>Téléphone</th>
+            <th>Adresse</th>
+            <th>Gouvernorat</th>
+            <th>Statut</th>
+            <th class="action-column">
+              Action
+            </th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <ng-container
+            *ngIf="
+              filteredVolunteers.length > 0;
+              else emptyVolunteers
+            "
+          >
+            <tr
+              *ngFor="
+                let volunteer of filteredVolunteers;
+                trackBy: trackByVolunteerId
+              "
+            >
+              <td class="volunteer-name">
+                {{ volunteer.nom }}
+              </td>
+
+              <td>
+                {{ volunteer.prenom }}
+              </td>
+
+              <td>
+                {{ volunteer.age }}
+              </td>
+
+              <td class="muted-cell">
+                {{ volunteer.email }}
+              </td>
+
+              <td class="muted-cell">
+                {{ volunteer.telephone }}
+              </td>
+
+              <td class="muted-cell">
+                {{ volunteer.adresse }}
+              </td>
+
+              <td>
+                {{ volunteer.gouvernorat }}
+              </td>
+
+              <td>
+                <span
+                  class="status-badge"
+                  [class.active-status]="
+                    volunteer.status === 'active'
+                  "
+                  [class.inactive-status]="
+                    volunteer.status === 'inactive'
+                  "
+                >
+                  <span
+                    class="status-dot"
+                    [class.active-dot]="
+                      volunteer.status === 'active'
+                    "
+                    [class.inactive-dot]="
+                      volunteer.status === 'inactive'
+                    "
+                  ></span>
+
+                  {{
+                    volunteer.status === 'active'
+                      ? 'Actif'
+                      : 'Inactif'
+                  }}
+                </span>
+              </td>
+
+              <td class="action-column">
+                <button
+                  type="button"
+                  class="status-action"
+                  (click)="toggleStatus(volunteer)"
+                >
+                  {{
+                    volunteer.status === 'active'
+                      ? 'Désactiver'
+                      : 'Activer'
+                  }}
+                </button>
+              </td>
+            </tr>
+          </ng-container>
+
+          <ng-template #emptyVolunteers>
+            <tr>
+              <td
+                colspan="9"
+                class="empty-table"
+              >
+                Aucun bénévole trouvé.
+              </td>
+            </tr>
+          </ng-template>
+        </tbody>
+      </table>
+    </div>
+
+    <footer class="table-footer">
+      <span>
+        {{ filteredVolunteers.length }}
+        bénévole(s) affiché(s)
+      </span>
+
+      <span class="export-information">
+        <i-lucide
+          name="download"
+          class="icon-12"
+        ></i-lucide>
+
+        Les exports respectent les filtres appliqués
+      </span>
+    </footer>
+  </section>
+
+  <!-- Demandes d'adhésion -->
+  <section
+    *ngIf="view === 'requests'"
+    class="requests-grid"
+  >
+    <div
+      *ngIf="requests.length === 0"
+      class="empty-requests"
+    >
+      Aucune demande en attente.
+    </div>
+
+    <article
+      class="request-card"
+      *ngFor="
+        let request of requests;
+        trackBy: trackByRequestId
+      "
+    >
+      <div class="request-card-header">
+        <div class="request-person">
+          <div class="request-avatar">
+            {{ getInitials(request) }}
+          </div>
+
+          <div>
+            <div class="request-name">
+              {{ request.prenom }} {{ request.nom }}
+            </div>
+
+            <div class="request-date">
+              {{ request.age }} ans · Demande du
+              {{ formatRequestDate(request.date) }}
+            </div>
+          </div>
+        </div>
+
+        <span class="pending-badge">
+          En attente
+        </span>
+      </div>
+
+      <div class="request-details">
+        <div class="request-detail">
+          <i-lucide
+            name="mail"
+            class="icon-16"
+          ></i-lucide>
+
+          <span>
+            {{ request.email }}
+          </span>
+        </div>
+
+        <div class="request-detail">
+          <i-lucide
+            name="phone"
+            class="icon-16"
+          ></i-lucide>
+
+          <span>
+            {{ request.telephone }}
+          </span>
+        </div>
+
+        <div class="request-detail full-width">
+          <i-lucide
+            name="map-pin"
+            class="icon-16"
+          ></i-lucide>
+
+          <span>
+            {{ request.gouvernorat }}
+          </span>
+        </div>
+      </div>
+
+      <p class="motivation">
+        “{{ request.motivation }}”
+      </p>
+
+      <div class="request-actions">
+        <button
+          type="button"
+          class="request-button accept-button"
+          (click)="acceptRequest(request)"
+        >
+          <i-lucide
+            name="check"
+            class="icon-16"
+          ></i-lucide>
+
+          Accepter
+        </button>
+
+        <button
+          type="button"
+          class="request-button refuse-button"
+          (click)="refuseRequest(request.id)"
+        >
+          <i-lucide
+            name="x"
+            class="icon-16"
+          ></i-lucide>
+
+          Refuser
+        </button>
+      </div>
+    </article>
+  </section>
 </div>
 
-
-    <!-- Template si pas de demandes -->
-    <ng-template #noDemandesTemplate>
-      <p class="text-center">Pas de demandes pour le moment</p>
-    </ng-template>
-
-  </div>
-</div>
+</app-sidebar-admin>

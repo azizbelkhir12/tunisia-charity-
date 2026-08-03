@@ -3,6 +3,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const Benevole = require('../models/Volunteer');
 const nodemailer = require('nodemailer');
+const transporter = require('../config/mailer');
 
 
 
@@ -398,43 +399,86 @@ exports.acceptDemande = async (req, res) => {
     const { id } = req.params;
 
     const demande = await Demande.findById(id);
+
     if (!demande) {
-      return res.status(404).json({ message: 'Demande not found' });
+      return res.status(404).json({
+        message: 'Demande not found',
+      });
     }
 
-    const existingBenevole = await Benevole.findOne({ email: demande.email });
+    const normalizedEmail = demande.email
+      .trim()
+      .toLowerCase();
+
+    const existingBenevole = await Benevole.findOne({
+      email: normalizedEmail,
+    });
+
     if (existingBenevole) {
-      return res.status(400).json({ message: 'A volunteer with this email already exists' });
+      return res.status(400).json({
+        message:
+          'A volunteer with this email already exists',
+      });
     }
 
-    const newBenevole = new Benevole({
+    const newBenevole = await Benevole.create({
       name: demande.name,
       lastName: demande.Prenom,
       age: demande.age,
-      email: demande.email,
+      email: normalizedEmail,
       password: demande.password,
       address: demande.address,
       phone: demande.phone,
       gouvernorat: demande.gouvernorat,
       image: demande.image,
-      status: 'active'
+      status: 'active',
     });
 
-    await newBenevole.save();
+    // The acceptance is completed before attempting the email.
     await Demande.findByIdAndDelete(id);
 
-    await sendAcceptanceEmail(newBenevole.email, `${newBenevole.name} ${newBenevole.lastName}`);
+    let emailSent = false;
+    let emailError = null;
 
-    res.status(200).json({
-      message: 'Demande accepted, volunteer created, and demande deleted',
-      benevole: newBenevole
+    try {
+      await sendAcceptanceEmail(
+        newBenevole.email,
+        `${newBenevole.name} ${newBenevole.lastName}`,
+      );
+
+      emailSent = true;
+    } catch (error) {
+      emailError = error.message;
+
+      console.error(
+        "Volunteer created, but acceptance email failed:",
+        error.message,
+      );
+    }
+
+    return res.status(200).json({
+      message: emailSent
+        ? 'Demande accepted and email sent successfully'
+        : 'Demande accepted, but the email could not be sent',
+      emailSent,
+      emailError,
+      benevole: {
+        id: newBenevole._id,
+        name: newBenevole.name,
+        lastName: newBenevole.lastName,
+        email: newBenevole.email,
+        status: newBenevole.status,
+      },
     });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Server error' });
+    console.error('acceptDemande error:', error);
+
+    return res.status(500).json({
+      message: 'Server error',
+      error: error.message,
+    });
   }
 };
-
 
 // Reject a demande
 exports.rejectDemande = async (req, res) => {
@@ -442,81 +486,147 @@ exports.rejectDemande = async (req, res) => {
     const { id } = req.params;
 
     const demande = await Demande.findById(id);
+
     if (!demande) {
-      return res.status(404).json({ message: 'Demande not found' });
+      return res.status(404).json({
+        message: 'Demande not found',
+      });
     }
 
     demande.status = 'rejected';
     await demande.save();
 
-    await sendRejectionEmail(demande.email, `${demande.name} ${demande.Prenom}`);
+    let emailSent = false;
+    let emailError = null;
 
-    res.status(200).json({ message: 'Demande rejected successfully' });
+    try {
+      await sendRejectionEmail(
+        demande.email,
+        `${demande.name} ${demande.Prenom}`,
+      );
+
+      emailSent = true;
+    } catch (error) {
+      emailError = error.message;
+
+      console.error(
+        "Demande rejected, but rejection email failed:",
+        error.message,
+      );
+    }
+
+    return res.status(200).json({
+      message: emailSent
+        ? 'Demande rejected and email sent successfully'
+        : 'Demande rejected, but the email could not be sent',
+      emailSent,
+      emailError,
+    });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Server error' });
+    console.error('rejectDemande error:', error);
+
+    return res.status(500).json({
+      message: 'Server error',
+      error: error.message,
+    });
   }
 };
 
 
-
   async function sendAcceptanceEmail(email, fullName) {
-  const transporter = nodemailer.createTransport({
-    host: process.env.EMAIL_HOST,
-    port: parseInt(process.env.EMAIL_PORT, 10),
-    secure: false,
-    auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASS
-    }
+  const frontendUrl =
+    process.env.FRONTEND_URL || 'http://localhost:4200';
+
+  const info = await transporter.sendMail({
+    from: process.env.EMAIL_FROM,
+    to: email,
+    subject: 'Votre demande de bénévolat a été acceptée !',
+
+    html: `
+      <div style="font-family: Arial, sans-serif; line-height: 1.6;">
+        <h2>Demande acceptée</h2>
+
+        <p>Bonjour ${fullName || ''},</p>
+
+        <p>
+          Nous avons le plaisir de vous informer que votre
+          demande de bénévolat a été acceptée.
+        </p>
+
+        <p>
+          Vous pouvez maintenant vous connecter à votre compte.
+        </p>
+
+        <p>
+          <a href="${frontendUrl}/connexion">
+            Se connecter
+          </a>
+        </p>
+
+        <p>
+          Merci pour votre engagement.
+        </p>
+
+        <p>
+          L'équipe Support Tunisia Charity
+        </p>
+      </div>
+    `,
   });
 
-  const mailOptions = {
-    from: `"Equipe Support" <${process.env.EMAIL_USER}>`,
-    to: email,
-    subject: '[- Votre demande de bénévolat a été acceptée !- ]',
-    html: `
-      <p>Bonjour ${Demande.fullName || fullName || ''},</p>
-        <p>Nous avons le plaisir de vous informer que votre demande de bénévolat a été acceptée !</p>
-        <p>Vous pouvez maintenant vous connecter à votre compte et commencer à contribuer à nos actions.</p>
-        <p><a href="${process.env.FRONTEND_URL}/login">Se connecter</a></p>
-        <br/>
-        <p>Merci pour votre engagement,</p>
-        <p>L'équipe Support Tunisia Charity</p>
-    `
-  };
+  console.log(
+    "E-mail d'acceptation envoyé :",
+    info.messageId,
+  );
 
-  await transporter.sendMail(mailOptions);
+  return info;
 }
+
+
 
 async function sendRejectionEmail(email, fullName) {
-  const transporter = nodemailer.createTransport({
-    host: process.env.EMAIL_HOST,
-    port: parseInt(process.env.EMAIL_PORT, 10),
-    secure: false,
-    auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASS
-    }
+  const frontendUrl =
+    process.env.FRONTEND_URL || 'http://localhost:4200';
+
+  const info = await transporter.sendMail({
+    from: process.env.EMAIL_FROM,
+    to: email,
+    subject:
+      "Votre demande de bénévolat n'a pas été acceptée",
+
+    html: `
+      <div style="font-family: Arial, sans-serif; line-height: 1.6;">
+        <h2>Réponse à votre demande</h2>
+
+        <p>Bonjour ${fullName || ''},</p>
+
+        <p>
+          Nous sommes désolés de vous informer que votre
+          demande de bénévolat n'a pas été acceptée.
+        </p>
+
+        <p>
+          Pour obtenir plus d'informations, vous pouvez
+          contacter notre équipe.
+        </p>
+
+        <p>
+          <a href="${frontendUrl}/contact">
+            Nous contacter
+          </a>
+        </p>
+
+        <p>
+          L'équipe Support Tunisia Charity
+        </p>
+      </div>
+    `,
   });
 
-  const mailOptions = {
-    from: `"Equipe Support" <${process.env.EMAIL_USER}>`,
-    to: email,
-    subject: '[- Votre demande de bénévolat n"a été pas acceptée -]',
-    html: `
-      <p>Bonjour ${Demande.fullName || fullName || ''},</p>
-        <p>Malheuresement votre demande de bénévolat déposé via notre platforme n'a pas  été acceptée !</p>
-        <p>Il semble que il y'a des erreurs dans votre demande. Si vous voulez plus d'informations n'hésite pas à nous contacter</p>
-        <p><a href="${process.env.FRONTEND_URL}/contact">contacter-nous</a></p>
-        <br/>
-        <p>L'équipe Support Tunisia Charity</p>
+  console.log(
+    'E-mail de refus envoyé :',
+    info.messageId,
+  );
 
-    `
-  };
-
-  await transporter.sendMail(mailOptions);
+  return info;
 }
-
-
-

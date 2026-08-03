@@ -59,6 +59,11 @@ import {
   TrendingDown,
   BarChart3,
   ChevronUp,
+  UserCheck,
+  UserX,
+  Clock,
+  Download,
+  FileSpreadsheet,
 } from 'lucide-angular';
 
 import { AppComponent } from './app.component';
@@ -230,6 +235,11 @@ export function HttpLoaderFactory(http: HttpClient) {
       TrendingDown,
       BarChart3,
       ChevronUp,
+      UserCheck,
+      UserX,
+      Clock,
+      Download,
+      FileSpreadsheet,
     }),
     TranslateModule.forRoot({
       loader: {
