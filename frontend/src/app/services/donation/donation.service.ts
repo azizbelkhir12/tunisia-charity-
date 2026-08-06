@@ -11,7 +11,6 @@ export class DonationService {
   constructor(private http: HttpClient) { }
 
   createDonation(data: any): Observable<any> {
-    // Validate required fields before sending
     if (!data.amount || !data.paymentMethod) {
       throw new Error('Missing required donation fields');
     }

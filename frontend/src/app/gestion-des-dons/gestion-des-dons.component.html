@@ -1,205 +1,343 @@
-<!-- Navbar et Sidebar -->
-<app-navbarcompte-admin></app-navbarcompte-admin>
-<app-sidebar-admin></app-sidebar-admin>
+<app-sidebar-admin>
+ <div class="donateurs-page">
+  <header class="page-header">
+    <h1>Donateurs</h1>
+    <p>
+      Gérez les donateurs, ajoutez des dons manuellement et exportez les listes.
+    </p>
+  </header>
 
-<div class="main-container">
-  <!-- Statistiques en ligne -->
-  <div class="stats-container row d-flex justify-content-between">
-    <div class="col-lg-3 col-md-5 col-12">
-      <div class="stats-card">
-        <i class="fas fa-dollar-sign icon-yellow"></i>
-        <h4>Total des Dons</h4>
-        <p>{{ totalDons }}</p>
-      </div>
-    </div>
-    <div class="col-lg-3 col-md-5 col-12">
-      <div class="stats-card">
-        <i class="fas fa-hand-holding-usd icon-yellow"></i>
-        <h4>Dons Reçus</h4>
-        <p>{{ totalDonsRecus }}</p>
-      </div>
-    </div>
-    <div class="col-lg-3 col-md-5 col-12">
-      <div class="stats-card">
-        <i class="fas fa-credit-card icon-yellow"></i>
-        <h4>Dons en Attente</h4>
-        <p>{{ totalDonsEnAttente }}</p>
-      </div>
-    </div>
-    <div class="col-lg-3 col-md-5 col-12">
-      <div class="stats-card">
-        <i class="fas fa-users icon-yellow"></i>
-        <h4>Total des Donateurs</h4>
-        <p>{{ totalDonateurs }}</p>
-      </div>
-    </div>
-  </div>
+  <section class="stats-grid" aria-label="Statistiques des dons">
+    <article
+      *ngFor="let stat of statsCards; trackBy: trackByLabel"
+      class="stat-card"
+    >
+      <div class="stat-content">
+        <div>
+          <div class="stat-label">{{ stat.label }}</div>
+          <div class="stat-value">{{ stat.value }}</div>
+        </div>
 
-  <!-- Sélection du formulaire -->
-  <div class="form-toggle-container">
-    <button class="btn-toggle" (click)="afficherFormulaire('don')">Ajouter un Don</button>
-    <button class="btn-toggle" (click)="afficherFormulaire('donateurs')">Voir Liste des Donateurs</button>
-    <button class="btn-toggle" (click)="afficherFormulaire('liste')">Voir Dons</button>
-  </div>
-
-  <!-- Formulaires et section des dons -->
-  <div class="row forms-container">
-    <!-- Formulaire d'ajout d'un don -->
-    <div class="col-lg-5 col-md-6 col-12" *ngIf="formulaireActif === 'don'">
-      <div class="form-card">
-        <h3>Ajouter un Don</h3>
-        <form [formGroup]="donForm" (ngSubmit)="ajouterDon()">
-          <div class="form-group">
-            <label>Nom</label>
-            <input type="text" class="form-control" formControlName="guestName" />
-          </div>
-          <div *ngIf="donForm.get('guestName')?.invalid && donForm.get('guestName')?.touched" class="error-message">
-            Le nom doit contenir au moins 2 caractères.
-          </div>
-
-          <div class="form-group">
-            <label>Email</label>
-            <input type="email" class="form-control" formControlName="guestEmail" />
-          </div>
-          <div *ngIf="donForm.get('guestEmail')?.invalid && donForm.get('guestEmail')?.touched" class="error-message">
-            Veuillez entrer un email valide.
-          </div>
-
-          <div class="form-group">
-            <label>Montant (TND)</label>
-            <input type="number" class="form-control" formControlName="amount" />
-          </div>
-
-          <div *ngIf="donForm.get('amount')?.invalid && donForm.get('amount')?.touched" class="error-message">
-            Veuillez entrer un montant valide.
-          </div>
-
-          <div class="form-group">
-            <label>Mode de Paiement</label>
-            <select class="form-control" formControlName="paymentMethod">
-              <option value="credit_card">Carte de Crédit</option>
-              <option value="paypal">PayPal</option>
-            </select>
-          </div>
-          <div *ngIf="donForm.get('paymentMethod')?.invalid && donForm.get('paymentMethod')?.touched" class="error-message">
-            Veuillez sélectionner un mode de paiement.
-          </div>
-
-          <div class="form-group">
-            <label>Statut</label>
-            <select class="form-control" formControlName="status">
-              <option value="pending">En attente</option>
-              <option value="completed">Confirmé</option>
-            </select>
-          </div>
-          
-          <div *ngIf="donForm.get('status')?.invalid && donForm.get('status')?.touched" class="error-message">
-            Veuillez sélectionner un statut.
-          </div>
-
-          <!-- Ajout du champ "Type de Don" -->
-          <div class="form-group">
-            <label>Type de Don</label>
-            <select class="form-control" formControlName="paymentType">
-              <option value="Local">Local</option>
-              <option value="International">International</option>
-            </select>
-          </div>  
-          <div *ngIf="donForm.get('paymentType')?.invalid && donForm.get('paymentType')?.touched" class="error-message">
-            Veuillez sélectionner un type de paiement.
-          </div>
-
-
-          <button class="btn-blue" type="submit" [disabled]="donForm.invalid" (click)="ajouterDon()">Ajouter le Don</button>
-        </form>
-      </div>
-    </div>
-
-    <!-- Section Liste des Donateurs -->
-    <div class="col-lg-6 col-md-8 col-12" *ngIf="formulaireActif === 'donateurs'">
-      <div class="form-card">
-        <h3>Liste des Donateurs</h3>
-
-        <!-- Barre de recherche -->
-        <input type="text" [(ngModel)]="searchDonateurs" placeholder="Rechercher un donateur" class="search-input">
-
-        <table #tableDonateurs class="table">
-          <thead>
-            <tr>
-              <th>Nom</th>
-              <th>Email</th>
-              <th>Téléphone</th>
-              <th>Adresse</th>
-              <th>Code Postal</th>
-              <th>Statut</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let donateur of filteredDonateurs()">
-              <td>{{ donateur.name }}</td>
-              <td>{{ donateur.email }}</td>
-              <td>{{ donateur.phone }}</td>
-              <td>{{ donateur.address }}</td>
-              <td>{{ donateur.zipCode }}</td>
-              <td>{{ donateur.status }}</td>
-            </tr>
-          </tbody>
-        </table>
-
-
-        <!-- Boutons pour exporter en PDF et Excel -->
-        <div class="ex">
-          <button class="ex" (click)="exporterPDF()">Exporter en PDF</button>
-          <button class="ex" (click)="exporterExcel()">Exporter en Excel</button>
+        <div class="stat-icon" [ngClass]="stat.colorClass">
+          <lucide-icon [img]="stat.icon" [size]="20"></lucide-icon>
         </div>
       </div>
+    </article>
+  </section>
+
+  <nav class="tabs" aria-label="Navigation des donateurs">
+    <button
+      *ngFor="let tab of tabs; trackBy: trackByTab"
+      type="button"
+      class="tab-button"
+      [class.active]="view === tab.key"
+      (click)="setView(tab.key)"
+    >
+      {{ tab.label }}
+    </button>
+  </nav>
+
+  <section *ngIf="view === 'ajouter'" class="form-card">
+    <div *ngIf="saved" class="success-message" role="status">
+      <lucide-icon [img]="CheckIcon" [size]="16"></lucide-icon>
+      <span>Le don a été enregistré avec succès.</span>
     </div>
 
+    <div *ngIf="apiError" class="api-error-message" role="alert">
+      {{ apiError }}
+    </div>
 
-    <!-- Section Liste des Dons -->
-    <div class="col-lg-6 col-md-8 col-12" *ngIf="formulaireActif === 'liste'">
-      <div class="form-card">
-        <h3>Liste des Dons</h3>
+    <form
+      class="don-form"
+      (ngSubmit)="submitDon()"
+      #donForm="ngForm"
+      novalidate
+    >
+      <div class="form-field">
+        <label for="nom">Nom</label>
+        <input
+          id="nom"
+          name="nom"
+          type="text"
+          [(ngModel)]="form.nom"
+          placeholder="Nom complet du donateur"
+        />
+        <p *ngIf="errors.nom" class="field-error">{{ errors.nom }}</p>
+      </div>
 
-        <!-- Barre de recherche -->
-        <input type="text" [(ngModel)]="searchDons" placeholder="Rechercher un don" class="search-input">
+      <div class="form-field">
+        <label for="email">Email</label>
+        <input
+          id="email"
+          name="email"
+          type="email"
+          [(ngModel)]="form.email"
+          placeholder="exemple@mail.tn"
+        />
+        <p *ngIf="errors.email" class="field-error">{{ errors.email }}</p>
+      </div>
 
-        <!-- Liste des dons -->
-  <table class="table">
-    <thead >
-      <tr>
-        <th>Donateur</th>
-        <th>Montant</th>
-        <th>Type  Don</th>
-        <th>Mode Paiement</th>
-        <th>Statut</th>
-        <th>Date</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let don of filteredDons()">
-        <td>{{ don.guestName }}</td>
-        <td>{{ don.amount }} TND</td>
-        <td>{{ don.paymentType }}</td>
-        <td>{{ don.paymentMethod }}</td>
-        <td>{{ don.status }}</td>
-        <td>{{ don.date | date:'dd/MM/yyyy' }}</td>
+      <div class="form-field">
+        <label for="montant">Montant (TND)</label>
+        <input
+          id="montant"
+          name="montant"
+          type="number"
+          min="1"
+          [(ngModel)]="form.montant"
+          placeholder="100"
+        />
+        <p *ngIf="errors.montant" class="field-error">
+          {{ errors.montant }}
+        </p>
+      </div>
 
-      </tr>
-    </tbody>
-  </table>
+      <div class="form-field">
+        <label for="mode">Mode de paiement</label>
+        <select id="mode" name="mode" [(ngModel)]="form.mode">
+          <option value="virement">Virement bancaire</option>
+          <option value="en_ligne">Paiement en ligne</option>
+          <option value="cash">Espèces</option>
+        </select>
+      </div>
 
-        <!-- Boutons pour exporter en PDF et Excel -->
-        <div class="ex">
-          <button class="ex" (click)="exporterDonsPDF()">Exporter en PDF</button>
-          <button class="ex" (click)="exporterDonsExcel()">Exporter en Excel</button>
-        </div>
+      <div class="form-field">
+        <label for="status">Statut</label>
+        <select id="status" name="status" [(ngModel)]="form.status">
+          <option value="en_attente">En attente</option>
+          <option value="confirme">Confirmé</option>
+        </select>
+      </div>
+
+      <div class="form-field">
+        <label for="type">Type de don</label>
+        <select id="type" name="type" [(ngModel)]="form.type">
+          <option value="local">Local</option>
+          <option value="international">International</option>
+        </select>
+      </div>
+
+      <div class="form-actions">
+        <button
+          type="submit"
+          class="primary-button"
+          [disabled]="isSubmitting"
+        >
+          <lucide-icon [img]="PlusCircleIcon" [size]="16"></lucide-icon>
+          <span>{{ isSubmitting ? 'Enregistrement…' : 'Enregistrer le don' }}</span>
+        </button>
+      </div>
+    </form>
+  </section>
+
+  <section *ngIf="view === 'donateurs'" class="table-card">
+    <div class="table-toolbar">
+      <div class="search-box">
+        <lucide-icon
+          class="search-icon"
+          [img]="SearchIcon"
+          [size]="16"
+        ></lucide-icon>
+        <input
+          type="search"
+          [(ngModel)]="qDonors"
+          placeholder="Rechercher un donateur…"
+          aria-label="Rechercher un donateur"
+        />
+      </div>
+
+      <div class="export-actions">
+        <button
+          type="button"
+          class="export-button export-xlsx"
+          (click)="exportDonorsXLSX()"
+        >
+          <lucide-icon
+            [img]="FileSpreadsheetIcon"
+            [size]="16"
+          ></lucide-icon>
+          <span>Export XLSX</span>
+        </button>
+
+        <button
+          type="button"
+          class="export-button export-pdf"
+          (click)="exportDonorsPDF()"
+        >
+          <lucide-icon [img]="FileTextIcon" [size]="16"></lucide-icon>
+          <span>Export PDF</span>
+        </button>
       </div>
     </div>
-  </div>
+
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>Nom</th>
+            <th>Email</th>
+            <th>Téléphone</th>
+            <th>Adresse</th>
+            <th>Code postal</th>
+            <th>Statut</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr *ngIf="filteredDonors.length === 0">
+            <td colspan="6" class="empty-row">
+              {{ loading ? 'Chargement des donateurs…' : 'Aucun donateur trouvé.' }}
+            </td>
+          </tr>
+
+          <tr
+            *ngFor="let donor of filteredDonors; trackBy: trackById"
+            class="data-row"
+          >
+            <td class="cell-strong">{{ donor.nom }}</td>
+            <td class="cell-muted">{{ donor.email }}</td>
+            <td class="cell-muted">{{ donor.telephone }}</td>
+            <td class="cell-muted">{{ donor.adresse }}</td>
+            <td>{{ donor.zipCode }}</td>
+            <td>
+              <span
+                class="status-badge"
+                [class.status-active]="donor.status === 'active'"
+                [class.status-inactive]="donor.status === 'inactive'"
+              >
+                <span class="status-dot"></span>
+                {{ donor.status === 'active' ? 'Actif' : 'Inactif' }}
+              </span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <footer class="table-footer">
+      <span>{{ filteredDonors.length }} donateur(s) affiché(s)</span>
+      <span class="export-hint">
+        <lucide-icon [img]="DownloadIcon" [size]="12"></lucide-icon>
+        Les exports respectent les filtres appliqués
+      </span>
+    </footer>
+  </section>
+
+  <section *ngIf="view === 'dons'" class="table-card">
+    <div class="table-toolbar">
+      <div class="search-box">
+        <lucide-icon
+          class="search-icon"
+          [img]="SearchIcon"
+          [size]="16"
+        ></lucide-icon>
+        <input
+          type="search"
+          [(ngModel)]="qDons"
+          placeholder="Rechercher un don…"
+          aria-label="Rechercher un don"
+        />
+      </div>
+
+      <select
+        class="status-filter"
+        [(ngModel)]="donStatusFilter"
+        aria-label="Filtrer les dons par statut"
+      >
+        <option value="all">Tous les statuts</option>
+        <option value="en_attente">En attente</option>
+        <option value="confirme">Confirmé</option>
+      </select>
+
+      <div class="export-actions">
+        <button
+          type="button"
+          class="export-button export-xlsx"
+          (click)="exportDonsXLSX()"
+        >
+          <lucide-icon
+            [img]="FileSpreadsheetIcon"
+            [size]="16"
+          ></lucide-icon>
+          <span>Export XLSX</span>
+        </button>
+
+        <button
+          type="button"
+          class="export-button export-pdf"
+          (click)="exportDonsPDF()"
+        >
+          <lucide-icon [img]="FileTextIcon" [size]="16"></lucide-icon>
+          <span>Export PDF</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>Donateur</th>
+            <th>Montant</th>
+            <th>Type de don</th>
+            <th>Mode de paiement</th>
+            <th>Statut</th>
+            <th>Date</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr *ngIf="filteredDons.length === 0">
+            <td colspan="6" class="empty-row">
+              {{ loading ? 'Chargement des dons…' : 'Aucun don trouvé.' }}
+            </td>
+          </tr>
+
+          <tr
+            *ngFor="let don of filteredDons; trackBy: trackById"
+            class="data-row"
+          >
+            <td>
+              <div class="cell-strong">{{ don.donateur }}</div>
+              <div class="cell-subtext">{{ don.email }}</div>
+            </td>
+            <td class="amount-cell">
+              {{ formatNumber(don.montant) }} TND
+            </td>
+            <td>
+              <span
+                class="type-badge"
+                [class.type-local]="don.type === 'local'"
+                [class.type-international]="don.type === 'international'"
+              >
+                {{ typeLabel[don.type] }}
+              </span>
+            </td>
+            <td class="cell-muted">{{ modeLabel[don.mode] }}</td>
+            <td>
+              <span
+                class="status-badge"
+                [class.status-confirmed]="don.status === 'confirme'"
+                [class.status-pending]="don.status === 'en_attente'"
+              >
+                <span class="status-dot"></span>
+                {{ statusLabel[don.status] }}
+              </span>
+            </td>
+            <td class="cell-muted">{{ formatDate(don.date) }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <footer class="table-footer">
+      <span>{{ filteredDons.length }} don(s) affiché(s)</span>
+      <span class="export-hint">
+        <lucide-icon [img]="DownloadIcon" [size]="12"></lucide-icon>
+        Les exports respectent les filtres appliqués
+      </span>
+    </footer>
+  </section>
 </div>
 
-
-
-
-
+</app-sidebar-admin>

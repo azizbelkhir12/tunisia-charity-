@@ -1,301 +1,551 @@
-/* ✅ Ajustement pour éviter que la sidebar masque le contenu */
-.main-container {
-  margin-left: 250px; /* Ajuste selon la largeur de ta sidebar */
-  padding: 10px;
+:host {
+  display: block;
+  --primary: var(--app-primary, #1c4875);
+  --primary-foreground: #ffffff;
+  --foreground: var(--app-foreground, #1f2937);
+  --muted: var(--app-muted, #f3f4f6);
+  --muted-foreground: var(--app-muted-foreground, #6b7280);
+  --border: var(--app-border, #e5e7eb);
+  --destructive: #dc2626;
+  color: var(--foreground);
+  font-family:
+    Inter,
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
 }
 
-/* ✅ Suppression de l’espace entre la navbar et les cartes */
-.stats-container {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 0px; /* ✅ Supprime l’espace en haut */
-  margin-bottom: 40px; /* ✅ Plus d’espace entre les stats et les formulaires */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
 }
 
-/* ✅ Cartes statistiques avec un effet plus moderne */
-.stats-card {
-  flex: 1;
-  max-width: 250px;
-  background: linear-gradient(135deg, #ffffff, #f8f9fa);
-  color: #333;
-  padding: 20px;
-  border-radius: 10px;
-  text-align: center;
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
-  border-top: 4px solid #0056b3; /* ✅ Bordure bleue foncée */
-  transition: all 0.3s ease-in-out;
-
-}
-.stats-card p {
-  font-size: 15px;
-  font-weight: bold;
-  margin: 0;
-  color: #00060c;
+button,
+input,
+select {
+  font: inherit;
 }
 
-/* ✅ Effet au survol des cartes */
-.stats-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
-}
-
-/* ✅ Icônes des cartes */
-.icon-yellow {
-  font-size: 35px;
-  color: #ffc107;
-  margin-bottom: 8px;
-}
-
-/* ✅ Organisation des formulaires */
-.forms-container {
-  display: flex;
-  justify-content: center; /* ✅ Centre les formulaires */
-  gap: 40px; /* ✅ Espace entre les deux formulaires */
-  margin-top: 20px; /* ✅ Réduction de l’espace au-dessus */
-}
-
-/* ✅ Formulaires modernisés */
-.form-card {
-  background: white;
-  padding: 25px;
-  border-radius: 10px;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-  border-left: 5px solid #0056b3;
-  width: auto;
-  min-width: auto;
-  display: inline-block;
-  margin: 0 auto;
-}
-
-/* ✅ Effet au survol */
-.form-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-}
-
-/* ✅ Titres des formulaires & tableaux */
-/* Table adjustments */
-.table {
-  width: 100%;
-  table-layout: auto;
-  border-collapse: collapse;
-}
-
-/* Column sizing - adjust as needed */
-.table th {
-  background: white;
-  color: white;
-  padding: 12px;
-  text-align: center;
-}
-
-.table td {
-  padding: 10px;
-  border-bottom: 1px solid #eee;
-  text-align: center;
-}
-
-/* Container adjustments */
-.forms-container {
-  display: flex;
-  justify-content: center;
-  gap: 40px;
-  width: 100%;
-}
-.form-card h3,
-.benevoles-table h3 {
-  color: #222;
-  font-size: 22px;
-  margin-bottom: 15px;
-  text-align: center;
-  font-weight: 600;
-  text-transform: uppercase;
-}
-
-/* ✅ Champs de formulaire modernisés */
-input, select {
-  width: 100%;
-  padding: 12px;
-  margin: 10px 0;
-  border: 2px solid #e0e0e0;
-  border-radius: 8px;
-  font-size: 16px;
-  background: white;
-  color: #333;
-  transition: all 0.3s ease;
-}
-
-/* ✅ Effet focus */
-input:focus, select:focus {
-  border-color: #0056b3;
-  box-shadow: 0 0 8px rgba(0, 86, 179, 0.3);
-  outline: none;
-}
-
-/* ✅ Conteneur des boutons de sélection */
-.form-toggle-container {
-  display: flex;
-  justify-content: center;
-  gap: 15px;
-  margin-bottom: 20px;
-}
-
-/* ✅ Boutons de sélection */
-.btn-toggle {
-  background: linear-gradient(135deg, #007bff, #0056b3);
-  color: white;
-  padding: 12px 20px;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 15px;
-  font-weight: bold;
-  transition: all 0.3s ease-in-out;
-}
-
-/* ✅ Effet hover */
-.btn-toggle:hover {
-  transform: scale(1.05);
-  box-shadow: 0 6px 14px rgba(0, 123, 255, 0.4);
-}
-
-/* ✅ Boutons modernisés avec effet gradient */
 button {
-  background: linear-gradient(135deg, #ffc107, #e0a800);
-  color: white;
-  padding: 10px;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 15px;
-  margin-top: 10px;
+  border: 0;
+}
+
+.donateurs-page {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
   width: 100%;
-  box-shadow: 0 4px 10px rgba(0, 123, 255, 0.2);
-  transition: all 0.3s ease-in-out;
 }
 
-/* ✅ Effet au survol des boutons */
-button:hover {
-  transform: scale(1.05);
-  box-shadow: 0 6px 14px rgba(0, 123, 255, 0.4);
+.page-header h1 {
+  margin: 0;
+  font-size: 24px;
+  line-height: 32px;
+  font-weight: 600;
+  color: var(--foreground);
 }
 
-/* ✅ Tableau modernisé */
-.benevoles-table {
-  margin-top: 40px;
+.page-header p {
+  margin: 2px 0 0;
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--muted-foreground);
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.stat-card {
   padding: 20px;
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  background: #ffffff;
+  border: 1px solid var(--border);
+  border-radius: 12px;
 }
 
-/* ✅ Design du tableau */
-.table-responsive {
+.stat-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.stat-label {
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 400;
+  letter-spacing: 0.025em;
+  text-transform: uppercase;
+  color: var(--muted-foreground);
+}
+
+.stat-value {
+  margin-top: 4px;
+  font-size: 24px;
+  line-height: 32px;
+  font-weight: 600;
+  color: var(--foreground);
+}
+
+.stat-icon {
+  display: flex;
+  flex: 0 0 44px;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 8px;
+}
+
+.stat-icon-primary {
+  color: var(--primary);
+  background: color-mix(in srgb, var(--primary) 10%, transparent);
+}
+
+.stat-icon-emerald {
+  color: #047857;
+  background: #d1fae5;
+}
+
+.stat-icon-sky {
+  color: #0369a1;
+  background: #e0f2fe;
+}
+
+.stat-icon-amber {
+  color: #b45309;
+  background: #fef3c7;
+}
+
+.tabs {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  border-bottom: 1px solid var(--border);
+}
+
+.tab-button {
+  position: relative;
+  margin-bottom: -1px;
+  padding: 10px 16px;
+  background: transparent;
+  border-bottom: 2px solid transparent;
+  color: var(--muted-foreground);
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 500;
+  cursor: pointer;
+  transition:
+    color 150ms ease,
+    border-color 150ms ease;
+}
+
+.tab-button:hover {
+  color: var(--foreground);
+}
+
+.tab-button.active {
+  color: var(--primary);
+  border-bottom-color: var(--primary);
+}
+
+.form-card {
+  width: 100%;
+  max-width: 768px;
+  padding: 24px;
+  background: #ffffff;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+
+.success-message {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 20px;
+  padding: 12px 16px;
+  background: #ecfdf5;
+  border: 1px solid #a7f3d0;
+  border-radius: 8px;
+  color: #065f46;
+  font-size: 14px;
+  line-height: 20px;
+}
+
+.don-form {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 16px;
+}
+
+.form-field label {
+  display: block;
+  margin-bottom: 6px;
+  color: var(--foreground);
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 500;
+}
+
+.form-field input,
+.form-field select,
+.status-filter,
+.search-box input {
+  width: 100%;
+  background: var(--muted);
+  border: 1px solid transparent;
+  border-radius: 8px;
+  color: var(--foreground);
+  font-size: 14px;
+  outline: none;
+  transition:
+    background 150ms ease,
+    border-color 150ms ease;
+}
+
+.form-field input,
+.form-field select {
+  height: 44px;
+  padding: 0 12px;
+}
+
+.form-field input::placeholder,
+.search-box input::placeholder {
+  color: #9ca3af;
+}
+
+.form-field input:focus,
+.form-field select:focus,
+.status-filter:focus,
+.search-box input:focus {
+  background: #ffffff;
+  border-color: var(--primary);
+}
+
+.field-error {
+  margin: 4px 0 0;
+  color: var(--destructive);
+  font-size: 12px;
+  line-height: 16px;
+}
+
+.form-actions {
+  display: flex;
+}
+
+.primary-button,
+.export-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border-radius: 8px;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition:
+    opacity 150ms ease,
+    background-color 150ms ease;
+}
+
+.primary-button {
+  height: 44px;
+  padding: 0 20px;
+  background: var(--primary);
+}
+
+.primary-button:hover,
+.export-pdf:hover {
+  opacity: 0.9;
+}
+
+.table-card {
+  overflow: hidden;
+  background: #ffffff;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+
+.table-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+.search-box {
+  position: relative;
+  flex: 1 1 220px;
+  min-width: 220px;
+}
+
+.search-box .search-icon {
+  position: absolute;
+  top: 50%;
+  left: 12px;
+  z-index: 1;
+  color: var(--muted-foreground);
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+.search-box input {
+  height: 40px;
+  padding: 0 12px 0 36px;
+}
+
+.status-filter {
+  width: auto;
+  height: 40px;
+  padding: 0 36px 0 12px;
+}
+
+.export-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+}
+
+.export-button {
+  height: 40px;
+  padding: 0 12px;
+}
+
+.export-xlsx {
+  background: #059669;
+}
+
+.export-xlsx:hover {
+  background: #047857;
+}
+
+.export-pdf {
+  background: var(--primary);
+}
+
+.table-wrapper {
   width: 100%;
   overflow-x: auto;
-  margin-bottom: 20px;
 }
 
-.table {
+table {
   width: 100%;
   border-collapse: collapse;
+  font-size: 14px;
+  line-height: 20px;
 }
 
-.table th {
-  background: #0056b3;
-  color: white;
-  padding: 12px;
+thead {
+  background: color-mix(in srgb, var(--muted) 60%, transparent);
+  color: var(--muted-foreground);
+  text-align: left;
+}
+
+th {
+  padding: 12px 16px;
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 500;
+  letter-spacing: 0.025em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+td {
+  padding: 12px 16px;
+  color: var(--foreground);
+  vertical-align: middle;
+}
+
+.data-row {
+  border-top: 1px solid var(--border);
+  transition: background-color 150ms ease;
+}
+
+.data-row:hover {
+  background: color-mix(in srgb, var(--muted) 30%, transparent);
+}
+
+.empty-row {
+  padding-top: 40px;
+  padding-bottom: 40px;
+  color: var(--muted-foreground);
   text-align: center;
 }
 
-.table td {
-  padding: 10px;
-  border-bottom: 1px solid #eee;
-  text-align: center;
+.cell-strong,
+.amount-cell {
+  color: var(--foreground);
+  font-weight: 600;
 }
 
-.table tr:hover {
-  background-color: #f5f5f5;
+.cell-muted,
+.cell-subtext {
+  color: var(--muted-foreground);
 }
 
-/* ✅ Boutons d’action modernisés */
-.btn-container {
+.cell-subtext {
+  font-size: 12px;
+  line-height: 16px;
+}
+
+.status-badge,
+.type-badge {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 9999px;
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.status-badge {
+  gap: 6px;
+  padding: 4px 10px;
+}
+
+.type-badge {
+  padding: 4px 10px;
+}
+
+.status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+}
+
+.status-active,
+.status-confirmed {
+  color: #047857;
+  background: #d1fae5;
+}
+
+.status-active .status-dot,
+.status-confirmed .status-dot {
+  background: #10b981;
+}
+
+.status-inactive {
+  color: #475569;
+  background: #f1f5f9;
+}
+
+.status-inactive .status-dot {
+  background: #94a3b8;
+}
+
+.status-pending {
+  color: #b45309;
+  background: #fef3c7;
+}
+
+.status-pending .status-dot {
+  background: #f59e0b;
+}
+
+.type-local {
+  color: #0369a1;
+  background: #e0f2fe;
+}
+
+.type-international {
+  color: #6d28d9;
+  background: #ede9fe;
+}
+
+.table-footer {
   display: flex;
-  justify-content: center;
-  gap: 5px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 12px 16px;
+  border-top: 1px solid var(--border);
+  color: var(--muted-foreground);
+  font-size: 12px;
+  line-height: 16px;
 }
 
-.btn-edit, .btn-delete {
-  background: linear-gradient(135deg, #ffb400, #e0a800);
-  color: white;
-  padding: 6px 10px;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 14px;
-  transition: all 0.3s ease-in-out;
+.export-hint {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
 }
 
-/* ✅ Effet hover */
-.btn-edit:hover, .btn-delete:hover {
-  transform: scale(1.1);
-  box-shadow: 0 4px 10px rgba(255, 165, 0, 0.4);
+@media (min-width: 640px) {
+  .don-form {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .form-actions {
+    grid-column: 1 / -1;
+  }
 }
 
-/* ✅ Statut en gras */
-.status-text {
-  color: #222;
-  font-weight: bold;
+@media (min-width: 768px) {
+  .stat-value {
+    font-size: 30px;
+    line-height: 36px;
+  }
 }
 
-.error-message {
-  color: red;
-  font-size: 14px;
-  margin-top: 10px;
+@media (min-width: 1024px) {
+  .stats-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
 }
 
-/* Responsive adjustments */
-@media (max-width: 1200px) {
-  .main-container {
+@media (max-width: 767px) {
+  .export-actions {
+    width: 100%;
     margin-left: 0;
-    padding: 15px;
+  }
+
+  .export-button {
+    flex: 1 1 auto;
+  }
+
+  .status-filter {
+    flex: 1 1 180px;
+  }
+
+  .table-footer {
+    align-items: flex-start;
+    flex-direction: column;
   }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 479px) {
   .stats-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  .form-toggle-container {
-    flex-direction: column;
-  }
-
-  .btn-toggle {
-    width: 100%;
-  }
-
-  .export-buttons {
-    flex-direction: column;
-  }
-
-  .export-btn {
-    width: 100%;
-  }
-}
-
-@media (max-width: 480px) {
-  .stats-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .data-table th,
-  .data-table td {
-    padding: 8px 5px;
-    font-size: 12px;
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .form-card {
-    padding: 15px;
+    padding: 20px;
+  }
+
+  .tab-button {
+    flex: 1 1 auto;
+    padding-right: 10px;
+    padding-left: 10px;
+  }
+
+  .export-actions {
+    flex-direction: column;
+  }
+
+  .export-button {
+    width: 100%;
   }
 }
