@@ -1,100 +1,332 @@
-<app-navbarcompte-admin></app-navbarcompte-admin>
-<app-sidebar-admin></app-sidebar-admin>
+<app-sidebar-admin>
+  <div class="reports-page">
+    <header class="page-header">
+      <h1>Rapports</h1>
 
-<div class="main-container">
-  <!-- Notification Message -->
+      <p>
+        Publiez les rapports financiers et littéraires, consultez-les,
+        téléchargez-les ou supprimez-les.
+      </p>
+    </header>
 
+    <!-- Statistiques -->
 
-  <!-- Cartes de statistiques -->
-  <div class="stats-container row d-flex justify-content-between">
-    <div class="col-lg-3 col-md-5 col-12">
-      <div class="stats-card">
-        <i class="fas fa-file-alt icon-yellow"></i>
-        <h4>Total Rapports</h4>
-        <p>{{ totalRapports }}</p>
-      </div>
-    </div>
+    <section class="stats-grid">
+      <article class="stat-card">
+        <div class="stat-content">
+          <span class="stat-label"> Total rapports </span>
 
-    <div class="col-lg-3 col-md-5 col-12">
-      <div class="stats-card">
-        <i class="fas fa-coins icon-yellow"></i>
-        <h4>Rapports Financiers</h4>
-        <p>{{ rapportsFinanciers }}</p>
-      </div>
-    </div>
-    <div class="col-lg-3 col-md-5 col-12">
-      <div class="stats-card">
-        <i class="fas fa-book icon-yellow"></i>
-        <h4>Rapports Littéraires</h4>
-        <p>{{ rapportsLitteraires }}</p>
-      </div>
-    </div>
-  </div>
-
-  <!-- Boutons pour afficher formulaire ou liste -->
-  <div class="form-toggle-container">
-    <button class="btn-toggle" (click)="afficherFormulaire = true">Ajouter un rapport</button>
-    <button class="btn-toggle" (click)="afficherFormulaire = false">Voir les rapports</button>
-  </div>
-
-  <!-- Formulaire -->
-  <div class="forms-container" *ngIf="afficherFormulaire">
-    <div class="form-card">
-      <h3>Ajouter un rapport</h3>
-        <input type="text" placeholder="Titre du rapport" [(ngModel)]="rapport.titre" required minlength="3" maxlength="100">
-        <div *ngIf="(rapport.titre ?? '').length < 3 && rapport.titre">
-          <small class="text-danger">Le titre doit comporter au moins 3 caractères.</small>
+          <strong class="stat-value">
+            {{ totalReports }}
+          </strong>
         </div>
-        <div *ngIf="(rapport.titre ?? '').length > 100">
-          <small class="text-danger">Le titre ne doit pas dépasser 100 caractères.</small>
-        </div>
-        <select [(ngModel)]="rapport.type" required>
-          <option value="">-- Sélectionner le type --</option>
-          <option value="financier">Financier</option>
-          <option value="litteraire">Littéraire</option>
-        </select>
-        <div *ngIf="!rapport.type">
-          <small class="text-danger">Le type de rapport est requis.</small>
-        </div>
-        <input type="file" (change)="onFileSelected($event)">
-        <button (click)="ajouterRapport()">Joindre le rapport</button>
-      </div>
-  </div>
 
-  <!-- Liste des rapports -->
-  <div class="benevoles-table" *ngIf="!afficherFormulaire">
-    <h3>Liste des rapports</h3>
+        <div class="stat-icon stat-icon-primary">
+          <lucide-icon [img]="FileTextIcon" [size]="21"></lucide-icon>
+        </div>
+      </article>
 
-    <!-- Barre de recherche -->
-    <div class="recherche-container">
-      <input type="text" placeholder="Rechercher par titre" [(ngModel)]="rechercheTitre">
-      <input type="date" [(ngModel)]="rechercheDate">
+      <article class="stat-card">
+        <div class="stat-content">
+          <span class="stat-label"> Financiers </span>
+
+          <strong class="stat-value">
+            {{ totalFinancialReports }}
+          </strong>
+        </div>
+
+        <div class="stat-icon stat-icon-financial">
+          <lucide-icon [img]="BarChart3Icon" [size]="21"></lucide-icon>
+        </div>
+      </article>
+
+      <article class="stat-card">
+        <div class="stat-content">
+          <span class="stat-label"> Littéraires </span>
+
+          <strong class="stat-value">
+            {{ totalLiteraryReports }}
+          </strong>
+        </div>
+
+        <div class="stat-icon stat-icon-literary">
+          <lucide-icon [img]="BookOpenIcon" [size]="21"></lucide-icon>
+        </div>
+      </article>
+    </section>
+
+    <!-- Succès -->
+
+    <div *ngIf="saved" class="success-message">
+      <lucide-icon [img]="CheckIcon" [size]="17"></lucide-icon>
+
+      <span> Le rapport a été ajouté avec succès. </span>
     </div>
 
-    <table class="table">
-      <thead>
-        <tr>
-          <th>Titre</th>
-          <th>Type</th>
-          <th>Date</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let r of getRapportsFiltres()">
-          <td>{{ r.titre }}</td>
-          <td>{{ r.type }}</td>
-          <td>{{ r.date | date:'dd/MM/yyyy' }}</td>
-          <td>
-            <div class="btn-container">
-              <i class="fas fa-trash-alt text-danger small-icon"
-                 (click)="supprimerRapport(r._id)" title="Supprimer"></i>
-              <i class="fas fa-file-download text-primary small-icon"
-                 (click)="telechargerRapport(r._id)" title="Télécharger"></i>
-            </div>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+    <!-- Erreur API -->
+
+    <div *ngIf="errorMessage" class="api-error-message">
+      {{ errorMessage }}
+    </div>
+
+    <!-- Navigation -->
+
+    <nav class="reports-tabs">
+      <button
+        type="button"
+        class="tab-button"
+        [class.active]="view === 'ajouter'"
+        (click)="changeView('ajouter')"
+      >
+        Ajouter rapport
+      </button>
+
+      <button
+        type="button"
+        class="tab-button"
+        [class.active]="view === 'liste'"
+        (click)="changeView('liste')"
+      >
+        Voir les rapports
+      </button>
+    </nav>
+
+    <!-- Ajouter rapport -->
+
+    <section *ngIf="view === 'ajouter'" class="form-card">
+      <form (ngSubmit)="submitReport()" novalidate>
+        <div class="form-group">
+          <label for="titre"> Titre du rapport </label>
+
+          <input
+            id="titre"
+            name="titre"
+            type="text"
+            [(ngModel)]="titre"
+            (ngModelChange)="onTitleChange()"
+            placeholder="Ex : Rapport Financier 2025"
+            [class.input-error]="errors.titre"
+          />
+
+          <p *ngIf="errors.titre" class="error-message">
+            {{ errors.titre }}
+          </p>
+        </div>
+
+        <div class="form-group">
+          <label for="type"> Type de rapport </label>
+
+          <select id="type" name="type" [(ngModel)]="type">
+            <option value="financier">Financier</option>
+
+            <option value="litteraire">Littéraire</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="rapportFile"> Fichier </label>
+
+          <div class="file-selection">
+            <label for="rapportFile" class="file-button">
+              <lucide-icon [img]="UploadIcon" [size]="17"></lucide-icon>
+
+              <span> Choisir un fichier </span>
+            </label>
+
+            <input
+              #fileInput
+              id="rapportFile"
+              type="file"
+              accept=".pdf,.doc,.docx"
+              class="hidden-file-input"
+              (change)="onFileSelected($event)"
+            />
+
+            <span class="selected-file">
+              <ng-container *ngIf="selectedFile; else noFileSelected">
+                {{ selectedFile.name }}
+                —
+                {{ selectedFile.size / 1024 / 1024 | number: "1.1-1" }}
+                Mo
+              </ng-container>
+
+              <ng-template #noFileSelected>
+                Aucun fichier sélectionné
+              </ng-template>
+            </span>
+          </div>
+
+          <p *ngIf="errors.file" class="error-message">
+            {{ errors.file }}
+          </p>
+        </div>
+
+        <button type="submit" class="primary-button" [disabled]="saving">
+          <span *ngIf="!saving"> Ajouter le rapport </span>
+
+          <span *ngIf="saving"> Ajout en cours... </span>
+        </button>
+      </form>
+    </section>
+
+    <!-- Voir les rapports -->
+
+    <section *ngIf="view === 'liste'" class="reports-list-section">
+      <div class="filters-container">
+        <div class="search-container">
+          <lucide-icon
+            class="search-icon"
+            [img]="SearchIcon"
+            [size]="17"
+          ></lucide-icon>
+
+          <input
+            type="search"
+            [(ngModel)]="searchQuery"
+            placeholder="Rechercher un rapport…"
+            aria-label="Rechercher un rapport"
+          />
+        </div>
+
+        <div class="filter-buttons">
+          <button
+            type="button"
+            class="filter-button"
+            [class.active]="typeFilter === 'all'"
+            (click)="setTypeFilter('all')"
+          >
+            Tous
+          </button>
+
+          <button
+            type="button"
+            class="filter-button"
+            [class.active]="typeFilter === 'financier'"
+            (click)="setTypeFilter('financier')"
+          >
+            Financiers
+          </button>
+
+          <button
+            type="button"
+            class="filter-button"
+            [class.active]="typeFilter === 'litteraire'"
+            (click)="setTypeFilter('litteraire')"
+          >
+            Littéraires
+          </button>
+        </div>
+      </div>
+
+      <div class="table-card">
+        <div *ngIf="loading" class="loading-state">
+          Chargement des rapports...
+        </div>
+
+        <div *ngIf="!loading" class="table-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th>Titre</th>
+                <th>Type</th>
+                <th>Fichier</th>
+                <th>Date</th>
+                <th class="actions-heading">Actions</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              <tr
+                *ngFor="let report of filteredReports; trackBy: trackByReportId"
+              >
+                <td class="report-title">
+                  {{ report.titre }}
+                </td>
+
+                <td>
+                  <span
+                    class="type-badge"
+                    [class.financial-badge]="report.type === 'financier'"
+                    [class.literary-badge]="report.type === 'litteraire'"
+                  >
+                    {{ getTypeLabel(report.type) }}
+                  </span>
+                </td>
+
+                <td class="muted-cell">
+                  {{ report.file?.originalName || "Fichier du rapport" }}
+                </td>
+
+                <td class="muted-cell">
+                  {{ report.date | date: "dd/MM/yyyy" }}
+                </td>
+
+                <td>
+                  <div class="actions-container">
+                    <button
+                      type="button"
+                      class="action-button view-button"
+                      [disabled]="consultingId === getReportId(report)"
+                      (click)="consultReport(report)"
+                    >
+                      <lucide-icon [img]="EyeIcon" [size]="15"></lucide-icon>
+
+                      <span>
+                        {{
+                          consultingId === getReportId(report)
+                            ? "Ouverture..."
+                            : "Consulter"
+                        }}
+                      </span>
+                    </button>
+
+                    <button
+                      type="button"
+                      class="action-button download-button"
+                      [disabled]="downloadingId === getReportId(report)"
+                      (click)="downloadReport(report)"
+                    >
+                      <lucide-icon
+                        [img]="DownloadIcon"
+                        [size]="15"
+                      ></lucide-icon>
+
+                      <span>
+                        {{
+                          downloadingId === getReportId(report)
+                            ? "Téléchargement..."
+                            : "Télécharger"
+                        }}
+                      </span>
+                    </button>
+
+                    <button
+                      type="button"
+                      class="action-button delete-button"
+                      [disabled]="deletingId === getReportId(report)"
+                      (click)="removeReport(report)"
+                    >
+                      <lucide-icon [img]="Trash2Icon" [size]="15"></lucide-icon>
+
+                      <span>
+                        {{
+                          deletingId === getReportId(report)
+                            ? "Suppression..."
+                            : "Supprimer"
+                        }}
+                      </span>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+
+              <tr *ngIf="filteredReports.length === 0">
+                <td colspan="5" class="empty-state">Aucun rapport trouvé.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
   </div>
-</div>
+</app-sidebar-admin>

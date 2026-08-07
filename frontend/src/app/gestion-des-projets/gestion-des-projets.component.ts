@@ -1,6 +1,69 @@
-import { Component, OnInit } from '@angular/core';
+import {Component,ElementRef,OnDestroy,OnInit,ViewChild,}from '@angular/core';
+import {
+  Check,
+  CheckCircle2,
+  ClockAlert,
+  Flag,
+  FolderKanban,
+  ImagePlus,
+  Loader,
+  Pencil,
+  Search,
+  Trash2,
+  Wallet,
+  X,
+} from 'lucide-angular';
+
 import { ProjetService } from '../services/projet/projet.service';
-import Swal from 'sweetalert2';
+import { Observable } from 'rxjs';
+
+type ProjectStatus =
+  | 'en_cours'
+  | 'termine'
+  | 'en_retard';
+
+
+type ProjectView = 'ajouter' | 'liste';
+
+type StatusFilter =
+  | 'all'
+  | ProjectStatus;
+
+interface Project {
+  id: string;
+  titre: string;
+  description: string;
+  dateDebut: string;
+  dateFin: string;
+  montantSoutenu: number;
+  statut: ProjectStatus;
+  imageUrl: string;
+}
+
+
+interface ProjectForm {
+  titre: string;
+  description: string;
+  dateDebut: string;
+  dateFin: string;
+  montantSoutenu: number | null;
+  statut: ProjectStatus;
+}
+
+interface ProjectStats {
+  total: number;
+  enCours: number;
+  termine: number;
+  enRetard: number;
+  montantTotal: number;
+}
+
+interface StatsCard {
+  label: string;
+  value: string;
+  icon: any;
+  colorClass: string;
+}
 
 @Component({
   selector: 'app-gestion-des-projets',
@@ -8,253 +71,854 @@ import Swal from 'sweetalert2';
   standalone: false,
   styleUrls: ['./gestion-des-projets.component.css']
 })
-export class GestionDesProjetsComponent implements OnInit {
+export class GestionDesProjetsComponent implements OnInit, OnDestroy {
 
-  formulaireActif: 'ajout' | 'liste' = 'liste';
-  rechercheTitre = '';
-  rechercheDate: string | null = null;
-  rechercheStatut = '';
-  enEdition: boolean = false; 
+  @ViewChild('fileInput')
+  fileInput?: ElementRef<HTMLInputElement>;
 
-  totalProjets = 0;
-  totalProjetsEnCours = 0;
-  totalProjetsTermines = 0;
-  totalProjetsEnRetard = 0;
 
-  projets: any[] = [];
-  selectedImage: File | null = null;
-  
-  // Modal properties
-  showModal = false;
-  projetEnEdition: any = null;
-  selectedImageForEdit: File | null = null;
 
-  nouveauProjet = {
-    titre: '',
-    description: '',
-    dateDebut: '',
-    dateFin: '',
-    montantSoutenu: 0,
-    statut: 'en_cours'
-  };
+  readonly FolderKanban = FolderKanban;
+  readonly Loader = Loader;
+  readonly CheckCircle2 = CheckCircle2;
+  readonly ClockAlert = ClockAlert;
+  readonly Wallet = Wallet;
+  readonly Search = Search;
+  readonly Check = Check;
+  readonly Pencil = Pencil;
+  readonly Trash2 = Trash2;
+  readonly Flag = Flag;
+  readonly ImagePlus = ImagePlus;
+  readonly X = X;
 
-  constructor(private projectService: ProjetService) { }
+  projects: Project[] = [];
+
+  form: ProjectForm = this.createEmptyForm();
+
+  view: ProjectView = 'ajouter';
+
+  statusFilter: StatusFilter = 'all';
+
+  searchTerm = '';
+
+  editingId: string | null = null;
+
+  selectedImageFile: File | null = null;
+
+  imagePreview = '';
+
+  existingImageUrl = '';
+
+  errors: Record<string, string> = {};
+
+  successMessage: string | null = null;
+
+  errorMessage: string | null = null;
+
+  loading = false;
+
+  saving = false;
+
+  deletingId: string | null = null;
+
+  updatingStatusId: string | null = null;
+
+  private messageTimer?: number;
+
+  readonly statusLabels:
+    Record<ProjectStatus, string> = {
+      en_cours: 'En cours',
+      termine: 'Terminé',
+      en_retard: 'En retard',
+    };
+
+  constructor(
+    private projetService: ProjetService,
+  ) {}
 
   ngOnInit(): void {
-    this.chargerProjets();
+    this.loadProjects();
   }
 
-  chargerProjets(): void {
-    this.projectService.getProjects().subscribe({
-      next: (projets) => {
-        this.projets = projets;
-        this.rafraichirStatistiques();
+  get stats(): ProjectStats {
+    const enCours = this.projects.filter(
+      project => project.statut === 'en_cours',
+    ).length;
+
+    const termines = this.projects.filter(
+      project => project.statut === 'termine',
+    ).length;
+
+    const enRetard = this.projects.filter(
+      project => project.statut === 'en_retard',
+    ).length;
+
+    const montantTotal = this.projects.reduce(
+      (total, project) =>
+        total +
+        Number(project.montantSoutenu || 0),
+      0,
+    );
+
+    return {
+      total: this.projects.length,
+      enCours,
+      termine: termines,
+      enRetard,
+      montantTotal,
+    };
+  }
+
+  get statsCards(): StatsCard[] {
+    return [
+      {
+        label: 'Total projets',
+        value: this.formatNumber(
+          this.stats.total,
+        ),
+        icon: this.FolderKanban,
+        colorClass: 'primary-icon',
       },
-      error: (err) => {
-        console.error('Erreur lors du chargement des projets:', err);
-        alert('Erreur lors du chargement des projets');
+      {
+        label: 'En cours',
+        value: this.formatNumber(
+          this.stats.enCours,
+        ),
+        icon: this.Loader,
+        colorClass: 'warning-icon',
+      },
+      {
+        label: 'Terminés',
+        value: this.formatNumber(
+          this.stats.termine,
+        ),
+        icon: this.CheckCircle2,
+        colorClass: 'success-icon',
+      },
+      {
+        label: 'En retard',
+        value: this.formatNumber(
+          this.stats.enRetard,
+        ),
+        icon: this.ClockAlert,
+        colorClass: 'danger-icon',
+      },
+      {
+        label: 'Montant total',
+        value:
+          `${this.formatNumber(
+            this.stats.montantTotal,
+          )} TND`,
+        icon: this.Wallet,
+        colorClass: 'info-icon',
+      },
+    ];
+  }
+
+  get filteredProjects(): Project[] {
+    const normalizedSearch =
+      this.searchTerm
+        .trim()
+        .toLowerCase();
+
+    return this.projects.filter(project => {
+      const matchesStatus =
+        this.statusFilter === 'all' ||
+        project.statut === this.statusFilter;
+
+      if (!matchesStatus) {
+        return false;
       }
+
+      if (!normalizedSearch) {
+        return true;
+      }
+
+      const searchableContent = [
+        project.titre,
+        project.description,
+        project.statut,
+      ]
+        .join(' ')
+        .toLowerCase();
+
+      return searchableContent.includes(
+        normalizedSearch,
+      );
     });
   }
 
-  afficherFormulaire(type: 'ajout' | 'liste') {
-    this.formulaireActif = type;
-    if (type === 'ajout') {
-      this.reinitialiserFormulaire();
-    }
-  }
+  loadProjects(): void {
+    this.loading = true;
+    this.errorMessage = null;
 
-  onImageChange(event: Event): void {
-    const input = event.target as HTMLInputElement;
-    if (input?.files?.length) {
-      this.selectedImage = input.files[0];
-    }
-  }
+    this.projetService
+      .getProjects()
+      .subscribe({
+        next: response => {
+          const backendProjects =
+            this.extractProjectList(response);
 
-  onImageChangeModif(event: Event): void {
-    const input = event.target as HTMLInputElement;
-    if (input?.files?.length) {
-      this.selectedImageForEdit = input.files[0];
-    }
-  }
+          this.projects =
+            backendProjects.map(
+              (project: any) =>
+                this.mapBackendProject(project),
+            );
 
-  soumettreProjet(): void {
-    if (!this.selectedImage) {
-      Swal.fire({
-        icon: 'warning',
-        title: 'Image requise',
-        text: 'Veuillez sélectionner une image'
+          this.loading = false;
+        },
+
+        error: error => {
+          console.error(
+            'Erreur de chargement des projets :',
+            error,
+          );
+
+          this.projects = [];
+
+          this.errorMessage =
+            error?.error?.message ||
+            'Impossible de charger les projets.';
+
+          this.loading = false;
+        },
       });
+  }
+
+  submitProject(): void {
+    this.errors = this.validateForm();
+    this.errorMessage = null;
+
+    if (
+      this.editingId === null &&
+      !this.selectedImageFile
+    ) {
+      this.errors['image'] =
+        'L’image du projet est obligatoire.';
+    }
+
+    if (
+      Object.keys(this.errors).length > 0
+    ) {
       return;
     }
 
-    this.projectService.addProject(this.nouveauProjet, this.selectedImage).subscribe({
-      next: () => {
-        Swal.fire({
-          icon: 'success',
-          title: 'Succès',
-          text: 'Projet ajouté avec succès'
-        });
-        this.reinitialiserFormulaire();
-        this.chargerProjets();
-        this.afficherFormulaire('liste');
-      },
-      error: (err) => {
-        console.error('Erreur lors de l\'ajout du projet:', err);
-        Swal.fire({
-          icon: 'error',
-          title: 'Erreur',
-          text: 'Erreur lors de l\'ajout du projet: ' + err.message
-        });
-      }
-    });
-  }
-  
+    const projectPayload = {
+      titre: this.form.titre.trim(),
+      description:
+        this.form.description.trim(),
+      dateDebut: this.form.dateDebut,
+      dateFin: this.form.dateFin,
+      montantSoutenu: Number(
+        this.form.montantSoutenu,
+      ),
+      statut: this.form.statut,
+    };
 
-  // Modal functions
-  openEditModal(projet: any): void {
-    this.projetEnEdition = { ...projet };
-    this.selectedImageForEdit = null;
-    this.showModal = true;
-  }
+    this.saving = true;
 
-  closeModal(): void {
-    this.showModal = false;
-  }
+    if (this.editingId !== null) {
+      this.updateExistingProject(
+        this.editingId,
+        projectPayload,
+      );
 
-  modifierProjet(): void {
-    this.projectService.updateProject(
-      this.projetEnEdition._id,
-      this.projetEnEdition,
-      this.selectedImageForEdit || undefined
-    ).subscribe({
-      next: () => {
-        Swal.fire({
-          icon: 'success',
-          title: 'Succès',
-          text: 'Projet modifié avec succès'
-        });
-        this.closeModal();
-        this.chargerProjets();
-      },
-      error: (err) => {
-        console.error('Erreur lors de la modification:', err);
-        Swal.fire({
-          icon: 'error',
-          title: 'Erreur',
-          text: 'Erreur lors de la modification: ' + err.message
-        });
-      }
-    });
-  }
-
-  supprimerProjet(projet: any): void {
-    Swal.fire({
-      title: `Êtes-vous sûr de vouloir supprimer le projet "${projet.titre}" ?`,
-      text: "Cette action est irréversible !",
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonText: 'Oui, supprimer',
-      cancelButtonText: 'Annuler'
-    }).then((result) => {
-      if (result.isConfirmed) {
-        this.projectService.deleteProject(projet._id).subscribe({
-          next: () => {
-            Swal.fire({
-              icon: 'success',
-              title: 'Supprimé !',
-              text: 'Projet supprimé avec succès'
-            });
-            this.chargerProjets();
-          },
-          error: (err) => {
-            console.error('Erreur lors de la suppression du projet:', err);
-            Swal.fire({
-              icon: 'error',
-              title: 'Erreur',
-              text: 'Erreur lors de la suppression du projet'
-            });
-          }
-        });
-      }
-    });
-  }
-
-  terminerProjet(projet: any): void {
-    Swal.fire({
-      title: 'Marquer comme terminé',
-      text: `Voulez-vous vraiment marquer le projet "${projet.titre}" comme terminé ?`,
-      icon: 'question',
-      showCancelButton: true,
-      confirmButtonText: 'Oui, terminer',
-      cancelButtonText: 'Annuler'
-    }).then((result) => {
-      if (result.isConfirmed) {
-        const updatedProjet = { ...projet, statut: 'termine' };
-        this.projectService.updateProject(projet._id, updatedProjet)
-          .subscribe({
-            next: () => {
-              Swal.fire({
-                icon: 'success',
-                title: 'Succès',
-                text: 'Projet marqué comme terminé'
-              });
-              this.chargerProjets();
-            },
-            error: (err) => {
-              console.error('Erreur lors de la mise à jour du projet:', err);
-              Swal.fire({
-                icon: 'error',
-                title: 'Erreur',
-                text: 'Erreur lors de la mise à jour du projet'
-              });
-            }
-          });
-      }
-    });
-  }
-
-  getProjetsFiltres(): any[] {
-    return this.projets.filter(projet => {
-      const titreMatch = projet.titre.toLowerCase().includes(this.rechercheTitre.toLowerCase());
-      const dateMatch = !this.rechercheDate || projet.dateDebut.includes(this.rechercheDate);
-      const statutMatch = !this.rechercheStatut || projet.statut === this.rechercheStatut;
-      return titreMatch && dateMatch && statutMatch;
-    });
-  }
-
-  getImageUrl(imageData: string): string {
-    if (!imageData) return 'assets/default-image.jpg';
-    
-    // If it's an Imgur URL (starts with http)
-    if (imageData.startsWith('https')) {
-      return imageData;
+      return;
     }
-    
-    // Fallback for base64 images if needed
-    return `data:image/jpeg;base64,${imageData}`;
+
+    const image = this.selectedImageFile;
+
+    if (!image) {
+      this.errors['image'] =
+        'L’image du projet est obligatoire.';
+
+      this.saving = false;
+      return;
+    }
+
+    this.projetService
+      .addProject(
+        projectPayload,
+        image,
+      )
+      .subscribe({
+        next: () => {
+          this.saving = false;
+
+          this.resetForm();
+          this.view = 'liste';
+
+          this.showSuccessMessage(
+            'Le projet a été ajouté avec succès.',
+          );
+
+          this.loadProjects();
+        },
+
+        error: error => {
+          console.error(
+            'Erreur lors de l’ajout :',
+            error,
+          );
+
+          this.errorMessage =
+            error?.error?.message ||
+            'Impossible d’ajouter le projet.';
+
+          this.saving = false;
+        },
+      });
   }
 
-  handleImageError(event: any) {
-    event.target.src = 'assets/default-image.jpg';
+  editProject(project: Project): void {
+    this.editingId = project.id;
+
+    this.form = {
+      titre: project.titre,
+      description: project.description,
+      dateDebut: project.dateDebut,
+      dateFin: project.dateFin,
+      montantSoutenu: project.montantSoutenu,
+      statut: project.statut,
+    };
+
+    this.existingImageUrl =
+      project.imageUrl;
+
+    this.imagePreview =
+      project.imageUrl;
+
+    this.selectedImageFile = null;
+
+    this.errors = {};
+    this.errorMessage = null;
+    this.view = 'ajouter';
+
+    if (this.fileInput) {
+      this.fileInput.nativeElement.value = '';
+    }
+
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth',
+    });
   }
 
-  rafraichirStatistiques(): void {
-    this.totalProjets = this.projets.length;
-    this.totalProjetsEnCours = this.projets.filter(p => p.statut === 'en_cours').length;
-    this.totalProjetsTermines = this.projets.filter(p => p.statut === 'termine').length;
-    this.totalProjetsEnRetard = this.projets.filter(p => p.statut === 'en_retard').length;
+  deleteProject(project: Project): void {
+    const confirmed = window.confirm(
+      `Supprimer définitivement le projet « ${project.titre} » ?`,
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+    this.deletingId = project.id;
+    this.errorMessage = null;
+
+    this.projetService
+      .deleteProject(project.id)
+      .subscribe({
+        next: () => {
+          this.projects =
+            this.projects.filter(
+              item => item.id !== project.id,
+            );
+
+          if (
+            this.editingId === project.id
+          ) {
+            this.resetForm();
+          }
+
+          this.deletingId = null;
+
+          this.showSuccessMessage(
+            'Le projet a été supprimé avec succès.',
+          );
+        },
+
+        error: error => {
+          console.error(
+            'Erreur lors de la suppression :',
+            error,
+          );
+
+          this.errorMessage =
+            error?.error?.message ||
+            'Impossible de supprimer le projet.';
+
+          this.deletingId = null;
+        },
+      });
   }
 
-  reinitialiserFormulaire(): void {
-    this.nouveauProjet = {
+  terminateProject(
+    project: Project,
+  ): void {
+    const confirmed = window.confirm(
+      `Marquer le projet « ${project.titre} » comme terminé ?`,
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+    const projectPayload = {
+      titre: project.titre,
+      description: project.description,
+      dateDebut: project.dateDebut,
+      dateFin: project.dateFin,
+      montantSoutenu:
+        project.montantSoutenu,
+      statut: 'termine',
+    };
+
+    this.updatingStatusId = project.id;
+    this.errorMessage = null;
+
+    this.projetService
+      .updateProject(
+        project.id,
+        projectPayload,
+      )
+      .subscribe({
+        next: () => {
+          this.updatingStatusId = null;
+
+          this.showSuccessMessage(
+            'Le projet a été marqué comme terminé.',
+          );
+
+          this.loadProjects();
+        },
+
+        error: error => {
+          console.error(
+            'Erreur de modification du statut :',
+            error,
+          );
+
+          this.errorMessage =
+            error?.error?.message ||
+            'Impossible de modifier le statut du projet.';
+
+          this.updatingStatusId = null;
+        },
+      });
+  }
+
+  handleImageSelection(
+    event: Event,
+  ): void {
+    const input =
+      event.target as HTMLInputElement;
+
+    const file = input.files?.[0];
+
+    if (!file) {
+      return;
+    }
+
+    if (!file.type.startsWith('image/')) {
+      this.errors['image'] =
+        'Veuillez sélectionner une image valide.';
+
+      input.value = '';
+      return;
+    }
+
+    const maximumSize = 5 * 1024 * 1024;
+
+    if (file.size > maximumSize) {
+      this.errors['image'] =
+        'L’image ne doit pas dépasser 5 Mo.';
+
+      input.value = '';
+      return;
+    }
+
+    this.selectedImageFile = file;
+
+    delete this.errors['image'];
+
+    const reader = new FileReader();
+
+    reader.onload = (): void => {
+      this.imagePreview =
+        String(reader.result);
+    };
+
+    reader.onerror = (): void => {
+      this.errors['image'] =
+        'Impossible de lire cette image.';
+
+      this.selectedImageFile = null;
+      input.value = '';
+    };
+
+    reader.readAsDataURL(file);
+  }
+
+  cancelSelectedImage(): void {
+    this.selectedImageFile = null;
+
+    this.imagePreview =
+      this.editingId !== null
+        ? this.existingImageUrl
+        : '';
+
+    delete this.errors['image'];
+
+    if (this.fileInput) {
+      this.fileInput.nativeElement.value = '';
+    }
+  }
+
+  cancelEdit(): void {
+    this.resetForm();
+  }
+
+  resetForm(): void {
+    this.form = this.createEmptyForm();
+
+    this.editingId = null;
+
+    this.selectedImageFile = null;
+
+    this.imagePreview = '';
+
+    this.existingImageUrl = '';
+
+    this.errors = {};
+
+    if (this.fileInput) {
+      this.fileInput.nativeElement.value = '';
+    }
+  }
+
+  setView(view: ProjectView): void {
+    this.view = view;
+
+    this.errorMessage = null;
+
+    if (
+      view === 'ajouter' &&
+      this.editingId === null
+    ) {
+      this.resetForm();
+    }
+  }
+
+  setStatusFilter(
+    filter: StatusFilter,
+  ): void {
+    this.statusFilter = filter;
+  }
+
+  getStatusLabel(
+    status: ProjectStatus,
+  ): string {
+    return this.statusLabels[status];
+  }
+
+  formatNumber(value: number): string {
+    return Number(value || 0)
+      .toLocaleString('fr-FR');
+  }
+
+  formatDate(
+    dateValue: string,
+  ): string {
+    if (!dateValue) {
+      return '—';
+    }
+
+    const normalizedDate =
+      this.formatDateForInput(dateValue);
+
+    if (!normalizedDate) {
+      return '—';
+    }
+
+    const [
+      year,
+      month,
+      day,
+    ] = normalizedDate
+      .split('-')
+      .map(Number);
+
+    const date = new Date(
+      year,
+      month - 1,
+      day,
+    );
+
+    return date.toLocaleDateString(
+      'fr-FR',
+    );
+  }
+
+  trackByProjectId(
+    index: number,
+    project: Project,
+  ): string {
+    return project.id;
+  }
+
+  trackByStatsLabel(
+    index: number,
+    card: StatsCard,
+  ): string {
+    return card.label;
+  }
+
+  ngOnDestroy(): void {
+    if (this.messageTimer) {
+      window.clearTimeout(
+        this.messageTimer,
+      );
+    }
+  }
+
+  private updateExistingProject(
+    id: string,
+    projectPayload: any,
+  ): void {
+    this.projetService
+      .updateProject(
+        id,
+        projectPayload,
+        this.selectedImageFile || undefined,
+      )
+      .subscribe({
+        next: () => {
+          this.saving = false;
+
+          this.resetForm();
+          this.view = 'liste';
+
+          this.showSuccessMessage(
+            'Le projet a été modifié avec succès.',
+          );
+
+          this.loadProjects();
+        },
+
+        error: error => {
+          console.error(
+            'Erreur lors de la modification :',
+            error,
+          );
+
+          this.errorMessage =
+            error?.error?.message ||
+            'Impossible de modifier le projet.';
+
+          this.saving = false;
+        },
+      });
+  }
+
+  private extractProjectList(
+    response: any,
+  ): any[] {
+    if (Array.isArray(response)) {
+      return response;
+    }
+
+    if (
+      Array.isArray(response?.projects)
+    ) {
+      return response.projects;
+    }
+
+    if (
+      Array.isArray(response?.projets)
+    ) {
+      return response.projets;
+    }
+
+    if (
+      Array.isArray(response?.data)
+    ) {
+      return response.data;
+    }
+
+    if (
+      Array.isArray(response?.result)
+    ) {
+      return response.result;
+    }
+
+    return [];
+  }
+
+  private mapBackendProject(
+    project: any,
+  ): Project {
+    return {
+      id:
+        project?._id ??
+        project?.id ??
+        '',
+
+      titre:
+        project?.titre ??
+        '',
+
+      description:
+        project?.description ??
+        '',
+
+      dateDebut:
+        this.formatDateForInput(
+          project?.dateDebut,
+        ),
+
+      dateFin:
+        this.formatDateForInput(
+          project?.dateFin,
+        ),
+
+      montantSoutenu:
+        Number(
+          project?.montantSoutenu ?? 0,
+        ),
+
+      statut:
+        this.normalizeStatus(
+          project?.statut,
+        ),
+
+      imageUrl:
+        this.projetService.getImageUrl(
+          project?.imageUrl,
+        ),
+    };
+  }
+
+  private normalizeStatus(
+    status: string,
+  ): ProjectStatus {
+    if (
+      status === 'termine' ||
+      status === 'en_retard'
+    ) {
+      return status;
+    }
+
+    return 'en_cours';
+  }
+
+  private formatDateForInput(
+    dateValue: string,
+  ): string {
+    if (!dateValue) {
+      return '';
+    }
+
+    const value = String(dateValue);
+
+    const datePart = value.match(
+      /^\d{4}-\d{2}-\d{2}/,
+    );
+
+    if (datePart) {
+      return datePart[0];
+    }
+
+    const date = new Date(value);
+
+    if (Number.isNaN(date.getTime())) {
+      return '';
+    }
+
+    return date
+      .toISOString()
+      .slice(0, 10);
+  }
+
+  private validateForm():
+    Record<string, string> {
+    const validationErrors:
+      Record<string, string> = {};
+
+    if (!this.form.titre.trim()) {
+      validationErrors['titre'] =
+        'Le titre est requis.';
+    }
+
+    if (
+      !this.form.description.trim()
+    ) {
+      validationErrors['description'] =
+        'La description est requise.';
+    }
+
+    if (!this.form.dateDebut) {
+      validationErrors['dateDebut'] =
+        'La date de début est requise.';
+    }
+
+    if (!this.form.dateFin) {
+      validationErrors['dateFin'] =
+        'La date de fin est requise.';
+    }
+
+    if (
+      this.form.dateDebut &&
+      this.form.dateFin &&
+      this.form.dateFin <
+        this.form.dateDebut
+    ) {
+      validationErrors['dateFin'] =
+        'La date de fin doit être postérieure à la date de début.';
+    }
+
+    const montant = Number(
+      this.form.montantSoutenu,
+    );
+
+    if (
+      !this.form.montantSoutenu ||
+      Number.isNaN(montant) ||
+      montant <= 0
+    ) {
+      validationErrors['montantSoutenu'] =
+        'Le montant doit être supérieur à zéro.';
+    }
+
+    return validationErrors;
+  }
+
+  private createEmptyForm():
+    ProjectForm {
+    return {
       titre: '',
       description: '',
       dateDebut: '',
       dateFin: '',
-      montantSoutenu: 0,
-      statut: 'en_cours'
+      montantSoutenu: null,
+      statut: 'en_cours',
     };
-    this.selectedImage = null;
+  }
+
+  private showSuccessMessage(
+    message: string,
+  ): void {
+    this.successMessage = message;
+
+    if (this.messageTimer) {
+      window.clearTimeout(
+        this.messageTimer,
+      );
+    }
+
+    this.messageTimer =
+      window.setTimeout(() => {
+        this.successMessage = null;
+      }, 3500);
   }
 }

@@ -1,218 +1,743 @@
-<app-navbarcompte-admin></app-navbarcompte-admin>
-<app-sidebar-admin></app-sidebar-admin>
+<app-sidebar-admin>
+  <section class="projects-page">
+  <header class="page-header">
+    <div>
+      <h1>Projets</h1>
 
-<div class="main-container">
+      <p>
+        Ajoutez, modifiez, terminez ou supprimez
+        les projets de l'association.
+      </p>
+    </div>
 
-  <!-- ✅ Statistiques des projets -->
-  <div class="stats-container">
-    <!-- Cards for stats -->
-    <div class="stats-card">
-      <i class="fas fa-layer-group icon-yellow"></i>
-      <h4>Tous les projets</h4>
-      <p>{{ totalProjets }}</p>
-    </div>
-    <div class="stats-card">
-      <i class="fas fa-clipboard-list icon-yellow"></i>
-      <h4>Projets en cours</h4>
-      <p>{{ totalProjetsEnCours }}</p>
-    </div>
-    <div class="stats-card">
-      <i class="fas fa-check-circle icon-yellow"></i>
-      <h4>Projets terminés</h4>
-      <p>{{ totalProjetsTermines }}</p>
-    </div>
-    <div class="stats-card">
-      <i class="fas fa-clock icon-yellow"></i>
-      <h4>Projets en retard</h4>
-      <p>{{ totalProjetsEnRetard }}</p>
-    </div>
+    <button
+      type="button"
+      class="refresh-button"
+      [disabled]="loading"
+      (click)="loadProjects()"
+    >
+      <lucide-icon
+        [img]="Loader"
+        [size]="17"
+        [class.spinning]="loading"
+      ></lucide-icon>
+
+      Actualiser
+    </button>
+  </header>
+
+  <!-- Statistics -->
+
+  <div class="stats-grid">
+    <article
+      *ngFor="
+        let card of statsCards;
+        trackBy: trackByStatsLabel
+      "
+      class="stats-card"
+    >
+      <div class="stats-content">
+        <span class="stats-label">
+          {{ card.label }}
+        </span>
+
+        <strong
+          class="stats-value"
+          [title]="card.value"
+        >
+          {{ card.value }}
+        </strong>
+      </div>
+
+      <div
+        class="stats-icon"
+        [ngClass]="card.colorClass"
+      >
+        <lucide-icon
+          [img]="card.icon"
+          [size]="21"
+        ></lucide-icon>
+      </div>
+    </article>
   </div>
 
-  <!-- ✅ Boutons de sélection -->
-  <div class="form-toggle-container">
-    <button class="btn-toggle" (click)="afficherFormulaire('ajout')">Ajouter un projet</button>
-    <button class="btn-toggle" (click)="afficherFormulaire('liste')">Voir les projets</button>
+  <!-- Messages -->
+
+  <div
+    *ngIf="successMessage"
+    class="success-message"
+  >
+    <lucide-icon
+      [img]="Check"
+      [size]="18"
+    ></lucide-icon>
+
+    <span>
+      {{ successMessage }}
+    </span>
   </div>
 
-  <!-- ✅ Barre de recherche -->
-  <div class="search-container" *ngIf="formulaireActif === 'liste'">
-    <div class="search-field">
-      <input type="text" id="searchTitre" [(ngModel)]="rechercheTitre" placeholder="Rechercher par titre de projet">
-    </div>
-    <div class="search-field">
-      <input type="date" id="searchDate" [(ngModel)]="rechercheDate" placeholder="Rechercher par date de début">
-    </div>
-    <div class="search-field">
-      <select id="searchStatut" [(ngModel)]="rechercheStatut">
-        <option value="">Tous les statuts</option>
-        <option value="en_cours">En cours</option>
-        <option value="termine">Terminé</option>
-        <option value="en_retard">En retard</option>
-      </select>
-    </div>
+  <div
+    *ngIf="errorMessage"
+    class="api-error-message"
+  >
+    {{ errorMessage }}
   </div>
 
-  <!-- ✅ Formulaire d’ajout de projet -->
-<div class="forms-container" *ngIf="formulaireActif === 'ajout'">
-  <div class="form-card">
-    <h3>Ajout d’un projet</h3>
-    <form (ngSubmit)="soumettreProjet()" #projetForm="ngForm" enctype="multipart/form-data">
-      <!-- Titre -->
-      <label for="titre">Titre</label>
-      <input type="text" id="titre" 
-             [(ngModel)]="nouveauProjet.titre" 
-             name="titre" 
-             #titre="ngModel"
-             required
-             minlength="3"
-             maxlength="100">
-      <div *ngIf="titre.invalid && (titre.dirty || titre.touched)" class="error-message">
-        <div *ngIf="titre.errors?.['required']">Le titre est requis</div>
-        <div *ngIf="titre.errors?.['minlength']">Le titre doit faire au moins 3 caractères</div>
-        <div *ngIf="titre.errors?.['maxlength']">Le titre ne peut pas dépasser 100 caractères</div>
-      </div>
+  <!-- Tabs -->
 
-      <!-- Description -->
-      <label for="description">Description</label>
-      <textarea id="description" 
-                [(ngModel)]="nouveauProjet.description" 
-                name="description" 
-                #description="ngModel"
-                rows="10" 
-                required
-                minlength="10"
-                maxlength="2000"></textarea>
-      <div *ngIf="description.invalid && (description.dirty || description.touched)" class="error-message">
-        <div *ngIf="description.errors?.['required']">La description est requise</div>
-        <div *ngIf="description.errors?.['minlength']">La description doit faire au moins 10 caractères</div>
-        <div *ngIf="description.errors?.['maxlength']">La description ne peut pas dépasser 2000 caractères</div>
-      </div>
+  <nav class="projects-tabs">
+    <button
+      type="button"
+      class="tab-button"
+      [class.active]="view === 'ajouter'"
+      (click)="setView('ajouter')"
+    >
+      {{
+        editingId !== null
+          ? 'Modifier projet'
+          : 'Ajouter projet'
+      }}
+    </button>
 
-      <!-- Date de début -->
-      <label for="dateDebut">Date de début</label>
-      <input type="date" id="dateDebut" 
-             [(ngModel)]="nouveauProjet.dateDebut" 
-             name="dateDebut" 
-             #dateDebut="ngModel"
-             required>
-      <div *ngIf="dateDebut.invalid && (dateDebut.dirty || dateDebut.touched)" class="error-message">
-        <div *ngIf="dateDebut.errors?.['required']">La date de début est requise</div>
-      </div>
+    <button
+      type="button"
+      class="tab-button"
+      [class.active]="view === 'liste'"
+      (click)="setView('liste')"
+    >
+      Voir les projets
+    </button>
+  </nav>
 
-      <!-- Date de fin -->
-      <label for="dateFin">Date de fin</label>
-      <input type="date" id="dateFin" 
-             [(ngModel)]="nouveauProjet.dateFin" 
-             name="dateFin" 
-             #dateFin="ngModel"
-             required
-             [min]="nouveauProjet.dateDebut">
-      <div *ngIf="dateFin.invalid && (dateFin.dirty || dateFin.touched)" class="error-message">
-        <div *ngIf="dateFin.errors?.['required']">La date de fin est requise</div>
-        <div *ngIf="dateFin.errors?.['min']">La date de fin doit être après la date de début</div>
-      </div>
+  <!-- Add and edit form -->
 
-      <!-- Montant soutenu -->
-      <label for="montantSoutenu">Montant soutenu</label>
-      <input type="number" id="montantSoutenu" 
-             [(ngModel)]="nouveauProjet.montantSoutenu" 
-             name="montantSoutenu" 
-             #montantSoutenu="ngModel"
-             required
-             min="0"
-             step="0.01">
-      <div *ngIf="montantSoutenu.invalid && (montantSoutenu.dirty || montantSoutenu.touched)" class="error-message">
-        <div *ngIf="montantSoutenu.errors?.['required']">Le montant est requis</div>
-        <div *ngIf="montantSoutenu.errors?.['min']">Le montant ne peut pas être négatif</div>
-      </div>
+  <section
+    *ngIf="view === 'ajouter'"
+    class="form-card"
+  >
+    <div class="form-card-header">
+      <div>
+        <h2>
+          {{
+            editingId !== null
+              ? 'Modifier le projet'
+              : 'Ajouter un nouveau projet'
+          }}
+        </h2>
 
-      <!-- Image du projet -->
-      <label for="image">Image du projet</label>
-      <input type="file" id="image" 
-             (change)="onImageChange($event)" 
-             name="image" 
-             required
-             accept="image/*">
-
-      <!-- Statut -->
-      <label for="statut">Statut</label>
-      <select id="statut" 
-              [(ngModel)]="nouveauProjet.statut" 
-              name="statut" 
-              #statut="ngModel"
-              required>
-        <option value="en_cours">En cours</option>
-        <option value="termine">Terminé</option>
-        <option value="en_retard">En retard</option>
-      </select>
-      <div *ngIf="statut.invalid && (statut.dirty || statut.touched)" class="error-message">
-        <div *ngIf="statut.errors?.['required']">Le statut est requis</div>
-      </div>
-
-      <button type="submit" class="btn btn-jaune" [disabled]="!projetForm.form.valid">
-        {{ enEdition ? 'Valider les modifications' : 'Ajouter le projet' }}
-      </button>
-    </form>
-  </div>
-</div>
-  <!-- ✅ Liste des projets -->
-  <div class="row justify-content-center" *ngIf="formulaireActif === 'liste'">
-    <div class="card-article" *ngFor="let projet of getProjetsFiltres()">
-      <div class="image-container">
-        <img [src]="getImageUrl(projet.imageUrl)" 
-     alt="{{ projet.titre }}" 
-     (error)="handleImageError($event)">
-      </div>
-      <h5>{{ projet.titre || 'Sans titre' }}</h5>
-      <p [innerHTML]="projet.description | slice:0:150"></p>
-      <div class="date">Début le : {{ projet.dateDebut | date:'dd/MM/yyyy' }}</div>
-      <p><strong>Statut:</strong> {{ projet.statut }}</p>
-
-      <!-- ✅ Actions -->
-      <div class="btn-container">
-        <i class="fas fa-edit text-primary small-icon" (click)="openEditModal(projet)" title="Modifier"></i>
-        <i class="fas fa-trash-alt text-danger small-icon" (click)="supprimerProjet(projet)" title="Supprimer"></i>
-        <i class="fas fa-check-circle text-success small-icon" *ngIf="projet.statut !== 'termine'" (click)="terminerProjet(projet)" title="Terminer"></i>
+        <p>
+          {{
+            editingId !== null
+              ? 'Modifiez les informations du projet sélectionné.'
+              : 'Complétez tous les champs pour créer un projet.'
+          }}
+        </p>
       </div>
     </div>
-  </div>
 
-  <!-- ✅ Modal de modification -->
-  <div class="modal" *ngIf="showModal">
-    <div class="modal-content">
-      <span class="close" (click)="closeModal()">&times;</span>
-      <h3>Modifier le projet</h3>
-      <form (ngSubmit)="modifierProjet()" #editForm="ngForm">
-        <label for="titreEdit">Titre</label>
-        <input type="text" id="titreEdit" [(ngModel)]="projetEnEdition.titre" name="titreEdit" required>
+    <form
+      class="project-form"
+      (ngSubmit)="submitProject()"
+      novalidate
+    >
+      <div class="form-group full-width">
+        <label for="titre">
+          Titre du projet
+          <span class="required-mark">*</span>
+        </label>
 
-        <label for="descriptionEdit">Description</label>
-        <textarea id="descriptionEdit" [(ngModel)]="projetEnEdition.description" name="descriptionEdit" rows="5" required></textarea>
+        <input
+          id="titre"
+          name="titre"
+          type="text"
+          [(ngModel)]="form.titre"
+          [class.input-error]="errors['titre']"
+          placeholder="Ex : Accès à l'eau potable — Kairouan"
+        />
 
-        <label for="dateDebutEdit">Date de début</label>
-        <input type="date" id="dateDebutEdit" [(ngModel)]="projetEnEdition.dateDebut" name="dateDebutEdit" required>
+        <p
+          *ngIf="errors['titre']"
+          class="field-error"
+        >
+          {{ errors['titre'] }}
+        </p>
+      </div>
 
-        <label for="dateFinEdit">Date de fin</label>
-        <input type="date" id="dateFinEdit" [(ngModel)]="projetEnEdition.dateFin" name="dateFinEdit" required>
+      <div class="form-group full-width">
+        <label for="description">
+          Description
+          <span class="required-mark">*</span>
+        </label>
 
-        <label for="montantSoutenuEdit">Montant soutenu</label>
-        <input type="number" id="montantSoutenuEdit" [(ngModel)]="projetEnEdition.montantSoutenu" name="montantSoutenuEdit" required>
+        <textarea
+          id="description"
+          name="description"
+          rows="5"
+          [(ngModel)]="form.description"
+          [class.input-error]="
+            errors['description']
+          "
+          placeholder="Décrivez les objectifs et les bénéficiaires du projet…"
+        ></textarea>
 
-        <label for="imageEdit">Changer l'image</label>
-        <input type="file" id="imageEdit" (change)="onImageChangeModif($event)" name="imageEdit">
+        <p
+          *ngIf="errors['description']"
+          class="field-error"
+        >
+          {{ errors['description'] }}
+        </p>
+      </div>
 
-        <label for="statutEdit">Statut</label>
-        <select id="statutEdit" [(ngModel)]="projetEnEdition.statut" name="statutEdit" required>
-          <option value="en_cours">En cours</option>
-          <option value="termine">Terminé</option>
-          <option value="en_retard">En retard</option>
+      <div class="form-group">
+        <label for="dateDebut">
+          Date de début
+          <span class="required-mark">*</span>
+        </label>
+
+        <input
+          id="dateDebut"
+          name="dateDebut"
+          type="date"
+          [(ngModel)]="form.dateDebut"
+          [class.input-error]="
+            errors['dateDebut']
+          "
+        />
+
+        <p
+          *ngIf="errors['dateDebut']"
+          class="field-error"
+        >
+          {{ errors['dateDebut'] }}
+        </p>
+      </div>
+
+      <div class="form-group">
+        <label for="dateFin">
+          Date de fin
+          <span class="required-mark">*</span>
+        </label>
+
+        <input
+          id="dateFin"
+          name="dateFin"
+          type="date"
+          [(ngModel)]="form.dateFin"
+          [class.input-error]="
+            errors['dateFin']
+          "
+        />
+
+        <p
+          *ngIf="errors['dateFin']"
+          class="field-error"
+        >
+          {{ errors['dateFin'] }}
+        </p>
+      </div>
+
+      <div class="form-group">
+        <label for="montantSoutenu">
+          Montant soutenu (TND)
+          <span class="required-mark">*</span>
+        </label>
+
+        <input
+          id="montantSoutenu"
+          name="montantSoutenu"
+          type="number"
+          min="1"
+          step="1"
+          [(ngModel)]="
+            form.montantSoutenu
+          "
+          [class.input-error]="
+            errors['montantSoutenu']
+          "
+          placeholder="Ex : 50000"
+        />
+
+        <p
+          *ngIf="
+            errors['montantSoutenu']
+          "
+          class="field-error"
+        >
+          {{ errors['montantSoutenu'] }}
+        </p>
+      </div>
+
+      <div class="form-group">
+        <label for="statut">
+          Statut
+          <span class="required-mark">*</span>
+        </label>
+
+        <select
+          id="statut"
+          name="statut"
+          [(ngModel)]="form.statut"
+        >
+          <option value="en_cours">
+            En cours
+          </option>
+
+          <option value="termine">
+            Terminé
+          </option>
+
+          <option value="en_retard">
+            En retard
+          </option>
         </select>
+      </div>
 
-        <button type="submit" class="btn btn-jaune" [disabled]="!editForm.form.valid">
-          Enregistrer les modifications
+      <div class="form-group full-width">
+        <label for="image">
+          Image de couverture
+
+          <span
+            *ngIf="editingId === null"
+            class="required-mark"
+          >
+            *
+          </span>
+        </label>
+
+        <p class="image-help">
+          L’image est obligatoire lors de
+          l’ajout. Lors d’une modification,
+          choisissez une nouvelle image
+          uniquement pour remplacer l’ancienne.
+        </p>
+
+        <div class="image-upload-container">
+          <label
+            for="image"
+            class="image-upload-button"
+          >
+            <lucide-icon
+              [img]="ImagePlus"
+              [size]="18"
+            ></lucide-icon>
+
+            <span>
+              {{
+                editingId !== null
+                  ? 'Changer l’image'
+                  : 'Choisir une image'
+              }}
+            </span>
+          </label>
+
+          <input
+            #fileInput
+            id="image"
+            type="file"
+            accept="image/png,image/jpeg,image/jpg,image/webp"
+            class="hidden-file-input"
+            (change)="
+              handleImageSelection($event)
+            "
+          />
+
+          <div
+            *ngIf="imagePreview"
+            class="image-preview-wrapper"
+          >
+            <img
+              [src]="imagePreview"
+              alt="Aperçu de l'image du projet"
+              class="image-preview"
+            />
+
+            <div class="image-preview-info">
+              <span>
+                {{
+                  selectedImageFile
+                    ? selectedImageFile.name
+                    : 'Image actuelle'
+                }}
+              </span>
+
+              <small
+                *ngIf="selectedImageFile"
+              >
+                {{
+                  selectedImageFile.size /
+                    1024 /
+                    1024
+                    | number: '1.1-2'
+                }}
+                Mo
+              </small>
+            </div>
+
+            <button
+              type="button"
+              class="remove-image-button"
+              aria-label="Annuler l'image sélectionnée"
+              title="Annuler l'image sélectionnée"
+              (click)="cancelSelectedImage()"
+            >
+              <lucide-icon
+                [img]="X"
+                [size]="17"
+              ></lucide-icon>
+            </button>
+          </div>
+        </div>
+
+        <p
+          *ngIf="errors['image']"
+          class="field-error"
+        >
+          {{ errors['image'] }}
+        </p>
+      </div>
+
+      <div class="form-actions full-width">
+        <button
+          type="submit"
+          class="primary-button"
+          [disabled]="saving"
+        >
+          <lucide-icon
+            *ngIf="saving"
+            [img]="Loader"
+            [size]="17"
+            class="spinning"
+          ></lucide-icon>
+
+          <span>
+            {{
+              saving
+                ? 'Enregistrement...'
+                : editingId !== null
+                  ? 'Enregistrer les modifications'
+                  : 'Ajouter le projet'
+            }}
+          </span>
         </button>
-      </form>
-    </div>
-  </div>
 
-</div>
+        <button
+          *ngIf="editingId !== null"
+          type="button"
+          class="secondary-button"
+          [disabled]="saving"
+          (click)="cancelEdit()"
+        >
+          Annuler
+        </button>
+      </div>
+    </form>
+  </section>
+
+  <!-- Projects list -->
+
+  <section
+    *ngIf="view === 'liste'"
+    class="projects-list-section"
+  >
+    <div class="projects-toolbar">
+      <div class="search-container">
+        <lucide-icon
+          class="search-icon"
+          [img]="Search"
+          [size]="17"
+        ></lucide-icon>
+
+        <input
+          type="text"
+          name="searchTerm"
+          [(ngModel)]="searchTerm"
+          placeholder="Rechercher un projet…"
+        />
+      </div>
+
+      <div class="filter-buttons">
+        <button
+          type="button"
+          class="filter-button"
+          [class.active]="
+            statusFilter === 'all'
+          "
+          (click)="setStatusFilter('all')"
+        >
+          Tous
+        </button>
+
+        <button
+          type="button"
+          class="filter-button"
+          [class.active]="
+            statusFilter === 'en_cours'
+          "
+          (click)="
+            setStatusFilter('en_cours')
+          "
+        >
+          En cours
+        </button>
+
+        <button
+          type="button"
+          class="filter-button"
+          [class.active]="
+            statusFilter === 'termine'
+          "
+          (click)="
+            setStatusFilter('termine')
+          "
+        >
+          Terminés
+        </button>
+
+        <button
+          type="button"
+          class="filter-button"
+          [class.active]="
+            statusFilter === 'en_retard'
+          "
+          (click)="
+            setStatusFilter('en_retard')
+          "
+        >
+          En retard
+        </button>
+      </div>
+    </div>
+
+    <!-- Loading -->
+
+    <div
+      *ngIf="loading"
+      class="loading-state"
+    >
+      <lucide-icon
+        [img]="Loader"
+        [size]="26"
+        class="spinning"
+      ></lucide-icon>
+
+      <span>
+        Chargement des projets...
+      </span>
+    </div>
+
+    <!-- Projects grid -->
+
+    <div
+      *ngIf="
+        !loading &&
+        filteredProjects.length > 0
+      "
+      class="projects-grid"
+    >
+      <article
+        *ngFor="
+          let project of filteredProjects;
+          trackBy: trackByProjectId
+        "
+        class="project-card"
+      >
+        <div class="project-image-container">
+          <img
+            [src]="project.imageUrl"
+            [alt]="project.titre"
+            class="project-image"
+          />
+
+          <span
+            class="status-badge image-status"
+            [ngClass]="
+              'status-' + project.statut
+            "
+          >
+            {{
+              getStatusLabel(
+                project.statut
+              )
+            }}
+          </span>
+        </div>
+
+        <div class="project-card-content">
+          <h3>
+            {{ project.titre }}
+          </h3>
+
+          <p class="project-description">
+            {{ project.description }}
+          </p>
+
+          <div class="project-information">
+            <div class="information-row">
+              <span class="information-label">
+                Début
+              </span>
+
+              <span class="information-value">
+                {{
+                  formatDate(
+                    project.dateDebut
+                  )
+                }}
+              </span>
+            </div>
+
+            <div class="information-row">
+              <span class="information-label">
+                Fin
+              </span>
+
+              <span class="information-value">
+                {{
+                  formatDate(
+                    project.dateFin
+                  )
+                }}
+              </span>
+            </div>
+          </div>
+
+          <div class="project-amount">
+            <span>
+              Montant soutenu
+            </span>
+
+            <strong>
+              {{
+                formatNumber(
+                  project.montantSoutenu
+                )
+              }}
+              TND
+            </strong>
+          </div>
+
+          <div class="project-actions">
+            <button
+              type="button"
+              class="edit-button"
+              [disabled]="
+                deletingId === project.id ||
+                updatingStatusId === project.id
+              "
+              (click)="editProject(project)"
+            >
+              <lucide-icon
+                [img]="Pencil"
+                [size]="15"
+              ></lucide-icon>
+
+              Modifier
+            </button>
+
+            <button
+              *ngIf="
+                project.statut !== 'termine'
+              "
+              type="button"
+              class="terminate-button"
+              [disabled]="
+                updatingStatusId === project.id ||
+                deletingId === project.id
+              "
+              (click)="
+                terminateProject(project)
+              "
+            >
+              <lucide-icon
+                [img]="
+                  updatingStatusId === project.id
+                    ? Loader
+                    : Flag
+                "
+                [size]="15"
+                [class.spinning]="
+                  updatingStatusId === project.id
+                "
+              ></lucide-icon>
+
+              {{
+                updatingStatusId === project.id
+                  ? 'Traitement...'
+                  : 'Terminer'
+              }}
+            </button>
+
+            <button
+              type="button"
+              class="delete-button"
+              [disabled]="
+                deletingId === project.id ||
+                updatingStatusId === project.id
+              "
+              (click)="deleteProject(project)"
+            >
+              <lucide-icon
+                [img]="
+                  deletingId === project.id
+                    ? Loader
+                    : Trash2
+                "
+                [size]="15"
+                [class.spinning]="
+                  deletingId === project.id
+                "
+              ></lucide-icon>
+
+              {{
+                deletingId === project.id
+                  ? 'Suppression...'
+                  : 'Supprimer'
+              }}
+            </button>
+          </div>
+        </div>
+      </article>
+    </div>
+
+    <!-- Empty state -->
+
+    <div
+      *ngIf="
+        !loading &&
+        filteredProjects.length === 0
+      "
+      class="empty-state"
+    >
+      <div class="empty-icon">
+        <lucide-icon
+          [img]="FolderKanban"
+          [size]="31"
+        ></lucide-icon>
+      </div>
+
+      <h3>Aucun projet trouvé</h3>
+
+      <p>
+        Aucun projet ne correspond à votre
+        recherche ou au filtre sélectionné.
+      </p>
+
+      <button
+        *ngIf="
+          searchTerm ||
+          statusFilter !== 'all'
+        "
+        type="button"
+        class="secondary-button"
+        (click)="
+          searchTerm = '';
+          setStatusFilter('all')
+        "
+      >
+        Réinitialiser les filtres
+      </button>
+    </div>
+  </section>
+</section>
+</app-sidebar-admin>
