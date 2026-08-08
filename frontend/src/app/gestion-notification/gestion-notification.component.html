@@ -1,148 +1,464 @@
-<app-navbarcompte-admin></app-navbarcompte-admin>
-<app-sidebar-admin></app-sidebar-admin>
+<app-sidebar-admin>
+  <div class="notifications-page">
+    <!-- ===================================================== -->
+    <!-- HEADER -->
+    <!-- ===================================================== -->
 
-<div class="main-container">
-  <!-- Statistics Cards -->
-  <div class="stats-container">
-    <!-- Card 1: Send Notification -->
-    <div class="stats-card">
-      <i class="fas fa-bell icon-yellow"></i>
-      <h4>Envoyer une Notification</h4>
+    <div class="page-header">
+      <h1>Notifications</h1>
+
+      <p>
+        Envoyez une notification à un membre, à un groupe ou à tous les membres.
+      </p>
     </div>
 
-    <!-- Card 2: Total Notifications -->
-    <div class="stats-card">
-      <i class="fas fa-paper-plane icon-yellow"></i>
-      <h4>Total Notifications</h4>
-      <p>{{ totalNotifications }}</p>
+    <!-- ===================================================== -->
+    <!-- ERROR MESSAGE -->
+    <!-- ===================================================== -->
+
+    <div *ngIf="errorMessage" class="api-error">
+      {{ errorMessage }}
     </div>
 
-    <!-- Card 3: Total Beneficiaries -->
-    <div class="stats-card">
-      <i class="fas fa-users icon-yellow"></i>
-      <h4>Total Bénéficiaires</h4>
-      <p>{{ listeBeneficiaires.length }}</p>
+    <!-- ===================================================== -->
+    <!-- SUCCESS MESSAGE -->
+    <!-- ===================================================== -->
+
+    <div *ngIf="sent" class="success-message">
+      <lucide-icon [img]="CheckIcon" [size]="17"> </lucide-icon>
+
+      <span> La notification a été envoyée avec succès. </span>
     </div>
 
-    <!-- Card 5: Last Notification -->
-    <div class="stats-card">
-      <i class="fas fa-comment-alt icon-yellow"></i>
-      <h4>Dernière Notification</h4>
-      <p>{{ derniereNotification?.titre || 'Aucune' }}</p>
-    </div>
-  </div>
+    <!-- ===================================================== -->
+    <!-- STATISTICS -->
+    <!-- ===================================================== -->
 
-  <!-- Success/Error Message -->
-  <div *ngIf="message" class="message-box" [class.success]="message.includes('✅')" [class.error]="message.includes('❌')">
-    {{ message }}
-  </div>
+    <div class="stats-grid">
+      <!-- Notifications envoyées -->
 
-  <!-- Notification Form -->
-  <!-- Notification Form -->
-<div class="forms-container">
-  <div class="form-card">
-    <h3>📢 Envoyer une Notification</h3>
+      <div class="stat-card">
+        <div class="stat-content">
+          <div>
+            <div class="stat-label">Notifications envoyées</div>
 
-    <!-- Mode Selection -->
-    <div class="mode-switch">
-      <label>
-        <input type="radio" name="mode" [(ngModel)]="broadcastType" value="single">
-        Individuel
-      </label>
-      <label>
-        <input type="radio" name="mode" [(ngModel)]="broadcastType" value="group">
-        Groupe
-      </label>
-      <label>
-        <input type="radio" name="mode" [(ngModel)]="broadcastType" value="all">
-        Tous
-      </label>
-    </div>
+            <div class="stat-value">
+              {{ totalNotifications }}
+            </div>
+          </div>
 
-    <!-- Search -->
-    <input
-      *ngIf="broadcastType !== 'all'"
-      type="text"
-      placeholder="🔍 Rechercher un bénéficiaire..."
-      [(ngModel)]="recherche"
-      (input)="filtrerBeneficiaires()"
-      class="search-input"
-    />
-
-    <form #notificationForm="ngForm"
-      (ngSubmit)="
-        broadcastType === 'all'
-          ? envoyerBroadcast()
-          : broadcastType === 'group'
-          ? envoyerGroupe()
-          : envoyerNotification()
-      "
-    >
-
-      <!-- SINGLE SELECT -->
-      <div *ngIf="broadcastType === 'single'">
-        <label>Bénéficiaire :</label>
-        <select
-          [(ngModel)]="notification.idBeneficiaire"
-          name="beneficiaire"
-          required
-        >
-          <option *ngFor="let b of beneficiairesFiltres" [value]="b._id">
-            {{ b.name }} {{ b.lastname }} ({{ b.email }})
-          </option>
-        </select>
-      </div>
-
-      <!-- MULTI SELECT -->
-      <div *ngIf="broadcastType === 'group'" class="multi-select-box">
-        <label>Sélectionner les bénéficiaires :</label>
-
-        <div class="checkbox-list">
-          <label *ngFor="let b of beneficiairesFiltres">
-            <input
-              type="checkbox"
-              [value]="b._id"
-              (change)="toggleBeneficiary(b._id, $event)"
-            />
-            {{ b.name }} {{ b.lastname }}
-          </label>
-        </div>
-
-        <div class="selected-count">
-          ✔ {{ selectedBeneficiaries.length }} sélectionné(s)
+          <div class="stat-icon primary-icon">
+            <lucide-icon [img]="BellIcon" [size]="21"> </lucide-icon>
+          </div>
         </div>
       </div>
 
-      <!-- Title -->
-      <label>Titre :</label>
-      <input
-        type="text"
-        [(ngModel)]="notification.titre"
-        name="titre"
-        required
-        minlength="3"
-      />
+      <!-- Membres -->
 
-      <!-- Content -->
-      <label>Contenu :</label>
-      <textarea
-        rows="4"
-        [(ngModel)]="notification.contenu"
-        name="contenu"
-        required
-      ></textarea>
+      <div class="stat-card">
+        <div class="stat-content">
+          <div>
+            <div class="stat-label">Membres</div>
 
-      <button class="btn-blue" type="submit"
-        [disabled]="
-          notificationForm.invalid ||
-          (broadcastType === 'group' && selectedBeneficiaries.length === 0)
-        "
+            <div class="stat-value">
+              {{ totalMembers }}
+            </div>
+          </div>
+
+          <div class="stat-icon members-icon">
+            <lucide-icon [img]="UsersIcon" [size]="21"> </lucide-icon>
+          </div>
+        </div>
+      </div>
+
+      <!-- Broadcasts -->
+
+      <div class="stat-card">
+        <div class="stat-content">
+          <div>
+            <div class="stat-label">Broadcasts</div>
+
+            <div class="stat-value">
+              {{ totalBroadcasts }}
+            </div>
+          </div>
+
+          <div class="stat-icon broadcast-icon">
+            <lucide-icon [img]="MegaphoneIcon" [size]="21"> </lucide-icon>
+          </div>
+        </div>
+      </div>
+
+      <!-- Destinataires ciblés -->
+
+      <div class="stat-card">
+        <div class="stat-content">
+          <div>
+            <div class="stat-label">Destinataires ciblés</div>
+
+            <div class="stat-value">
+              {{ targetCount }}
+            </div>
+          </div>
+
+          <div class="stat-icon target-icon">
+            <lucide-icon [img]="SendIcon" [size]="20"> </lucide-icon>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===================================================== -->
+    <!-- LOADING -->
+    <!-- ===================================================== -->
+
+    <div *ngIf="loading" class="loading-box">Chargement des données...</div>
+
+    <!-- ===================================================== -->
+    <!-- TABS -->
+    <!-- ===================================================== -->
+
+    <div *ngIf="!loading" class="tabs">
+      <button
+        type="button"
+        class="tab-button"
+        [class.active]="view === 'envoyer'"
+        (click)="changeView('envoyer')"
       >
-        <i class="fas fa-paper-plane"></i>
-        Envoyer
+        Envoyer une notification
       </button>
-    </form>
-  </div>
-</div>
 
-</div>
+      <button
+        type="button"
+        class="tab-button"
+        [class.active]="view === 'historique'"
+        (click)="changeView('historique')"
+      >
+        Historique
+      </button>
+    </div>
+
+    <!-- ===================================================== -->
+    <!-- SEND NOTIFICATION -->
+    <!-- ===================================================== -->
+
+    <form
+      *ngIf="view === 'envoyer' && !loading"
+      class="notification-form"
+      (ngSubmit)="submit()"
+      novalidate
+    >
+      <!-- =================================================== -->
+      <!-- LEFT CARD -->
+      <!-- =================================================== -->
+
+      <div class="form-card">
+        <!-- TYPE -->
+
+        <div class="form-section">
+          <span class="form-label"> Type de notification </span>
+
+          <div class="notification-types">
+            <button
+              *ngFor="let notificationType of types"
+              type="button"
+              class="type-card"
+              [class.active]="type === notificationType.key"
+              (click)="changeType(notificationType.key)"
+            >
+              <lucide-icon [img]="notificationType.icon" [size]="21">
+              </lucide-icon>
+
+              <div class="type-title">
+                {{ notificationType.label }}
+              </div>
+
+              <div class="type-description">
+                {{ notificationType.desc }}
+              </div>
+            </button>
+          </div>
+        </div>
+
+        <!-- ================================================= -->
+        <!-- TITLE -->
+        <!-- ================================================= -->
+
+        <div class="form-section">
+          <label class="form-label" for="titre"> Titre </label>
+
+          <input
+            id="titre"
+            name="titre"
+            type="text"
+            class="form-control"
+            [(ngModel)]="titre"
+            placeholder="Ex : Réunion des bénévoles"
+            maxlength="120"
+          />
+
+          <p *ngIf="errors['titre']" class="error-message">
+            {{ errors["titre"] }}
+          </p>
+        </div>
+
+        <!-- ================================================= -->
+        <!-- CONTENT -->
+        <!-- ================================================= -->
+
+        <div class="form-section">
+          <label class="form-label" for="contenu"> Contenu </label>
+
+          <textarea
+            id="contenu"
+            name="contenu"
+            class="form-control textarea"
+            [(ngModel)]="contenu"
+            placeholder="Rédigez le message à envoyer…"
+            maxlength="1000"
+            rows="6"
+          ></textarea>
+
+          <p *ngIf="errors['contenu']" class="error-message">
+            {{ errors["contenu"] }}
+          </p>
+        </div>
+
+        <!-- ================================================= -->
+        <!-- SUBMIT BUTTON -->
+        <!-- ================================================= -->
+
+        <button type="submit" class="send-button" [disabled]="sending">
+          <lucide-icon [img]="SendIcon" [size]="17"> </lucide-icon>
+
+          <span *ngIf="!sending"> Envoyer la notification </span>
+
+          <span *ngIf="sending"> Envoi en cours... </span>
+        </button>
+      </div>
+
+      <!-- =================================================== -->
+      <!-- RIGHT CARD -->
+      <!-- =================================================== -->
+
+      <div class="form-card recipient-card">
+        <!-- HEADER -->
+
+        <div class="recipient-header">
+          <span class="form-label">
+            {{
+              type === "broadcast"
+                ? "Destinataires"
+                : "Sélectionner le(s) membre(s)"
+            }}
+          </span>
+
+          <span *ngIf="type !== 'broadcast'" class="selected-count">
+            {{ selected.length }} sélectionné(s)
+          </span>
+        </div>
+
+        <!-- ================================================= -->
+        <!-- BROADCAST -->
+        <!-- ================================================= -->
+
+        <div *ngIf="type === 'broadcast'" class="broadcast-information">
+          Cette notification sera envoyée à
+
+          <strong> tous les membres </strong>
+
+          ({{ members.length }}).
+        </div>
+
+        <!-- ================================================= -->
+        <!-- MONOCAST / MULTICAST -->
+        <!-- ================================================= -->
+
+        <ng-container *ngIf="type !== 'broadcast'">
+          <!-- =============================================== -->
+          <!-- SEARCH + ROLE FILTER -->
+          <!-- =============================================== -->
+
+          <div class="member-filters">
+            <!-- Search -->
+
+            <div class="search-wrapper">
+              <lucide-icon class="search-icon" [img]="SearchIcon" [size]="17">
+              </lucide-icon>
+
+              <input
+                type="text"
+                name="search"
+                class="form-control search-input"
+                [(ngModel)]="q"
+                placeholder="Rechercher un membre…"
+              />
+            </div>
+
+            <!-- Role -->
+
+            <select
+              name="roleFilter"
+              class="role-select"
+              [(ngModel)]="roleFilter"
+            >
+              <option value="all">Tous les rôles</option>
+
+              <option value="Bénévole">Bénévoles</option>
+
+              <option value="Donateur">Donateurs</option>
+
+              <option value="Bénéficiaire">Bénéficiaires</option>
+            </select>
+          </div>
+
+          <!-- =============================================== -->
+          <!-- MEMBERS LIST -->
+          <!-- =============================================== -->
+
+          <div class="members-list">
+            <button
+              *ngFor="let member of filteredMembers"
+              type="button"
+              class="member-row"
+              [class.active]="isSelected(member.id)"
+              (click)="toggleMember(member)"
+            >
+              <!-- Selection -->
+
+              <span
+                class="selection-box"
+                [class.radio]="type === 'monocast'"
+                [class.checked]="isSelected(member.id)"
+              >
+                <lucide-icon
+                  *ngIf="isSelected(member.id)"
+                  [img]="CheckIcon"
+                  [size]="14"
+                >
+                </lucide-icon>
+              </span>
+
+              <!-- Member information -->
+
+              <span class="member-information">
+                <span class="member-name">
+                  {{ member.nom }}
+                </span>
+
+                <span class="member-email">
+                  {{ member.email }}
+                </span>
+              </span>
+
+              <!-- Member role -->
+
+              <span class="role-badge">
+                {{ member.role }}
+              </span>
+            </button>
+
+            <!-- No result -->
+
+            <div *ngIf="filteredMembers.length === 0" class="no-members">
+              Aucun membre trouvé.
+            </div>
+          </div>
+
+          <!-- =============================================== -->
+          <!-- SELECTION ERROR -->
+          <!-- =============================================== -->
+
+          <p *ngIf="errors['selected']" class="error-message">
+            {{ errors["selected"] }}
+          </p>
+        </ng-container>
+      </div>
+    </form>
+
+    <!-- ===================================================== -->
+    <!-- HISTORY -->
+    <!-- ===================================================== -->
+
+    <div *ngIf="view === 'historique' && !loading" class="history-card">
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Notification</th>
+
+              <th>Bénéficiaire</th>
+
+              <th>Statut</th>
+
+              <th>Date</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            <!-- ================================================= -->
+            <!-- NOTIFICATION ROW -->
+            <!-- ================================================= -->
+
+            <tr *ngFor="let notification of notifications">
+              <!-- Notification -->
+
+              <td>
+                <div class="notification-title">
+                  {{ notification.titre }}
+                </div>
+
+                <div class="notification-content">
+                  {{ notification.contenu }}
+                </div>
+              </td>
+
+              <!-- Beneficiary -->
+
+              <td>
+                <div class="recipient-name">
+                  {{ getBeneficiaryName(notification) }}
+                </div>
+
+                <div
+                  *ngIf="getBeneficiaryEmail(notification)"
+                  class="recipient-number"
+                >
+                  {{ getBeneficiaryEmail(notification) }}
+                </div>
+              </td>
+
+              <!-- Status -->
+
+              <td>
+                <span
+                  class="read-badge"
+                  [class.read]="notification.lu"
+                  [class.unread]="!notification.lu"
+                >
+                  {{ notification.lu ? "Lue" : "Non lue" }}
+                </span>
+              </td>
+
+              <!-- Date -->
+
+              <td class="date-cell">
+                {{ formatDate(notification.dateEnvoi) }}
+              </td>
+            </tr>
+
+            <!-- ================================================= -->
+            <!-- EMPTY HISTORY -->
+            <!-- ================================================= -->
+
+            <tr *ngIf="notifications.length === 0">
+              <td colspan="4" class="empty-history">
+                Aucune notification trouvée.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</app-sidebar-admin>

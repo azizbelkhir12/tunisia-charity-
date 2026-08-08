@@ -14,7 +14,6 @@ export class NotificationService {
     return this.http.post(`${this.apiUrl}/send`, notificationData);
   }
 
-  // Add this method to your notification service
   broadcastNotification(notificationData: { titre: string, contenu: string }) {
   return this.http.post<any>(`${this.apiUrl}/sendmultiple`, notificationData);
   }
@@ -28,7 +27,7 @@ export class NotificationService {
   } 
 
   getAllNotifications(): Observable<any> {
-    return this.http.get(`${this.apiUrl}/all`);
+    return this.http.get(`${this.apiUrl}/getall`);
   }
 
   

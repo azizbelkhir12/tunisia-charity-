@@ -43,6 +43,12 @@ export class SidebarAdminComponent implements OnInit {
       icon: 'file-text',
     },
     {
+      to: '/admin-compte/gestion-notification',
+      label: "notifications",
+      icon: 'bell',
+      exact: true,
+    },
+    {
       to: '/admin-compte/gestion-des-parametres',
       label: 'Paramètres',
       icon: 'settings',
