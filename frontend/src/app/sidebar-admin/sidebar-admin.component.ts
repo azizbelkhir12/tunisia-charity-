@@ -33,6 +33,11 @@ export class SidebarAdminComponent implements OnInit {
       icon: 'users',
     },
     {
+      to: '/admin-compte/gestion-beneficiaires',
+      label: 'Bénéficiaires',
+      icon: 'HeartHandshake',
+    },
+    {
       to: '/admin-compte/gestion-des-projets',
       label: 'Projets',
       icon: 'folder-kanban',

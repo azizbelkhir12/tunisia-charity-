@@ -1,244 +1,796 @@
-<app-navbarcompte-admin></app-navbarcompte-admin>
-<app-sidebar-admin></app-sidebar-admin>
+<app-sidebar-admin>
+  <div class="beneficiaires-page">
+    <!-- ====================================================== -->
+    <!-- HEADER -->
+    <!-- ====================================================== -->
 
-<div class="main-container">
-  <!-- ✅ Statistiques -->
-  <div class="stats-container">
-    <div class="stats-card">
-      <i class="fas fa-users icon-yellow"></i>
-      <h4>Total Bénéficiaires</h4>
-      <p>{{ totalBeneficiaires }}</p>
-    </div>
-  </div>
+    <div class="page-header">
+      <h1>Gestion bénéficiaires</h1>
 
-  <!-- ✅ Sélection du formulaire -->
-  <div class="form-toggle-container">
-    <button class="btn-toggle" (click)="afficherFormulaire('beneficiaire')">Créer un Bénéficiaire</button>
-    <button class="btn-toggle" (click)="afficherFormulaire('affectation')">Affecter un Bénéficiaire</button>
-    <button class="btn-toggle" (click)="afficherFormulaire('listeBeneficiaires')">Voir Liste des Bénéficiaires</button>
-  </div>
-
-  <!-- ✅ Message d'alerte -->
-  <div *ngIf="message" class="success-msg">
-    {{ message }}
-  </div>
-
-  <!-- ✅ Formulaires -->
-  <div class="row forms-container">
-    <!-- Formulaire de création de bénéficiaire -->
-    <div class="col-lg-5 col-md-6 col-12" *ngIf="formulaireActif === 'beneficiaire'">
-      <div class="form-card">
-        <h3>Créer un compte Bénéficiaire</h3>
-        <form #beneficiaireForm="ngForm" (ngSubmit)="creerBeneficiaire()" class="formulaire-beneficiaire">
-          <!-- Beneficiary Fields -->
-          <label for="email">Email :</label>
-          <input id="email" type="email" [(ngModel)]="nouveauBeneficiaire.email" name="email" required email #email="ngModel" />
-          <div *ngIf="email.invalid && email.touched" class="error-message">
-            Veuillez entrer un email valide.
-          </div>
-
-          <label for="nom">Nom :</label>
-          <input id="nom" type="text" [(ngModel)]="nouveauBeneficiaire.name" name="nom" required minlength="2" #nom="ngModel" />
-          <div *ngIf="nom.invalid && nom.touched" class="error-message">
-            Le nom doit contenir au moins 2 caractères.
-          </div>
-
-          <label for="prenom">Prénom :</label>
-          <input id="prenom" type="text" [(ngModel)]="nouveauBeneficiaire.lastname" name="prenom" required minlength="2" #prenom="ngModel" />
-          <div *ngIf="prenom.invalid && prenom.touched" class="error-message">
-            Le prénom doit contenir au moins 2 caractères.
-          </div>
-
-          <label for="telephone">Telephone :</label>
-          <input id="telephone" type="text" [(ngModel)]="nouveauBeneficiaire.phoneNumber" name="telephone" required minlength="8" #telephone="ngModel" />
-          <div *ngIf="telephone.invalid && telephone.touched" class="error-message">
-            Le numéro de téléphone doit contenir au moins 8 chiffres.
-          </div>
-
-          <label for="motDePasse">Mot de passe :</label>
-          <input id="motDePasse" type="password" [(ngModel)]="nouveauBeneficiaire.password" name="motDePasse" required minlength="6" pattern="(?=.*[A-Z])(?=.*[!@#$%^&*]).*" #motDePasse="ngModel" />
-          <div *ngIf="motDePasse.invalid && motDePasse.touched" class="error-message">
-            Le mot de passe doit contenir au moins 6 caractères, une majuscule et un caractère spécial.
-          </div>
-
-          <label for="addresse">Adresse :</label>
-          <input id="addresse" type="text" [(ngModel)]="nouveauBeneficiaire.address" name="addresse" required #addresse="ngModel" />
-          <div *ngIf="addresse.invalid && addresse.touched" class="error-message">
-            L'adresse est obligatoire.
-          </div>
-
-          <label for="gouvernorat">Gouvernorat :</label>
-          <select id="gouvernorat" [(ngModel)]="nouveauBeneficiaire.gouvernorat" name="gouvernorat" required #gouvernorat="ngModel">
-            <option *ngFor="let gouvernorat of gouvernorats" [value]="gouvernorat">{{ gouvernorat }}</option>
-          </select>
-          <div *ngIf="gouvernorat.invalid && gouvernorat.touched" class="error-message">
-            Veuillez sélectionner un gouvernorat.
-          </div>
-
-          <label for="age">Âge :</label>
-          <input id="age" type="number" [(ngModel)]="nouveauBeneficiaire.Age" name="age" required min="18" max="100" #age="ngModel" />
-          <div *ngIf="age.invalid && age.touched" class="error-message">
-            L'âge doit être compris entre 18 et 100 ans.
-          </div>
-
-          <!-- Children Section -->
-          <h4>Enfants</h4>
-          <div *ngFor="let child of nouveauBeneficiaire.children; let i = index" class="child-entry">
-            <label for="childName{{i}}">Nom de l'enfant :</label>
-            <input id="childName{{i}}" type="text" [(ngModel)]="child.name" name="childName{{i}}" required minlength="2" #childName="ngModel" />
-            <div *ngIf="childName.invalid && childName.touched" class="error-message">
-              Le nom de l'enfant doit contenir au moins 2 caractères.
-            </div>
-
-            <label for="childAge{{i}}">Âge de l'enfant :</label>
-            <input id="childAge{{i}}" type="number" [(ngModel)]="child.age" name="childAge{{i}}" required min="0" max="18" #childAge="ngModel" />
-            <div *ngIf="childAge.invalid && childAge.touched" class="error-message">
-              L'âge de l'enfant doit être compris entre 0 et 18 ans.
-            </div>
-
-            <button type="button" (click)="supprimerEnfant(i)" class="remove-child-btn">Supprimer</button>
-          </div>
-
-          <button type="button" (click)="ajouterEnfant()">Ajouter un enfant</button>
-
-          <!-- Submit -->
-          <button class="btn-blue" type="submit" [disabled]="beneficiaireForm.invalid">Créer le compte</button>
-        </form>
-      </div>
+      <p>
+        Créez, affectez et suivez les bénéficiaires ainsi que leurs documents.
+      </p>
     </div>
 
-    <!-- Formulaire d'affectation d'un bénéficiaire à un donateur -->
-    <div class="col-lg-5 col-md-6 col-12" *ngIf="formulaireActif === 'affectation'">
-      <div class="form-card">
-        <h3>Affecter un Bénéficiaire à un Donateur</h3>
-        <form>
-  <label for="donateur">Sélectionner un Donateur :</label>
-  <select [(ngModel)]="affectation.idDonateur" name="idDonateur" required>
-    <option *ngFor="let donor of donors" [value]="donor._id">{{ donor.name }}</option>
-  </select>
+    <!-- ====================================================== -->
+    <!-- KPIs -->
+    <!-- ====================================================== -->
 
-<label for="beneficiaire">Sélectionner un Bénéficiaire :</label>
-  <select [(ngModel)]="affectation.idBeneficiaire" name="idBeneficiaire" required>
-    <option *ngFor="let b of beneficiaries" [value]="b._id">{{ b.name }} {{b.lastname}}</option>
-  </select>
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-header">
+          <span> Bénéficiaires </span>
 
-  <button class="btn-blue" type="button" (click)="assign()">Affecter le Bénéficiaire</button>
-</form>
-
-      </div>
-    </div>
-
-    <!-- Section Liste des Bénéficiaires -->
-    <div class="col-12" *ngIf="formulaireActif === 'listeBeneficiaires'">
-      <div class="form-card">
-        <h3>Liste des Bénéficiaires</h3>
-
-        <!-- Filtres et barre de recherche -->
-        <div class="filters">
-          <input type="text" placeholder=" 🔍 Rechercher par nom..." [(ngModel)]="filtreNom" />
-          <input type="number" placeholder="🔍 Rechercher par âge..." [(ngModel)]="filtreAge" />
+          <div class="kpi-icon">
+            <fa-icon [icon]="faHeart"></fa-icon>
+          </div>
         </div>
 
-       <div class="table-responsive">
-  <table class="table table-striped">
-    <thead>
-      <tr>
-        <th>Nom</th>
-        <th>Prénom</th>
-        <th>Email</th>
-        <th class="col-age">Âge</th>
-        <th>Téléphone</th>
-        <th>Adresse</th>
-        <th>Gouvernorat</th>
-        <th>Enfants</th>
-        <th>Actions</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let beneficiaire of filtrerBeneficiaires()">
-        <td>{{ beneficiaire.name }}</td>
-        <td>{{ beneficiaire.lastname }}</td>
-        <td>{{ beneficiaire.email }}</td>
-        <td class="col-age">{{ beneficiaire.Age }}</td>
-        <td>{{ beneficiaire.phoneNumber }}</td>
-        <td>{{ beneficiaire.address }}</td>
-        <td>{{ beneficiaire.gouvernorat }}</td>
-        <td>
-          <ul *ngIf="beneficiaire.children.length > 0; else noChildren">
-            <li *ngFor="let child of beneficiaire.children">
-              {{ child.name }} ({{ child.age }} ans)
-            </li>
-          </ul>
-          <ng-template #noChildren>
-            <em>Aucun enfant</em>
-          </ng-template>
-        </td>
-        <td>
-          <button class="btn btn-primary btn-sm"
-                  (click)="ouvrirModalModification(beneficiaire)"
-                  data-bs-toggle="modal"
-                  data-bs-target="#updateBeneficiaryModal">
-            <i class="fas fa-edit"></i> Modifier
-          </button><br>
-          <button class="btn btn-danger btn-sm" (click)="deleteBeneficiaire(beneficiaire._id)">
-            <i class="fas fa-trash-alt"></i> Supprimer
+        <div class="kpi-value">
+          {{ totalBeneficiaires }}
+        </div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-header">
+          <span> Enfants à charge </span>
+
+          <div class="kpi-icon">
+            <fa-icon [icon]="faBaby"></fa-icon>
+          </div>
+        </div>
+
+        <div class="kpi-value">
+          {{ totalEnfants }}
+        </div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-header">
+          <span> Bénéficiaires affectés </span>
+
+          <div class="kpi-icon">
+            <fa-icon [icon]="faLink"></fa-icon>
+          </div>
+        </div>
+
+        <div class="kpi-value">
+          {{ totalBeneficiairesAffectes }}
+        </div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-header">
+          <span> Documents soumis </span>
+
+          <div class="kpi-icon">
+            <fa-icon [icon]="faFileAlt"></fa-icon>
+          </div>
+        </div>
+
+        <div class="kpi-value">
+          {{ totalDocuments }}
+        </div>
+      </div>
+    </div>
+
+    <!-- ====================================================== -->
+    <!-- TABS -->
+    <!-- ====================================================== -->
+
+    <div class="tabs-container">
+      <button
+        type="button"
+        class="tab-button"
+        [class.active]="activeTab === 'creer'"
+        (click)="changeTab('creer')"
+      >
+        <fa-icon [icon]="faUserPlus"></fa-icon>
+
+        <span> Créer bénéficiaire </span>
+      </button>
+
+      <button
+        type="button"
+        class="tab-button"
+        [class.active]="activeTab === 'affecter'"
+        (click)="changeTab('affecter')"
+      >
+        <fa-icon [icon]="faLink"></fa-icon>
+
+        <span> Affecter bénéficiaire </span>
+      </button>
+
+      <button
+        type="button"
+        class="tab-button"
+        [class.active]="activeTab === 'liste'"
+        (click)="changeTab('liste')"
+      >
+        <fa-icon [icon]="faUsers"></fa-icon>
+
+        <span> Voir liste bénéficiaires </span>
+      </button>
+
+      <button
+        type="button"
+        class="tab-button"
+        [class.active]="activeTab === 'documents'"
+        (click)="changeTab('documents')"
+      >
+        <fa-icon [icon]="faFileAlt"></fa-icon>
+
+        <span> Documents soumis </span>
+      </button>
+    </div>
+
+    <!-- ====================================================== -->
+    <!-- CREATE BENEFICIARY -->
+    <!-- ====================================================== -->
+
+    <form
+      *ngIf="activeTab === 'creer'"
+      class="content-card create-form"
+      (ngSubmit)="submitCreate()"
+      novalidate
+    >
+      <div *ngIf="saved" class="alert alert-success">
+        <fa-icon [icon]="faCheck"></fa-icon>
+
+        <span> Bénéficiaire créé avec succès. </span>
+      </div>
+
+      <div class="form-grid">
+        <!-- NOM -->
+
+        <div class="form-group">
+          <label> Nom </label>
+
+          <input
+            type="text"
+            [(ngModel)]="form.nom"
+            name="nom"
+            [class.input-error]="errors['nom']"
+            (ngModelChange)="saved = false"
+          />
+
+          <span *ngIf="errors['nom']" class="error-message">
+            {{ errors["nom"] }}
+          </span>
+        </div>
+
+        <!-- PRENOM -->
+
+        <div class="form-group">
+          <label> Prénom </label>
+
+          <input
+            type="text"
+            [(ngModel)]="form.prenom"
+            name="prenom"
+            [class.input-error]="errors['prenom']"
+            (ngModelChange)="saved = false"
+          />
+
+          <span *ngIf="errors['prenom']" class="error-message">
+            {{ errors["prenom"] }}
+          </span>
+        </div>
+
+        <!-- EMAIL -->
+
+        <div class="form-group">
+          <label> Adresse e-mail </label>
+
+          <input
+            type="email"
+            [(ngModel)]="form.email"
+            name="email"
+            [class.input-error]="errors['email']"
+            (ngModelChange)="saved = false"
+          />
+
+          <span *ngIf="errors['email']" class="error-message">
+            {{ errors["email"] }}
+          </span>
+        </div>
+
+        <!-- TELEPHONE -->
+
+        <div class="form-group">
+          <label> Numéro de téléphone </label>
+
+          <input
+            type="text"
+            placeholder="22 145 879"
+            [(ngModel)]="form.telephone"
+            name="telephone"
+            [class.input-error]="errors['telephone']"
+            (ngModelChange)="saved = false"
+          />
+
+          <span *ngIf="errors['telephone']" class="error-message">
+            {{ errors["telephone"] }}
+          </span>
+        </div>
+
+        <!-- PASSWORD -->
+
+        <div class="form-group">
+          <label> Mot de passe </label>
+
+          <input
+            type="password"
+            [(ngModel)]="form.motDePasse"
+            name="motDePasse"
+            [class.input-error]="errors['motDePasse']"
+            (ngModelChange)="saved = false"
+          />
+
+          <span *ngIf="errors['motDePasse']" class="error-message">
+            {{ errors["motDePasse"] }}
+          </span>
+        </div>
+
+        <!-- AGE -->
+
+        <div class="form-group">
+          <label> Âge </label>
+
+          <input
+            type="number"
+            min="18"
+            [(ngModel)]="form.age"
+            name="age"
+            [class.input-error]="errors['age']"
+            (ngModelChange)="saved = false"
+          />
+
+          <span *ngIf="errors['age']" class="error-message">
+            {{ errors["age"] }}
+          </span>
+        </div>
+
+        <!-- ADDRESS -->
+
+        <div class="form-group">
+          <label> Adresse </label>
+
+          <input
+            type="text"
+            [(ngModel)]="form.adresse"
+            name="adresse"
+            [class.input-error]="errors['adresse']"
+            (ngModelChange)="saved = false"
+          />
+
+          <span *ngIf="errors['adresse']" class="error-message">
+            {{ errors["adresse"] }}
+          </span>
+        </div>
+
+        <!-- GOUVERNORAT -->
+
+        <div class="form-group">
+          <label> Gouvernorat </label>
+
+          <select
+            [(ngModel)]="form.gouvernorat"
+            name="gouvernorat"
+            [class.input-error]="errors['gouvernorat']"
+            (ngModelChange)="saved = false"
+          >
+            <option value="">Choisir un gouvernorat</option>
+
+            <option
+              *ngFor="let gouvernorat of gouvernorats"
+              [value]="gouvernorat"
+            >
+              {{ gouvernorat }}
+            </option>
+          </select>
+
+          <span *ngIf="errors['gouvernorat']" class="error-message">
+            {{ errors["gouvernorat"] }}
+          </span>
+        </div>
+      </div>
+
+      <!-- ================================================== -->
+      <!-- CHILDREN -->
+      <!-- ================================================== -->
+
+      <div class="children-section">
+        <div class="children-header">
+          <div class="children-title">
+            <fa-icon [icon]="faBaby"></fa-icon>
+
+            <span> Enfants à charge </span>
+          </div>
+
+          <button type="button" class="btn-outline" (click)="addEnfant()">
+            <fa-icon [icon]="faPlus"></fa-icon>
+
+            Ajouter un enfant
           </button>
-        </td>
-      </tr>
-    </tbody>
-  </table>
-</div>
+        </div>
 
+        <p *ngIf="enfants.length === 0" class="empty-text">
+          Aucun enfant ajouté.
+        </p>
+
+        <div *ngIf="enfants.length > 0" class="children-list">
+          <div *ngFor="let enfant of enfants; let i = index" class="child-row">
+            <div class="form-group">
+              <label> Nom de l'enfant </label>
+
+              <input
+                type="text"
+                [(ngModel)]="enfant.nom"
+                [name]="'enfantNom' + i"
+                [class.input-error]="errors['enfant-nom-' + i]"
+                (ngModelChange)="saved = false"
+              />
+
+              <span *ngIf="errors['enfant-nom-' + i]" class="error-message">
+                {{ errors["enfant-nom-" + i] }}
+              </span>
+            </div>
+
+            <div class="form-group">
+              <label> Âge </label>
+
+              <input
+                type="number"
+                min="0"
+                [(ngModel)]="enfant.age"
+                [name]="'enfantAge' + i"
+                [class.input-error]="errors['enfant-age-' + i]"
+                (ngModelChange)="saved = false"
+              />
+
+              <span *ngIf="errors['enfant-age-' + i]" class="error-message">
+                {{ errors["enfant-age-" + i] }}
+              </span>
+            </div>
+
+            <button
+              type="button"
+              class="delete-child-btn"
+              aria-label="Supprimer l'enfant"
+              (click)="removeEnfant(i)"
+            >
+              <fa-icon [icon]="faTimes"></fa-icon>
+            </button>
+          </div>
+        </div>
       </div>
 
-      <div class="export-buttons">
-        <button class="btn-export" (click)="exportToXLSX()">Exporter en XLSX</button>
-        <button class="btn-export" (click)="exportToPDF()">Exporter en PDF</button>
+      <button type="submit" class="btn-primary">
+        <fa-icon [icon]="faUserPlus"></fa-icon>
+
+        Créer le bénéficiaire
+      </button>
+    </form>
+
+    <!-- ====================================================== -->
+    <!-- AFFECTATION -->
+    <!-- ====================================================== -->
+
+    <div *ngIf="activeTab === 'affecter'" class="affectation-layout">
+      <!-- LEFT FORM -->
+
+      <form
+        class="content-card affectation-form"
+        (ngSubmit)="submitAffectation()"
+        novalidate
+      >
+        <div *ngIf="affectationSuccess" class="alert alert-success">
+          <fa-icon [icon]="faCheck"></fa-icon>
+
+          Affectation enregistrée.
+        </div>
+
+        <!-- DONATEUR -->
+
+        <div class="form-group">
+          <label> Donateur </label>
+
+          <div class="search-input-wrapper">
+            <fa-icon class="search-icon" [icon]="faSearch"></fa-icon>
+
+            <input
+              type="text"
+              [(ngModel)]="donateurSearch"
+              name="donateurSearch"
+              placeholder="Rechercher un donateur…"
+              class="search-input"
+            />
+          </div>
+
+          <select
+            [(ngModel)]="selectedDonateurId"
+            name="selectedDonateurId"
+            (ngModelChange)="affectationSuccess = false"
+          >
+            <option value="">Choisir un donateur</option>
+
+            <option
+              *ngFor="let donateur of donateursFiltres"
+              [value]="donateur.id"
+            >
+              {{ donateur.nom }}
+              —
+              {{ donateur.email }}
+            </option>
+          </select>
+
+          <p *ngIf="donateursFiltres.length === 0" class="search-empty">
+            Aucun donateur trouvé.
+          </p>
+        </div>
+
+        <!-- BENEFICIAIRE -->
+
+        <div class="form-group">
+          <label> Bénéficiaire </label>
+
+          <div class="search-input-wrapper">
+            <fa-icon class="search-icon" [icon]="faSearch"></fa-icon>
+
+            <input
+              type="text"
+              [(ngModel)]="beneficiaireAffectationSearch"
+              name="beneficiaireAffectationSearch"
+              placeholder="Rechercher un bénéficiaire…"
+              class="search-input"
+            />
+          </div>
+
+          <select
+            [(ngModel)]="selectedBeneficiaireId"
+            name="selectedBeneficiaireId"
+            (ngModelChange)="affectationSuccess = false"
+          >
+            <option value="">Choisir un bénéficiaire</option>
+
+            <option
+              *ngFor="let beneficiaire of beneficiairesAffectationFiltres"
+              [value]="beneficiaire.id"
+            >
+              {{ beneficiaire.prenom }}
+              {{ beneficiaire.nom }}
+              —
+              {{ beneficiaire.gouvernorat }}
+            </option>
+          </select>
+
+          <p
+            *ngIf="beneficiairesAffectationFiltres.length === 0"
+            class="search-empty"
+          >
+            Aucun bénéficiaire trouvé.
+          </p>
+        </div>
+
+        <p *ngIf="affectationError" class="form-error">
+          {{ affectationError }}
+        </p>
+
+        <p class="form-help">
+          Un donateur peut parrainer plusieurs bénéficiaires.
+        </p>
+
+        <button type="submit" class="btn-primary full-width">
+          <fa-icon [icon]="faLink"></fa-icon>
+
+          Affecter
+        </button>
+      </form>
+
+      <!-- EXISTING AFFECTATIONS -->
+
+      <div class="table-card">
+        <div class="table-card-header">
+          Affectations existantes
+
+          <span> ({{ affectations.length }}) </span>
+        </div>
+
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>Donateur</th>
+                <th>Bénéficiaire</th>
+                <th>Date</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              <tr *ngFor="let affectation of affectations">
+                <td>
+                  {{ getDonateurName(affectation.donateurId) }}
+                </td>
+
+                <td>
+                  {{ getBeneficiaireName(affectation.beneficiaireId) }}
+                </td>
+
+                <td>
+                  {{ affectation.date }}
+                </td>
+
+                <td>
+                  <button
+                    type="button"
+                    class="table-delete-button"
+                    (click)="supprimerAffectation(affectation.id)"
+                  >
+                    <fa-icon [icon]="faTrash"></fa-icon>
+
+                    Retirer
+                  </button>
+                </td>
+              </tr>
+
+              <tr *ngIf="affectations.length === 0">
+                <td colspan="4" class="empty-table">Aucune affectation.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ====================================================== -->
+    <!-- BENEFICIARY LIST -->
+    <!-- ====================================================== -->
+
+    <div *ngIf="activeTab === 'liste'" class="table-card">
+      <div class="list-filters">
+        <div class="search-wrapper">
+          <fa-icon class="search-icon" [icon]="faSearch"></fa-icon>
+
+          <input
+            type="text"
+            [(ngModel)]="searchQuery"
+            placeholder="Rechercher un bénéficiaire…"
+          />
+        </div>
+
+        <select [(ngModel)]="gouvernoratFilter" class="filter-select">
+          <option value="all">Tous les gouvernorats</option>
+
+          <option
+            *ngFor="let gouvernorat of gouvernorats"
+            [value]="gouvernorat"
+          >
+            {{ gouvernorat }}
+          </option>
+        </select>
+      </div>
+
+      <div class="table-wrapper">
+        <table class="beneficiaires-table">
+          <thead>
+            <tr>
+              <th>Nom</th>
+              <th>Prénom</th>
+              <th>Email</th>
+              <th>Téléphone</th>
+              <th>Âge</th>
+              <th>Adresse</th>
+              <th>Gouvernorat</th>
+              <th>Enfants</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            <tr *ngFor="let beneficiaire of filteredBeneficiaires">
+              <td>
+                {{ beneficiaire.nom }}
+              </td>
+
+              <td>
+                {{ beneficiaire.prenom }}
+              </td>
+
+              <td>
+                {{ beneficiaire.email }}
+              </td>
+
+              <td>
+                {{ beneficiaire.telephone }}
+              </td>
+
+              <td>
+                {{ beneficiaire.age }}
+              </td>
+
+              <td class="address-cell">
+                {{ beneficiaire.adresse }}
+              </td>
+
+              <td>
+                {{ beneficiaire.gouvernorat }}
+              </td>
+
+              <td>
+                <span *ngIf="beneficiaire.enfants.length === 0" class="muted">
+                  —
+                </span>
+
+                <ul
+                  *ngIf="beneficiaire.enfants.length > 0"
+                  class="children-table-list"
+                >
+                  <li *ngFor="let enfant of beneficiaire.enfants">
+                    {{ enfant.nom }}
+                    ({{ enfant.age }} ans)
+                  </li>
+                </ul>
+              </td>
+
+              <td>
+                <button
+                  type="button"
+                  class="table-delete-button"
+                  (click)="supprimerBeneficiaire(beneficiaire.id)"
+                >
+                  <fa-icon [icon]="faTrash"></fa-icon>
+
+                  Supprimer
+                </button>
+              </td>
+            </tr>
+
+            <tr *ngIf="filteredBeneficiaires.length === 0">
+              <td colspan="9" class="empty-table">
+                Aucun bénéficiaire trouvé.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ====================================================== -->
+    <!-- DOCUMENTS -->
+    <!-- ====================================================== -->
+
+    <div *ngIf="activeTab === 'documents'" class="documents-container">
+      <!-- FILTER BAR -->
+
+      <div class="documents-filter-card">
+        <div class="document-search-wrapper">
+          <fa-icon class="search-icon" [icon]="faSearch"></fa-icon>
+
+          <input
+            type="text"
+            [(ngModel)]="documentSearch"
+            placeholder="Rechercher un bénéficiaire ou un fichier…"
+          />
+        </div>
+
+        <select [(ngModel)]="documentBeneficiaireFilter" class="filter-select">
+          <option value="all">Tous les bénéficiaires</option>
+
+          <option
+            *ngFor="let beneficiaire of beneficiaires"
+            [value]="beneficiaire.id"
+          >
+            {{ beneficiaire.prenom }}
+            {{ beneficiaire.nom }}
+          </option>
+        </select>
+
+        <span class="documents-summary">
+          {{ filteredDepots.length }}
+          dépôt(s)
+
+          <span class="summary-separator"> — </span>
+
+          {{ totalDocuments }}
+          fichier(s)
+        </span>
+      </div>
+
+      <!-- DEPOTS -->
+
+      <div class="depots-list">
+        <div *ngFor="let depot of filteredDepots" class="depot-card">
+          <!-- DEPOT HEADER -->
+
+          <div class="depot-header">
+            <div class="depot-beneficiaire">
+              <div class="depot-name">
+                {{ getBeneficiaireName(depot.beneficiaireId) }}
+              </div>
+
+              <div class="depot-meta">
+                Soumis le
+                {{ depot.date }}
+                ·
+                {{ depot.fichiers.length }}
+                fichier(s)
+              </div>
+            </div>
+
+            <span class="depot-badge"> Dépôt #{{ depot.id }} </span>
+          </div>
+
+          <!-- DEPOT FILES -->
+
+          <div class="table-wrapper">
+            <table class="documents-table">
+              <thead>
+                <tr>
+                  <th>Document</th>
+                  <th>Type</th>
+                  <th>Taille</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                <tr *ngFor="let fichier of depot.fichiers">
+                  <td>
+                    <span class="document-name">
+                      <fa-icon [icon]="faFileAlt"></fa-icon>
+
+                      {{ fichier.nom }}
+                    </span>
+                  </td>
+
+                  <td>
+                    <span class="document-type">
+                      {{ fichier.type }}
+                    </span>
+                  </td>
+
+                  <td>
+                    {{ fichier.taille }}
+                  </td>
+
+                  <td>
+                    <div class="document-actions">
+                      <a
+                        [href]="fichier.url"
+                        target="_blank"
+                        rel="noreferrer"
+                        class="action-link"
+                      >
+                        <fa-icon [icon]="faEye"></fa-icon>
+
+                        Consulter
+                      </a>
+
+                      <a
+                        [href]="fichier.url"
+                        [attr.download]="fichier.nom"
+                        class="action-link"
+                      >
+                        <fa-icon [icon]="faDownload"></fa-icon>
+
+                        Télécharger
+                      </a>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- EMPTY -->
+
+        <div *ngIf="filteredDepots.length === 0" class="documents-empty">
+          Aucun document soumis.
+        </div>
       </div>
     </div>
   </div>
-</div>
-
-<!-- Update Beneficiary Modal -->
-<div class="modal fade" id="updateBeneficiaryModal" tabindex="-1" aria-labelledby="updateBeneficiaryModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="updateBeneficiaryModalLabel">Modifier le Bénéficiaire</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
-      </div>
-
-      <div class="modal-body">
-        <form (ngSubmit)="updateBeneficiaire()">
-          <div class="mb-3">
-            <label for="nom" class="form-label">Nom</label>
-            <input type="text" id="nom" [(ngModel)]="nouveauBeneficiaire.name" name="nom" class="form-control" required />
-          </div>
-          <div class="mb-3">
-            <label for="prenom" class="form-label">Prénom</label>
-            <input type="text" id="prenom" [(ngModel)]="nouveauBeneficiaire.lastname" name="prenom" class="form-control" required />
-          </div>
-          <div class="mb-3">
-            <label for="email" class="form-label">Email</label>
-            <input type="email" id="email" [(ngModel)]="nouveauBeneficiaire.email" name="email" class="form-control" required />
-          </div>
-          <div class="mb-3">
-            <label for="phoneNumber" class="form-label">Téléphone</label>
-            <input type="text" id="phoneNumber" [(ngModel)]="nouveauBeneficiaire.phoneNumber" name="phoneNumber" class="form-control" required />
-          </div>
-          <div class="mb-3">
-            <label for="address" class="form-label">Adresse</label>
-            <input type="text" id="address" [(ngModel)]="nouveauBeneficiaire.address" name="address" class="form-control" required />
-          </div>
-          <div class="mb-3">
-            <label for="gouvernorat" class="form-label">Gouvernorat</label>
-            <select id="gouvernorat" [(ngModel)]="nouveauBeneficiaire.gouvernorat" name="gouvernorat" class="form-control" required>
-              <option *ngFor="let gouvernorat of gouvernorats" [value]="gouvernorat">{{ gouvernorat }}</option>
-            </select>
-          </div>
-          <button type="submit" class="btn btn-primary">Enregistrer</button>
-        </form>
-      </div>
-    </div>
-  </div>
-</div>
+</app-sidebar-admin>

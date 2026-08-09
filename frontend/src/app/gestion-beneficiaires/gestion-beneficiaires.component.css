@@ -1,643 +1,1208 @@
-/* ✅ Ajustement pour éviter que la sidebar masque le contenu */
-@media (max-width: 991px) {
-  .main-container {
-    margin-left: 0;
-    padding: 10px;
-  }}
-.main-container {
-  margin-left: 250px; /* Ajuste selon la largeur de ta sidebar */
-  padding: 10px;
+:host {
+  display: block;
+
+  --primary: #1f5d91;
+  --primary-dark: #174f82;
+  --primary-light: #eaf3fb;
+
+  --background: #f8fafc;
+  --card: #ffffff;
+
+  --text: #263b50;
+  --text-dark: #174f82;
+  --muted: #5b7da5;
+
+  --border: #dbe5ef;
+  --border-hover: #aac5dd;
+
+  --danger: #e74c3c;
+  --danger-light: #fff1ef;
+
+  --success: #168c5a;
+  --success-light: #eaf9f2;
+
+  --shadow:
+    0 5px 18px rgba(31, 79, 122, 0.05);
+
+  font-family:
+    Inter,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+
+  color: var(--text);
 }
 
-/* ✅ Centrage des cartes statistiques */
-.stats-container {
-  display: flex;
-  justify-content: center; /* ✅ Centre les cartes horizontalement */
-  align-items: center; /* ✅ Centre les cartes verticalement si nécessaire */
-  margin-top: 0px;
-  margin-bottom: 40px;
-  flex-wrap: wrap;
-  gap: 20px; /* ✅ Espacement entre les cartes */
-}
-.formulaire-beneficiaire {
-
-  border-radius: 10px;
-  padding: 20px;
-  border-left: 5px solid #0056b3;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  transition: all 0.3s ease;
+* {
+  box-sizing: border-box;
 }
 
+/* =========================================================
+   PAGE
+========================================================= */
 
-/* ✅ Cartes statistiques avec un effet plus moderne */
-.stats-card {
-  flex: 1;
-  max-width: 300px; /* Définir une largeur maximale pour la carte */
-  background: linear-gradient(135deg, #ffffff, #f8f9fa);
-  color: #333;
-  padding: 20px;
-  border-radius: 10px;
-  text-align: center;
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
-  border-top: 4px solid #0056b3; /* Bordure bleue foncée */
-  transition: all 0.3s ease-in-out;
-  width: 100%; /* Prendre toute la largeur disponible dans la carte */
-}
-
-/* ✅ Effet au survol des cartes */
-.stats-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
-}
-
-/* ✅ Icônes des cartes */
-.icon-yellow {
-  font-size: 35px;
-  color: #ffc107;
-  margin-bottom: 8px;
-}
-.stats-card p {
-  font-size: 15px;
-  font-weight: bold;
-  margin: 0;
-  color: #00060c;
-}
-
-/* ✅ Organisation des formulaires */
-/* ✅ FORMULAIRE */
-.forms-container {
-  display: flex;
-  justify-content: center;
-  margin-bottom: 40px;
-}
-
-.form-card {
-  background: white;
-  padding: 25px;
-  border-radius: 10px;
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
-  border-left: 5px solid #0056b3;
+.beneficiaires-page {
   width: 100%;
-  max-width: 600px;
+  padding: 4px 0 30px;
 }
 
+/* =========================================================
+   HEADER
+========================================================= */
 
-/* ✅ Effet au survol */
-.form-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+.page-header {
+  margin-bottom: 28px;
 }
 
-/* ✅ Titres des formulaires & tableaux */
-.form-card h3,
-.benevoles-table h3 {
-  color: #222;
-  font-size: 22px;
-  margin-bottom: 15px;
-  text-align: center;
-  font-weight: 600;
-  text-transform: uppercase;
+.beneficiaires-page .page-header h1 {
+  margin: 0 !important;
+
+  color: #174f82 !important;
+
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif !important;
+
+  font-size: 36px !important;
+  font-weight: 700 !important;
+  line-height: 1.15 !important;
+
+  opacity: 1 !important;
 }
 
-/* ✅ Supprime le scroll horizontal */
-.benevoles-table {
-  margin-top: 40px;
-  padding: 20px;
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-  overflow: visible;
+.beneficiaires-page .page-header p {
+  margin: 7px 0 0 !important;
+
+  color: #5b7da5 !important;
+
+  font-size: 16px !important;
+  font-weight: 400 !important;
+  line-height: 1.5 !important;
+
+  opacity: 1 !important;
 }
 
-/* ✅ Empêche le scroll horizontal globalement */
-html, body {
-  overflow-x: hidden;
+/* =========================================================
+   KPI
+========================================================= */
+
+.kpi-grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(4, minmax(0, 1fr));
+
+  gap: 18px;
+
+  margin-bottom: 28px;
 }
 
+.kpi-card {
+  min-height: 148px;
 
+  padding: 24px;
 
-/* ✅ Champs de formulaire modernisés */
-input, select {
-  width: 100%;
-  padding: 12px;
-  margin: 10px 0;
-  border: 2px solid #e0e0e0;
-  border-radius: 8px;
-  font-size: 16px;
-  background: white;
-  color: #333;
-  transition: all 0.3s ease;
-}
-
-/* ✅ Effet focus */
-input:focus, select:focus {
-  border-color: #0056b3;
-  box-shadow: 0 0 8px rgba(0, 86, 179, 0.3);
-  outline: none;
-}
-
-/* ✅ Conteneur des boutons de sélection */
-.form-toggle-container {
-  display: flex;
-  justify-content: center;
-  gap: 15px;
-  margin-bottom: 20px;
-}
-
-/* ✅ Boutons de sélection */
-.btn-toggle {
-  background: linear-gradient(135deg, #007bff, #0056b3);
-  color: white;
-  padding: 12px 20px;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 15px;
-  font-weight: bold;
-  transition: all 0.3s ease-in-out;
-}
-
-/* ✅ Effet hover */
-.btn-toggle:hover {
-  transform: scale(1.05);
-  box-shadow: 0 6px 14px rgba(0, 123, 255, 0.4);
-}
-
-/* ✅ Boutons modernisés avec effet gradient */
-button {
-  background: linear-gradient(135deg, #ffc107, #e0a800);
-  color: white;
-  padding: 10px;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 15px;
-  margin-top: 10px;
-  width: 100%;
-  box-shadow: 0 4px 10px rgba(0, 123, 255, 0.2);
-  transition: all 0.3s ease-in-out;
-}
-
-/* ✅ Effet au survol des boutons */
-button:hover {
-  transform: scale(1.05);
-  box-shadow: 0 6px 14px rgba(0, 123, 255, 0.4);
-}
-
-.table-responsive {
-  margin-top: 40px;
-  padding: 20px;
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-  overflow-x: auto;
-}
-
-/* Style général du tableau */
-.table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 14px;
-}
-
-.table thead th {
-  background-color: #0056b3;
-  color: white;
-  text-align: center;
-  vertical-align: middle;
-  padding: 10px;
-}
-
-.table tbody td {
-  vertical-align: middle;
-  padding: 10px;
-  text-align: center;
-}
-
-/* Réduire la taille des boutons */
-.table .btn {
-  padding: 4px 8px;
-  font-size: 13px;
-  margin: 2px 0;
-  width: 90px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-}
-
-/* Espacement entre les lignes */
-.table-striped tbody tr:nth-of-type(odd) {
-  background-color: #f8f9fa;
-}
-
-/* Hover */
-.table tbody tr:hover {
-  background: rgba(0, 123, 255, 0.08);
-}
-
-/* Icônes dans les boutons */
-.table .btn i {
-  margin-right: 4px;
-}
-
-
-/* ✅ Boutons d’action modernisés */
-.btn-container {
-  display: flex;
-  justify-content: center;
-  gap: 5px;
-}
-
-.btn-edit, .btn-delete {
-  background: linear-gradient(135deg, #ffb400, #e0a800);
-  color: white;
-  padding: 6px 10px;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 14px;
-  transition: all 0.3s ease-in-out;
-}
-
-.btn-export {
-  background: linear-gradient(135deg, #ffc107, #e0a800);
-  color: white;
-  padding: 10px 20px;
-  border: none;
-  border-radius: 8px;
-  margin-right: 10px;
-  font-weight: bold;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-  transition: all 0.3s ease;
-}
-
-.form-card {
-  background: #fff;
-  padding: 25px 30px;
-  border-radius: 12px;
-  box-shadow: 0 5px 15px rgba(0,0,0,0.08);
-  border: none;
-  width: 100%;
-  max-width: 1200px;
-  margin: 0 auto;
-}
-
-.form-card h3 {
-  color: #222;
-  font-size: 22px;
-  margin-bottom: 18px;
-  text-align: center;
-  font-weight: 600;
-  text-transform: none;
-}
-
-.filters {
-  display: flex;
-  gap: 12px;
-  margin-bottom: 18px;
-  flex-wrap: wrap;
-}
-
-.filters input,
-.filters select {
-  padding: 10px 14px;
-  border: 2px solid #e0e0e0;
-  border-radius: 8px;
-  font-size: 15px;
-  background: #fff;
-  color: #333;
-  width: 270px;
-  transition: border 0.2s;
-}
-
-.filters input:focus,
-.filters select:focus {
-  border-color: #0056b3;
-  outline: none;
-}
-
-.table-responsive {
-  width: 100%;
-  overflow-x: auto;
-  margin-bottom: 20px;
-  -webkit-overflow-scrolling: touch;
-}
-
-.table {
-  width: 100%;
-  border-collapse: collapse;
-  table-layout: fixed;
-}
-
-.table th {
-  background-color: #0056b3;
-  color: white;
-  padding: 12px 15px;
-  text-align: center;
-  font-weight: 600;
-  font-size: 14px;
-  border-bottom: 2px solid #dee2e6;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  white-space: nowrap;
-}
-
-.table td {
-  padding: 12px 15px;
-  white-space: normal;
-  word-break: break-word;
-  text-align: left;
-  vertical-align: top;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-}
-
-/* Specific column widths */
-.table td:nth-child(1) { min-width: 120px; } /* Nom */
-.table td:nth-child(2) { min-width: 120px; } /* Prénom */
-.table td:nth-child(3) { min-width: 200px; max-width: 250px; } /* Email */
-.table td:nth-child(4) { min-width: 80px; max-width: 80px; text-align: center; } /* Âge */
-.table td:nth-child(5) { min-width: 130px; } /* Téléphone */
-.table td:nth-child(6) { min-width: 150px; } /* Adresse */
-.table td:nth-child(7) { min-width: 120px; } /* Gouvernorat */
-.table td:nth-child(8) { min-width: 180px; } /* Enfants */
-.table td:nth-child(9) { min-width: 120px; text-align: center; } /* Actions */
-
-/* Children list styling */
-.table td ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  text-align: left;
-}
-
-/* Hover effect */
-.table tr:hover {
-  background: rgba(0, 123, 255, 0.1);
-}
-
-
-.table tr:hover {
-  background: #eaf1fb;
-}
-
-.btn-accept {
-  background: linear-gradient(135deg, #28a745, #218838);
-  color: white;
-  padding: 8px 15px;
-  border: none;
-  border-radius: 8px;
-  margin-right: 5px;
-  font-weight: bold;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-  transition: all 0.3s ease;
-}
-
-.btn-reject {
-  background: linear-gradient(135deg, #dc3545, #c82333);
-  color: white;
-  padding: 8px 15px;
-  border: none;
-  border-radius: 8px;
-  font-weight: bold;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-  transition: all 0.3s ease;
-}
-
-.status-active {
-  color: #28a745;
-  font-weight: 600;
-  text-transform: lowercase;
-}
-
-.status-inactive {
-  color: #6c757d;
-  font-weight: 600;
-  text-transform: lowercase;
-}
-
-.btn-container {
-  display: flex;
-  justify-content: center;
-  gap: 5px;
-}
-
-.btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 7px 18px;
-  border: none;
-  border-radius: 8px;
-  font-size: 15px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s;
-  box-shadow: none;
-}
-
-.btn-primary {
-  background: #28a745;
-  color: #fff;
-}
-
-.btn-danger {
-  background: #dc3545;
-  color: #fff;
-}
-
-.btn-primary i,
-.btn-danger i {
-  font-size: 16px;
-}
-
-.btn-primary:hover,
-.btn-danger:hover {
-  opacity: 0.9;
-  transform: scale(1.04);
-}
-
-.export-btns {
-  display: flex;
-  gap: 12px;
-  margin-top: 22px;
-  justify-content: flex-start;
-}
-
-.btn-export {
-  background: #ffc107;
-  width: 200px;
-  color: #222;
-  padding: 12px 24px;
-  border: none;
-  border-radius: 8px;
-  font-weight: bold;
-  font-size: 15px;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.08);
-  transition: all 0.2s;
-}
-
-.btn-export:hover {
-  background: #e0a800;
-  color: #fff;
-  transform: scale(1.04);
-}
-
-
-
-
-/* ✅ Effet hover */
-.btn-edit:hover, .btn-delete:hover {
-  transform: scale(1.1);
-  box-shadow: 0 4px 10px rgba(255, 165, 0, 0.4);
-}
-
-/* ✅ Statut en gras */
-.status-text {
-  color: #222;
-  font-weight: bold;
-}
-
-.error-message {
-  color: red;
-  font-size: 14px;
-  margin-top: 10px;
-  text-align: center;
-}
-
-.success-msg {
-  color: green;
-  font-size: 30px;
-  margin-top: 10px;
-  text-align: center;
-}
-
-/* ✅ Responsive */
-@media (max-width: 991px) {
-  .main-container {
-    margin-left: 0;
-    padding: 15px;
-  }
-}
-
-/* Stats Card */
-.stats-card {
   background: #ffffff;
-  border-radius: 10px;
-  padding: 20px;
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+
+  border: 1px solid var(--border);
+  border-radius: 17px;
+
+  box-shadow: var(--shadow);
+
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    border-color 0.2s ease;
 }
 
-.icon-yellow {
-  font-size: 2rem;
-  color: #f4c542;
+.kpi-card:hover {
+  transform: translateY(-2px);
+
+  border-color: #ccdcea;
+
+  box-shadow:
+    0 9px 25px rgba(31, 79, 122, 0.08);
 }
 
-/* Buttons */
-.form-toggle-container .btn {
-  min-width: 180px;
+.kpi-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 12px;
+
+  font-size: 15px;
   font-weight: 500;
 }
 
-/* Forms */
-.form-card {
-  background-color: #f9f9f9;
+.beneficiaires-page
+.kpi-card
+.kpi-header,
+.beneficiaires-page
+.kpi-card
+.kpi-header span {
+  color: #5b7da5 !important;
+  opacity: 1 !important;
+}
+
+.kpi-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 44px;
+  height: 44px;
+
+  flex-shrink: 0;
+
+  color: #175789 !important;
+
+  background: #eaf3fb;
+
   border-radius: 12px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+
+  font-size: 17px;
+
+  opacity: 1 !important;
 }
 
-/* Child Entry Box */
-.child-entry {
-  margin-bottom: 15px;
-  padding: 10px;
-  background-color: #eef1f7;
-  border-radius: 8px;
+.kpi-value {
+  margin-top: 12px;
+
+  color: #174f82 !important;
+
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 1;
+
+  opacity: 1 !important;
 }
 
-/* Remove Child Button */
-.remove-child-btn {
-  margin-top: 8px;
-  background-color: #dc3545;
-  color: white;
-  border: none;
-  padding: 6px 10px;
-  border-radius: 5px;
-}
-.btn-sm {
-  min-width: 100px; /* largeur minimale */
-  padding-left: 12px;
-  padding-right: 12px;
-  white-space: nowrap; /* empêcher le texte de passer à la ligne */
+/* =========================================================
+   TABS
+========================================================= */
+
+.tabs-container {
+  display: flex;
+  flex-wrap: wrap;
+
+  gap: 10px;
+
+  margin-bottom: 24px;
 }
 
+.tab-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 
-/* Submit Button */
-.btn-blue {
-  background-color: #007bff;
-  color: white;
-  border: none;
-  margin-top: 15px;
-  padding: 10px 20px;
-  border-radius: 5px;
-}
+  gap: 9px;
 
-/* Table styling */
-.table-responsive {
-  width: 100%;
-  overflow-x: auto;
-  margin-bottom: 20px;
-  border-radius: 10px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
+  min-height: 48px;
 
-.table {
-  width: 100%;
-  border-collapse: collapse;
-  margin: 0;
-  background: white;
-}
+  padding: 0 20px;
 
-.table th {
-  background: #0056b3;
-  color: white;
-  padding: 15px 12px;
-  text-align: center;
+  color: #174f82;
+
+  background: #ffffff;
+
+  border: 1px solid #d7e2ec;
+  border-radius: 11px;
+
+  cursor: pointer;
+
+  font-family: inherit;
+  font-size: 14px;
   font-weight: 600;
-  font-size: 14px;
-  position: sticky;
-  top: 0;
-  z-index: 10;
+
+  transition:
+    background 0.2s ease,
+    color 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.15s ease,
+    box-shadow 0.2s ease;
 }
 
-.table td {
-  padding: 12px;
-  border-bottom: 1px solid #e9ecef;
+.tab-button:hover {
+  color: #174f82;
+
+  background: #f8fbfd;
+
+  border-color: #aac5dd;
+}
+
+.tab-button:active {
+  transform: scale(0.98);
+}
+
+.tab-button.active {
+  color: #ffffff;
+
+  background: #1f5d91;
+
+  border-color: #1f5d91;
+
+  box-shadow:
+    0 5px 13px rgba(31, 93, 145, 0.18);
+}
+
+.beneficiaires-page
+.tab-button.active,
+.beneficiaires-page
+.tab-button.active span,
+.beneficiaires-page
+.tab-button.active fa-icon {
+  color: #ffffff !important;
+}
+
+.beneficiaires-page
+.tab-button:not(.active),
+.beneficiaires-page
+.tab-button:not(.active) span,
+.beneficiaires-page
+.tab-button:not(.active) fa-icon {
+  color: #174f82 !important;
+}
+
+/* =========================================================
+   GENERAL CARDS
+========================================================= */
+
+.content-card,
+.table-card,
+.depot-card,
+.documents-filter-card {
+  background: #ffffff;
+
+  border: 1px solid var(--border);
+
+  border-radius: 17px;
+
+  box-shadow:
+    0 4px 16px rgba(31, 79, 122, 0.035);
+}
+
+.content-card {
+  padding: 26px;
+}
+
+.create-form {
+  display: flex;
+  flex-direction: column;
+
+  gap: 24px;
+}
+
+/* =========================================================
+   ALERT
+========================================================= */
+
+.alert {
+  display: flex;
+  align-items: center;
+
+  gap: 9px;
+
+  padding: 12px 14px;
+
+  border-radius: 9px;
+
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.alert-success {
+  color: var(--success);
+
+  background: var(--success-light);
+
+  border: 1px solid #cfeee0;
+}
+
+/* =========================================================
+   FORMS
+========================================================= */
+
+.form-grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(2, minmax(0, 1fr));
+
+  gap: 20px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group label {
+  margin-bottom: 8px;
+
+  color: #193b5d !important;
+
+  font-size: 14px;
+  font-weight: 600;
+
+  opacity: 1 !important;
+}
+
+.form-group input,
+.form-group select,
+.filter-select {
+  width: 100%;
+  height: 52px;
+
+  padding: 0 14px;
+
+  color: #263b50;
+
+  background: #ffffff;
+
+  border: 1px solid #d5e1eb;
+  border-radius: 11px;
+
+  outline: none;
+
+  font-family: inherit;
+  font-size: 14px;
+
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.form-group input::placeholder {
+  color: #9badbd;
+  opacity: 1;
+}
+
+.form-group input:hover,
+.form-group select:hover,
+.filter-select:hover {
+  border-color: #b9ccdc;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.filter-select:focus {
+  border-color: #1f5d91;
+
+  box-shadow:
+    0 0 0 3px rgba(31, 93, 145, 0.08);
+}
+
+.form-group input.input-error,
+.form-group select.input-error {
+  border-color: var(--danger);
+}
+
+.error-message,
+.form-error {
+  margin-top: 5px;
+
+  color: var(--danger);
+
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.form-help {
+  margin: 0;
+
+  color: #71869c !important;
+
+  font-size: 12px;
+}
+
+/* =========================================================
+   SEARCH INPUT INSIDE AFFECTATION
+========================================================= */
+
+.search-input-wrapper {
+  position: relative;
+
+  margin-bottom: 8px;
+}
+
+.search-input-wrapper .search-icon {
+  position: absolute;
+
+  top: 50%;
+  left: 13px;
+
+  z-index: 2;
+
+  color: #71869c;
+
+  transform: translateY(-50%);
+}
+
+.form-group
+.search-input-wrapper
+.search-input {
+  height: 42px;
+
+  padding-left: 38px;
+
+  font-size: 13px;
+}
+
+.search-empty {
+  margin: 5px 0 0;
+
+  color: #71869c !important;
+
+  font-size: 11px;
+
+  opacity: 1 !important;
+}
+
+/* =========================================================
+   CHILDREN
+========================================================= */
+
+.children-section {
+  padding: 18px;
+
+  background: #fcfdff;
+
+  border: 1px solid var(--border);
+  border-radius: 13px;
+}
+
+.children-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 15px;
+
+  margin-bottom: 14px;
+}
+
+.children-title {
+  display: flex;
+  align-items: center;
+
+  gap: 8px;
+
+  color: #174f82;
+
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.children-title fa-icon {
+  color: #1f5d91;
+}
+
+.children-list {
+  display: flex;
+  flex-direction: column;
+
+  gap: 13px;
+}
+
+.child-row {
+  display: grid;
+
+  grid-template-columns:
+    minmax(0, 1fr)
+    140px
+    52px;
+
+  align-items: start;
+
+  gap: 12px;
+}
+
+.delete-child-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 52px;
+  height: 52px;
+
+  margin-top: 26px;
+
+  color: var(--danger);
+
+  background: #ffffff;
+
+  border: 1px solid var(--border);
+  border-radius: 11px;
+
+  cursor: pointer;
+}
+
+.delete-child-btn:hover {
+  background: var(--danger-light);
+
+  border-color: #f5b8b2;
+}
+
+.empty-text {
+  margin: 0;
+
+  color: #71869c !important;
+
+  font-size: 13px;
+
+  opacity: 1 !important;
+}
+
+/* =========================================================
+   BUTTONS
+========================================================= */
+
+.btn-primary,
+.btn-outline {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 8px;
+
+  height: 46px;
+
+  padding: 0 19px;
+
+  border-radius: 10px;
+
+  cursor: pointer;
+
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 650;
+
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.15s ease;
+}
+
+.btn-primary {
+  width: fit-content;
+
+  color: #ffffff;
+
+  background: #1f5d91;
+
+  border: 1px solid #1f5d91;
+}
+
+.btn-primary:hover {
+  background: #174f82;
+
+  border-color: #174f82;
+
+  box-shadow:
+    0 5px 12px
+    rgba(31, 93, 145, 0.2);
+}
+
+.btn-outline {
+  height: 40px;
+
+  padding: 0 14px;
+
+  color: #1f5d91;
+
+  background: #ffffff;
+
+  border: 1px solid #bcd3e6;
+}
+
+.btn-outline:hover {
+  background: #edf5fb;
+
+  border-color: #1f5d91;
+}
+
+.full-width {
+  width: 100%;
+}
+
+/* =========================================================
+   AFFECTATION
+========================================================= */
+
+.affectation-layout {
+  display: grid;
+
+  grid-template-columns:
+    380px minmax(0, 1fr);
+
+  gap: 20px;
+
+  align-items: start;
+}
+
+.affectation-form {
+  display: flex;
+  flex-direction: column;
+
+  gap: 17px;
+}
+
+/* =========================================================
+   TABLES
+========================================================= */
+
+.table-card,
+.depot-card {
+  overflow: hidden;
+}
+
+.table-card-header {
+  min-height: 57px;
+
+  padding: 15px 19px;
+
+  color: #174f82 !important;
+
+  border-bottom: 1px solid var(--border);
+
+  font-size: 14px;
+  font-weight: 700;
+
+  opacity: 1 !important;
+}
+
+.table-wrapper {
+  width: 100%;
+
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+
+  min-width: 750px;
+
+  border-collapse: collapse;
+
+  font-size: 13px;
+}
+
+thead {
+  background: #f7f9fc;
+}
+
+th {
+  padding: 13px 15px;
+
+  color: #64798d !important;
+
+  text-align: left;
+
+  border-bottom: 1px solid var(--border);
+
+  font-size: 10px;
+  font-weight: 700;
+
+  letter-spacing: 0.06em;
+
+  text-transform: uppercase;
+
+  white-space: nowrap;
+
+  opacity: 1 !important;
+}
+
+td {
+  padding: 14px 15px;
+
+  color: #344b60 !important;
+
+  border-bottom: 1px solid #edf1f5;
+
+  vertical-align: top;
+
+  opacity: 1 !important;
+}
+
+tbody tr:hover {
+  background: #fbfcfe;
+}
+
+tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.empty-table {
+  padding: 35px 15px !important;
+
+  color: #71869c !important;
+
+  text-align: center !important;
+}
+
+/* =========================================================
+   DELETE ACTION
+========================================================= */
+
+.table-delete-button {
+  display: inline-flex;
+  align-items: center;
+
+  gap: 6px;
+
+  padding: 0;
+
+  color: var(--danger);
+
+  background: transparent;
+
+  border: none;
+
+  cursor: pointer;
+
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.table-delete-button:hover {
+  text-decoration: underline;
+}
+
+/* =========================================================
+   BENEFICIARY FILTER
+========================================================= */
+
+.list-filters {
+  display: flex;
+  align-items: center;
+
+  gap: 12px;
+
+  padding: 16px;
+
+  border-bottom: 1px solid var(--border);
+}
+
+.search-wrapper,
+.document-search-wrapper {
+  position: relative;
+
+  flex: 1;
+
+  min-width: 230px;
+}
+
+.search-wrapper input,
+.document-search-wrapper input {
+  width: 100%;
+  height: 48px;
+
+  padding:
+    0
+    12px
+    0
+    39px;
+
+  color: #263b50;
+
+  background: #ffffff;
+
+  border: 1px solid #d5e1eb;
+  border-radius: 10px;
+
+  outline: none;
+
+  font-family: inherit;
+  font-size: 14px;
+}
+
+.search-wrapper input:focus,
+.document-search-wrapper input:focus {
+  border-color: #1f5d91;
+
+  box-shadow:
+    0 0 0 3px
+    rgba(31, 93, 145, 0.08);
+}
+
+.search-icon {
+  position: absolute;
+
+  top: 50%;
+  left: 14px;
+
+  z-index: 2;
+
+  color: #68839e;
+
+  font-size: 13px;
+
+  transform: translateY(-50%);
+}
+
+.filter-select {
+  width: auto;
+
+  min-width: 210px;
+}
+
+/* =========================================================
+   BENEFICIARY TABLE
+========================================================= */
+
+.beneficiaires-table {
+  min-width: 1100px;
+}
+
+.address-cell {
+  min-width: 180px;
+
+  line-height: 1.45;
+}
+
+.children-table-list {
+  margin: 0;
+
+  padding-left: 17px;
+
+  line-height: 1.7;
+}
+
+.muted {
+  color: #71869c !important;
+}
+
+/* =========================================================
+   DOCUMENTS
+========================================================= */
+
+.documents-container {
+  display: flex;
+  flex-direction: column;
+
+  gap: 20px;
+}
+
+.documents-filter-card {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+
+  gap: 12px;
+
+  padding: 16px;
+}
+
+.document-search-wrapper {
+  flex: 1;
+
+  min-width: 240px;
+}
+
+.documents-summary {
+  color: #71869c !important;
+
+  font-size: 13px;
+
+  white-space: nowrap;
+
+  opacity: 1 !important;
+}
+
+.summary-separator {
+  margin: 0 3px;
+
+  color: #9aabb9 !important;
+}
+
+/* =========================================================
+   DEPOTS
+========================================================= */
+
+.depots-list {
+  display: flex;
+  flex-direction: column;
+
+  gap: 16px;
+}
+
+.depot-card {
+  width: 100%;
+}
+
+.depot-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 16px;
+
+  padding: 17px 20px;
+
+  border-bottom: 1px solid var(--border);
+}
+
+.depot-name {
+  color: #174f82 !important;
+
+  font-size: 14px;
+  font-weight: 700;
+
+  opacity: 1 !important;
+}
+
+.depot-meta {
+  margin-top: 4px;
+
+  color: #71869c !important;
+
+  font-size: 11px;
+
+  opacity: 1 !important;
+}
+
+.depot-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 6px 12px;
+
+  color: #1f5d91 !important;
+
+  background: #eaf3fb;
+
+  border-radius: 999px;
+
+  font-size: 11px;
+  font-weight: 600;
+
+  white-space: nowrap;
+
+  opacity: 1 !important;
+}
+
+.documents-table {
+  min-width: 700px;
+}
+
+.document-name {
+  display: inline-flex;
+  align-items: center;
+
+  gap: 8px;
+
+  color: #344b60 !important;
+
+  white-space: nowrap;
+}
+
+.document-name fa-icon {
+  color: #1f5d91;
+}
+
+.document-type {
+  display: inline-flex;
+
+  padding: 4px 8px;
+
+  color: #174f82 !important;
+
+  background: #eaf3fb;
+
+  border-radius: 6px;
+
+  font-size: 10px;
+  font-weight: 700;
+
+  text-transform: uppercase;
+
+  opacity: 1 !important;
+}
+
+.document-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+
+  gap: 14px;
+
+  white-space: nowrap;
+}
+
+.action-link {
+  display: inline-flex;
+  align-items: center;
+
+  gap: 5px;
+
+  color: #1f5d91 !important;
+
+  text-decoration: none;
+
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.action-link:hover {
+  text-decoration: underline;
+}
+
+.documents-empty {
+  padding: 42px 20px;
+
+  color: #71869c !important;
+
+  background: #ffffff;
+
+  border: 1px solid var(--border);
+  border-radius: 17px;
+
   text-align: center;
-  font-size: 14px;
-  vertical-align: middle;
+
+  font-size: 13px;
+
+  opacity: 1 !important;
 }
 
-.table tbody tr:hover {
-  background-color: #f5f5f5;
+/* =========================================================
+   GLOBAL ADMIN COLOR PROTECTION
+========================================================= */
+
+.beneficiaires-page
+.page-header p {
+  color: #5b7da5 !important;
+
+  opacity: 1 !important;
 }
 
+.beneficiaires-page
+.kpi-card
+.kpi-header span {
+  color: #5b7da5 !important;
 
+  opacity: 1 !important;
+}
 
-/* Modal Responsive */
-@media (max-width: 576px) {
-  .modal-dialog {
-    width: 90% !important;
-    margin: auto;
+.beneficiaires-page
+.kpi-card
+.kpi-value {
+  color: #174f82 !important;
+
+  opacity: 1 !important;
+}
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 1200px) {
+
+  .kpi-grid {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
   }
-}
-/* Correction affichage de la colonne ÂGE */
-.table td.col-age,
-.table th.col-age {
-  width: 70px; /* ou adapte selon l’espace */
-  white-space: nowrap; /* empêche le retour à la ligne */
-  text-align: center;
+
 }
 
+@media (max-width: 1050px) {
 
+  .affectation-layout {
+    grid-template-columns: 1fr;
+  }
 
+}
 
+@media (max-width: 900px) {
 
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .documents-filter-card {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .document-search-wrapper,
+  .filter-select {
+    width: 100%;
+  }
+
+}
+
+@media (max-width: 700px) {
+
+  .beneficiaires-page
+  .page-header h1 {
+    font-size: 30px !important;
+  }
+
+  .beneficiaires-page
+  .page-header p {
+    font-size: 15px !important;
+  }
+
+  .kpi-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .kpi-card {
+    min-height: 125px;
+  }
+
+  .tabs-container {
+    flex-direction: column;
+  }
+
+  .tab-button {
+    justify-content: flex-start;
+
+    width: 100%;
+  }
+
+  .content-card {
+    padding: 18px;
+  }
+
+  .children-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .child-row {
+    grid-template-columns: 1fr;
+  }
+
+  .delete-child-btn {
+    margin-top: 0;
+  }
+
+  .list-filters {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .search-wrapper {
+    width: 100%;
+  }
+
+  .filter-select {
+    width: 100%;
+  }
+
+  .depot-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .btn-primary {
+    width: 100%;
+  }
+
+}

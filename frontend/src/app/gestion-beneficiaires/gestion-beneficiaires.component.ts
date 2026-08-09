@@ -1,320 +1,1172 @@
-import { Component } from '@angular/core';
-import * as XLSX from 'xlsx';
-import { jsPDF } from 'jspdf';
-import Swal from 'sweetalert2';
+import { Component, OnInit } from '@angular/core';
+import { Meta, Title } from '@angular/platform-browser';
+
+import {
+  faHeart,
+  faUserPlus,
+  faLink,
+  faUsers,
+  faFileAlt,
+  faSearch,
+  faCheck,
+  faPlus,
+  faTimes,
+  faTrash,
+  faEye,
+  faDownload,
+  faBaby,
+} from '@fortawesome/free-solid-svg-icons';
+
 import { BeneficiaryService } from '../services/beneficiary/beneficiary.service';
 import { DonorsService } from '../services/donors/donors.service';
+
+type TabKey = 'creer' | 'affecter' | 'liste' | 'documents';
+
+interface EnfantForm {
+  nom: string;
+  age: string;
+}
+
+interface Enfant {
+  nom: string;
+  age: number;
+}
+
+interface Beneficiaire {
+  id: string;
+  _id?: string;
+
+  nom: string;
+  prenom: string;
+  email: string;
+  telephone: string;
+  adresse: string;
+  gouvernorat: string;
+
+  age: number;
+
+  enfants: Enfant[];
+
+  documents?: {
+    personalPhoto?: string;
+    housePhoto?: string;
+
+    bulletin?: {
+      data?: any;
+      originalName?: string;
+      mimeType?: string;
+      size?: number;
+    };
+  } | null;
+
+  [key: string]: any;
+}
+
+interface Donateur {
+  id: string;
+  _id?: string;
+
+  nom: string;
+  email: string;
+
+  beneficiaires?: any[];
+  beneficiaries?: any[];
+
+  [key: string]: any;
+}
+
+interface Affectation {
+  id: string;
+
+  donateurId: string;
+  beneficiaireId: string;
+
+  date: string;
+}
+
+interface DocFile {
+  id: string;
+
+  nom: string;
+  type: string;
+  taille: string;
+  url?: string;
+  kind:
+    | 'personalPhoto'
+    | 'housePhoto'
+    | 'bulletin';
+}
+
+interface Depot {
+  id: string;
+
+  beneficiaireId: string;
+
+  date: string;
+
+  fichiers: DocFile[];
+}
 
 @Component({
   selector: 'app-gestion-beneficiaires',
   templateUrl: './gestion-beneficiaires.component.html',
-  standalone:false,
+  standalone: false,
   styleUrls: ['./gestion-beneficiaires.component.css'],
 })
-export class GestionBeneficiairesComponent {
-  nouveauBeneficiaire = {
-    _id: '',
-    name: '',
-    lastname: '',
-    address: '',
-    email: '',
-    password: '',
-    phoneNumber: '',
-    Age: 0,
-    gouvernorat: '',
-    children: [{ name: '', age: null }]
-  };
+export class GestionBeneficiairesComponent implements OnInit {
+  faHeart = faHeart;
+  faUserPlus = faUserPlus;
+  faLink = faLink;
+  faUsers = faUsers;
+  faFileAlt = faFileAlt;
+  faSearch = faSearch;
+  faCheck = faCheck;
+  faPlus = faPlus;
+  faTimes = faTimes;
+  faTrash = faTrash;
+  faEye = faEye;
+  faDownload = faDownload;
+  faBaby = faBaby;
 
-  totalBeneficiaires: number = 0;
+  activeTab: TabKey = 'creer';
 
-  beneficiaries: any[] = [];
+  loadingBeneficiaires = false;
+  loadingDonateurs = false;
+
+  creatingBeneficiaire = false;
+  assigningBeneficiaire = false;
+
+  loadError = '';
 
   gouvernorats: string[] = [
-    'Ariana', 'Béja', 'Ben Arous', 'Bizerte', 'Gabès', 'Gafsa', 'Jendouba', 'Kairouan',
-    'Kasserine', 'Kébili', 'Le Kef', 'Mahdia', 'Manouba', 'Medenine', 'Monastir', 'Nabeul',
-    'Sfax', 'Sidi Bouzid', 'Siliana', 'Sousse', 'Tataouine', 'Tozeur', 'Tunis', 'Zaghouan'
+    'Ariana',
+    'Béja',
+    'Ben Arous',
+    'Bizerte',
+    'Gabès',
+    'Gafsa',
+    'Jendouba',
+    'Kairouan',
+    'Kasserine',
+    'Kébili',
+    'La Manouba',
+    'Le Kef',
+    'Mahdia',
+    'Médenine',
+    'Monastir',
+    'Nabeul',
+    'Sfax',
+    'Sidi Bouzid',
+    'Siliana',
+    'Sousse',
+    'Tataouine',
+    'Tozeur',
+    'Tunis',
+    'Zaghouan',
   ];
 
-  formulaireActif: string = 'beneficiaire';
-  message: string = '';
+  beneficiaires: Beneficiaire[] = [];
 
-  affectation: any = { idBeneficiaire: null, idDonateur: null };
+  donateurs: Donateur[] = [];
 
-  filtreNom: string = '';
-  filtreAge: number | null = null;
-  donors: any[] = [];
-  parrainDonors: any[] = [];
+  affectations: Affectation[] = [];
 
-  constructor(private beneficiaryService: BeneficiaryService, private donorService : DonorsService) {}
+  depots: Depot[] = [];
+
+  form = {
+    nom: '',
+    prenom: '',
+    email: '',
+    telephone: '',
+    motDePasse: '',
+    adresse: '',
+    gouvernorat: '',
+    age: '',
+  };
+
+  enfants: EnfantForm[] = [];
+
+  errors: Record<string, string> = {};
+
+  saved = false;
+
+  createError = '';
+
+  selectedDonateurId = '';
+  selectedBeneficiaireId = '';
+
+  donateurSearch = '';
+  beneficiaireAffectationSearch = '';
+
+  affectationError = '';
+  affectationSuccess = false;
+
+  searchQuery = '';
+  gouvernoratFilter = 'all';
+
+  documentBeneficiaireFilter = 'all';
+  documentSearch = '';
+
+  constructor(
+    private titleService: Title,
+    private metaService: Meta,
+    private beneficiaireService: BeneficiaryService,
+    private donorsService: DonorsService,
+  ) {}
 
   ngOnInit(): void {
-    this.getBeneficiaires();
-    this.loadDonors();
-    
+    this.titleService.setTitle('Gestion bénéficiaires — Admin Tunisia Charity');
+
+    this.metaService.updateTag({
+      name: 'robots',
+      content: 'noindex',
+    });
+
+    this.loadBeneficiaires();
+    this.loadDonateurs();
   }
 
-  private updateStatistics(): void {
-    this.totalBeneficiaires = this.beneficiaries.length;
+  changeTab(tab: TabKey): void {
+    this.activeTab = tab;
   }
 
-  afficherFormulaire(formulaire: string) {
-    this.formulaireActif = formulaire;
-    this.message = '';
-  }
+  loadBeneficiaires(): void {
+    this.loadingBeneficiaires = true;
+    this.loadError = '';
 
-  ajouterEnfant() {
-    this.nouveauBeneficiaire.children.push({ name: '', age: null });
-  }
+    this.beneficiaireService.getBeneficiaires().subscribe({
+      next: (response: any) => {
+        console.log('Bénéficiaires chargés:', response);
 
-  supprimerEnfant(index: number) {
-    this.nouveauBeneficiaire.children.splice(index, 1);
-  }
+        const data = response?.data?.beneficiaries;
 
-  getBeneficiaires(): void {
-    this.beneficiaryService.getBeneficiaires().subscribe({
-      next: (response) => {
-        this.beneficiaries = response.data.beneficiaries;
-        this.updateStatistics()
+        if (Array.isArray(data)) {
+          this.beneficiaires = data.map((beneficiaire: any) =>
+            this.normalizeBeneficiaire(beneficiaire),
+          );
+        } else {
+          this.beneficiaires = [];
+        }
+
+        console.log(
+          'Liste bénéficiaires utilisée par le composant:',
+          this.beneficiaires,
+        );
+
+        this.buildDepots();
+
+        this.loadingBeneficiaires = false;
       },
-      error: (error) => {
-        console.error('Erreur lors du chargement des bénéficiaires :', error);
-      }
+
+      error: (error: any) => {
+        console.error('Erreur chargement bénéficiaires:', error);
+
+        this.beneficiaires = [];
+
+        this.loadError = 'Impossible de charger les bénéficiaires.';
+
+        this.loadingBeneficiaires = false;
+      },
     });
   }
 
-  loadDonors(): void {
-    this.donorService.getDonors().subscribe({
-      next: (data) => {
-        console.log('Liste des donateurs:', data);
-        // Filtrer uniquement les donateurs avec le statut 'parrain'
-        this.donors = Array.isArray(data) ? data.filter((donor: any) => donor.status === 'parrain') : [];
+  loadDonateurs(): void {
+    this.loadingDonateurs = true;
+
+    this.donorsService.getDonors().subscribe({
+      next: (response: any) => {
+        const data = this.extractArray(response);
+
+        this.donateurs = data.map((donateur: any) =>
+          this.normalizeDonateur(donateur),
+        );
+
+        this.buildAffectations();
+
+        this.loadingDonateurs = false;
       },
-      error: (err) => {
-        console.error('Erreur lors du chargement des donateurs :', err);
-      }
+
+      error: (error: any) => {
+        console.error('Erreur chargement donateurs:', error);
+
+        this.loadingDonateurs = false;
+      },
     });
   }
 
-  assign(): void {
-    const donorId = this.affectation.idDonateur;
-    const beneficiaryId = this.affectation.idBeneficiaire;
-
-    console.log('ID Donateur:', donorId);
-    console.log('ID Bénéficiaire:', beneficiaryId);
-    if (!donorId || !beneficiaryId) {
-      Swal.fire({
-        icon: 'error',
-        title: 'Erreur',
-        text: 'Veuillez sélectionner un donateur et un bénéficiaire.',
-      });
-      return;
+  private extractArray(response: any): any[] {
+    // Beneficiaries API
+    if (Array.isArray(response?.data?.beneficiaries)) {
+      return response.data.beneficiaries;
     }
 
-    this.donorService.assignBeneficiaryToDonor(donorId, beneficiaryId).subscribe({
-      next: (res) => {
-        Swal.fire({
-          icon: 'success',
-          title: 'Succès',
-          text: 'Bénéficiaire assigné avec succès!',
-        });
-      },
-      error: (err) => {
-        Swal.fire({
-          icon: 'error',
-          title: 'Erreur',
-          text: 'Échec de l\'assignation: ' + (err.error?.message || err.message),
-        });
-      }
-    });
+    // Direct array
+    if (Array.isArray(response)) {
+      return response;
+    }
+
+    // Generic nested data
+    if (Array.isArray(response?.data)) {
+      return response.data;
+    }
+
+    // Other common formats
+    if (Array.isArray(response?.beneficiaries)) {
+      return response.beneficiaries;
+    }
+
+    if (Array.isArray(response?.beneficiaires)) {
+      return response.beneficiaires;
+    }
+
+    if (Array.isArray(response?.donors)) {
+      return response.donors;
+    }
+
+    if (Array.isArray(response?.result)) {
+      return response.result;
+    }
+
+    return [];
   }
 
+  private normalizeBeneficiaire(beneficiaire: any): Beneficiaire {
+    return {
+      ...beneficiaire,
 
+      id: beneficiaire?._id ?? beneficiaire?.id ?? '',
 
-  creerBeneficiaire() {
-    if (!this.nouveauBeneficiaire.name || !this.nouveauBeneficiaire.lastname || !this.nouveauBeneficiaire.email) {
-      Swal.fire({
-        icon: 'error',
-        title: 'Erreur',
-        text: 'Veuillez remplir tous les champs obligatoires.',
-      });
-      return;
-    }
-    this.beneficiaryService.createBeneficiaire(this.nouveauBeneficiaire).subscribe(
-      (response) => {
-        Swal.fire({
-          icon: 'success',
-          title: 'Succès',
-          text: 'Bénéficiaire créé avec succès!',
-        });
-        this.resetBeneficiaireForm();
-        this.getBeneficiaires();
-      },
-      (error: any) => {
-        Swal.fire({
-          icon: 'error',
-          title: 'Erreur',
-          text: 'Erreur lors de la création du bénéficiaire: ' + error.error.message,
-        });
-      }
+      _id: beneficiaire?._id,
+
+      nom: beneficiaire?.name ?? '',
+
+      prenom: beneficiaire?.lastname ?? '',
+
+      email: beneficiaire?.email ?? '',
+
+      telephone: beneficiaire?.phoneNumber ?? '',
+
+      adresse: beneficiaire?.address ?? '',
+
+      gouvernorat: beneficiaire?.gouvernorat ?? '',
+
+      age: Number(beneficiaire?.Age ?? 0),
+
+      enfants: Array.isArray(beneficiaire?.children)
+        ? beneficiaire.children.map((child: any) => ({
+            nom: child?.name ?? '',
+            age: Number(child?.age ?? 0),
+          }))
+        : [],
+
+      // IMPORTANT:
+      // documents is an OBJECT, not an array
+      documents: beneficiaire?.documents ?? null,
+    };
+  }
+
+  private normalizeDonateur(donateur: any): Donateur {
+    const nomComplet =
+      donateur?.nom ??
+      donateur?.fullName ??
+      [donateur?.name, donateur?.Prenom].filter(Boolean).join(' ');
+
+    return {
+      ...donateur,
+
+      id: donateur?._id ?? donateur?.id ?? '',
+
+      _id: donateur?._id,
+
+      nom: nomComplet || 'Donateur',
+
+      email: donateur?.email ?? '',
+    };
+  }
+
+  // =========================================================
+  // KPI
+  // =========================================================
+
+  get totalBeneficiaires(): number {
+    return this.beneficiaires.length;
+  }
+
+  get totalEnfants(): number {
+    return this.beneficiaires.reduce(
+      (total, beneficiaire) => total + (beneficiaire.enfants?.length ?? 0),
+      0,
     );
   }
 
-  ouvrirModalModification(beneficiaire: any): void {
-    this.nouveauBeneficiaire = { ...beneficiaire };
+  get totalBeneficiairesAffectes(): number {
+    return new Set(
+      this.affectations.map((affectation) => affectation.beneficiaireId),
+    ).size;
   }
 
-  updateBeneficiaire(): void {
-    if (!this.nouveauBeneficiaire?._id) {
-      this.message = 'Aucun bénéficiaire sélectionné pour la mise à jour.';
+  get totalDocuments(): number {
+    return this.depots.reduce(
+      (total, depot) => total + depot.fichiers.length,
+      0,
+    );
+  }
+
+  // =========================================================
+  // CHILDREN
+  // =========================================================
+
+  addEnfant(): void {
+    this.enfants.push({
+      nom: '',
+      age: '',
+    });
+
+    this.saved = false;
+  }
+
+  removeEnfant(index: number): void {
+    this.enfants.splice(index, 1);
+
+    this.saved = false;
+
+    this.errors = {};
+  }
+
+  // =========================================================
+  // CREATE BENEFICIARY
+  // =========================================================
+
+  submitCreate(): void {
+    this.saved = false;
+    this.createError = '';
+
+    const newErrors: Record<string, string> = {};
+
+    if (!this.form.nom.trim()) {
+      newErrors['nom'] = 'Le nom est requis';
+    }
+
+    if (!this.form.prenom.trim()) {
+      newErrors['prenom'] = 'Le prénom est requis';
+    }
+
+    if (!/^\S+@\S+\.\S+$/.test(this.form.email)) {
+      newErrors['email'] = 'Adresse e-mail invalide';
+    }
+
+    if (!/^[0-9\s+]{8,}$/.test(this.form.telephone)) {
+      newErrors['telephone'] = 'Numéro de téléphone invalide';
+    }
+
+    if (this.form.motDePasse.length < 8) {
+      newErrors['motDePasse'] = '8 caractères minimum';
+    }
+
+    if (!this.form.adresse.trim()) {
+      newErrors['adresse'] = "L'adresse est requise";
+    }
+
+    if (!this.form.gouvernorat) {
+      newErrors['gouvernorat'] = 'Choisissez un gouvernorat';
+    }
+
+    if (!this.form.age || Number(this.form.age) < 18) {
+      newErrors['age'] = 'Âge invalide (18 ans minimum)';
+    }
+
+    this.enfants.forEach((enfant, index) => {
+      if (!enfant.nom.trim()) {
+        newErrors[`enfant-nom-${index}`] = 'Nom requis';
+      }
+
+      if (enfant.age === '' || Number(enfant.age) < 0) {
+        newErrors[`enfant-age-${index}`] = 'Âge requis';
+      }
+    });
+
+    this.errors = newErrors;
+
+    if (Object.keys(newErrors).length > 0) {
       return;
     }
 
-    this.beneficiaryService.updateBeneficiaire(this.nouveauBeneficiaire._id, this.nouveauBeneficiaire).subscribe({
-      next: () => {
-        this.message = 'Bénéficiaire mis à jour avec succès !';
-        this.getBeneficiaires();
-        this.resetBeneficiaireForm();
-        this.updateStatistics()
+    const beneficiaireData = {
+      nom: this.form.nom.trim(),
+
+      prenom: this.form.prenom.trim(),
+
+      email: this.form.email.trim(),
+
+      telephone: this.form.telephone.trim(),
+
+      motDePasse: this.form.motDePasse,
+
+      adresse: this.form.adresse.trim(),
+
+      gouvernorat: this.form.gouvernorat,
+
+      age: Number(this.form.age),
+
+      enfants: this.enfants.map((enfant) => ({
+        nom: enfant.nom.trim(),
+
+        age: Number(enfant.age),
+      })),
+    };
+
+    this.creatingBeneficiaire = true;
+
+    this.beneficiaireService.createBeneficiaire(beneficiaireData).subscribe({
+      next: (response: any) => {
+        console.log('Bénéficiaire créé:', response);
+
+        this.creatingBeneficiaire = false;
+
+        this.saved = true;
+
+        this.resetCreateForm();
+
+        // Reload from backend so UI
+        // always reflects MongoDB data.
+        this.loadBeneficiaires();
       },
-      error: (err) => {
-        this.message = 'Erreur lors de la mise à jour du bénéficiaire : ' + err.error.message;
-      }
+
+      error: (error: any) => {
+        console.error('Erreur création bénéficiaire:', error);
+
+        this.creatingBeneficiaire = false;
+
+        this.createError =
+          error?.error?.message ??
+          error?.error?.error ??
+          'Impossible de créer le bénéficiaire.';
+      },
     });
   }
 
-  deleteBeneficiaire(id: string): void {
+  resetCreateForm(): void {
+    this.form = {
+      nom: '',
+      prenom: '',
+      email: '',
+      telephone: '',
+      motDePasse: '',
+      adresse: '',
+      gouvernorat: '',
+      age: '',
+    };
+
+    this.enfants = [];
+
+    this.errors = {};
+  }
+
+  // =========================================================
+  // DELETE BENEFICIARY
+  // =========================================================
+
+  supprimerBeneficiaire(id: string): void {
     if (!id) {
-      this.showMessage('ID du bénéficiaire invalide', 'error');
       return;
     }
 
-    Swal.fire({
-      title: 'Êtes-vous sûr?',
-      text: 'Cette action est irréversible!',
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#3085d6',
-      cancelButtonColor: '#d33',
-      confirmButtonText: 'Oui, supprimer!',
-      cancelButtonText: 'Annuler'
-    }).then((result) => {
-      if (result.isConfirmed) {
-        this.beneficiaryService.deleteBeneficiaire(id).subscribe({
-          next: () => {
-            this.showMessage('Bénéficiaire supprimé avec succès', 'success');
-            this.beneficiaries = this.beneficiaries.filter((b: any) => b._id !== id);
-            if (this.nouveauBeneficiaire._id === id) {
-              this.resetBeneficiaireForm();
-            }
-          },
-          error: (err) => {
-            this.showMessage(`Erreur lors de la suppression: ${err.error?.message || err.message}`, 'error');
-          }
+    const confirmed = window.confirm(
+      'Voulez-vous vraiment supprimer ce bénéficiaire ?',
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+    this.beneficiaireService.deleteBeneficiaire(id).subscribe({
+      next: () => {
+        this.beneficiaires = this.beneficiaires.filter(
+          (beneficiaire) => beneficiaire.id !== id,
+        );
+
+        this.affectations = this.affectations.filter(
+          (affectation) => affectation.beneficiaireId !== id,
+        );
+
+        this.depots = this.depots.filter(
+          (depot) => depot.beneficiaireId !== id,
+        );
+      },
+
+      error: (error: any) => {
+        console.error('Erreur suppression bénéficiaire:', error);
+
+        alert(
+          error?.error?.message ?? 'Impossible de supprimer le bénéficiaire.',
+        );
+      },
+    });
+  }
+
+  // =========================================================
+  // DONOR SEARCH
+  // =========================================================
+
+  get donateursFiltres(): Donateur[] {
+    const search = this.donateurSearch.trim().toLowerCase();
+
+    if (!search) {
+      return this.donateurs;
+    }
+
+    return this.donateurs.filter((donateur) => {
+      return `${donateur.nom} ${donateur.email}`.toLowerCase().includes(search);
+    });
+  }
+
+  // =========================================================
+  // BENEFICIARY SEARCH FOR ASSIGNMENT
+  // =========================================================
+
+  get beneficiairesAffectationFiltres(): Beneficiaire[] {
+    const search = this.beneficiaireAffectationSearch.trim().toLowerCase();
+
+    if (!search) {
+      return this.beneficiaires;
+    }
+
+    return this.beneficiaires.filter((beneficiaire) => {
+      const text = [
+        beneficiaire.prenom,
+        beneficiaire.nom,
+        beneficiaire.email,
+        beneficiaire.gouvernorat,
+      ]
+        .join(' ')
+        .toLowerCase();
+
+      return text.includes(search);
+    });
+  }
+
+  // =========================================================
+  // ASSIGN BENEFICIARY
+  // =========================================================
+
+  submitAffectation(): void {
+    this.affectationSuccess = false;
+
+    this.affectationError = '';
+
+    if (!this.selectedDonateurId || !this.selectedBeneficiaireId) {
+      this.affectationError = 'Choisissez un donateur et un bénéficiaire';
+
+      return;
+    }
+
+    const exists = this.affectations.some(
+      (affectation) =>
+        affectation.donateurId === this.selectedDonateurId &&
+        affectation.beneficiaireId === this.selectedBeneficiaireId,
+    );
+
+    if (exists) {
+      this.affectationError = 'Cette affectation existe déjà';
+
+      return;
+    }
+
+    this.assigningBeneficiaire = true;
+
+    this.donorsService
+      .assignBeneficiaryToDonor(
+        this.selectedDonateurId,
+        this.selectedBeneficiaireId,
+      )
+      .subscribe({
+        next: () => {
+          this.assigningBeneficiaire = false;
+
+          this.affectationSuccess = true;
+
+          const affectation: Affectation = {
+            id: `${Date.now()}`,
+
+            donateurId: this.selectedDonateurId,
+
+            beneficiaireId: this.selectedBeneficiaireId,
+
+            date: this.today(),
+          };
+
+          this.affectations = [affectation, ...this.affectations];
+
+          this.selectedBeneficiaireId = '';
+
+          // Reload donors because the backend
+          // relation has changed.
+          this.loadDonateurs();
+        },
+
+        error: (error: any) => {
+          console.error('Erreur affectation:', error);
+
+          this.assigningBeneficiaire = false;
+
+          this.affectationSuccess = false;
+
+          this.affectationError =
+            error?.error?.message ??
+            error?.error?.error ??
+            'Impossible d’affecter le bénéficiaire.';
+        },
+      });
+  }
+
+  // =========================================================
+  // BUILD EXISTING ASSIGNMENTS FROM DONORS
+  // =========================================================
+
+  private buildAffectations(): void {
+    const result: Affectation[] = [];
+
+    this.donateurs.forEach((donateur) => {
+      const relations =
+        donateur.beneficiaires ??
+        donateur.beneficiaries ??
+        donateur['assignedBeneficiaries'] ??
+        [];
+
+      if (!Array.isArray(relations)) {
+        return;
+      }
+
+      relations.forEach((relation: any, index: number) => {
+        const beneficiaryId =
+          typeof relation === 'string'
+            ? relation
+            : (relation?._id ??
+              relation?.id ??
+              relation?.beneficiaryId ??
+              relation?.beneficiaireId);
+
+        if (!beneficiaryId) {
+          return;
+        }
+
+        result.push({
+          id: relation?._id ?? `${donateur.id}-${beneficiaryId}-${index}`,
+
+          donateurId: donateur.id,
+
+          beneficiaireId: beneficiaryId,
+
+          date:
+            relation?.date ?? relation?.assignedAt ?? relation?.createdAt ?? '',
+        });
+      });
+    });
+
+    this.affectations = result;
+  }
+
+  // =========================================================
+  // REMOVE ASSIGNMENT LOCALLY
+  // =========================================================
+
+  supprimerAffectation(id: string): void {
+    /*
+      IMPORTANT:
+
+      Your DonorsService currently has no
+      "remove assignment" endpoint.
+
+      Therefore we cannot safely delete the
+      assignment from MongoDB here.
+
+      This only removes it visually.
+
+      Once you have an API such as:
+
+      DELETE /unassign-beneficiary/:donorId/:beneficiaryId
+
+      replace this method with the real HTTP call.
+    */
+
+    this.affectations = this.affectations.filter(
+      (affectation) => affectation.id !== id,
+    );
+  }
+
+  // =========================================================
+  // NAMES
+  // =========================================================
+
+  getDonateurName(id: string): string {
+    return this.donateurs.find((donateur) => donateur.id === id)?.nom ?? '—';
+  }
+
+  getBeneficiaireName(id: string): string {
+    const beneficiaire = this.beneficiaires.find((item) => item.id === id);
+
+    if (!beneficiaire) {
+      return '—';
+    }
+
+    return `${beneficiaire.prenom} ` + `${beneficiaire.nom}`;
+  }
+
+  // =========================================================
+  // BENEFICIARY FILTER
+  // =========================================================
+
+  get filteredBeneficiaires(): Beneficiaire[] {
+    const search = this.searchQuery.trim().toLowerCase();
+
+    return this.beneficiaires.filter((beneficiaire) => {
+      if (
+        this.gouvernoratFilter !== 'all' &&
+        beneficiaire.gouvernorat !== this.gouvernoratFilter
+      ) {
+        return false;
+      }
+
+      if (!search) {
+        return true;
+      }
+
+      const text = [
+        beneficiaire.nom,
+        beneficiaire.prenom,
+        beneficiaire.email,
+        beneficiaire.telephone,
+        beneficiaire.gouvernorat,
+      ]
+        .join(' ')
+        .toLowerCase();
+
+      return text.includes(search);
+    });
+  }
+
+  
+ private buildDepots(): void {
+  const result: Depot[] = [];
+
+  this.beneficiaires.forEach(
+    beneficiaire => {
+
+      const documents =
+        beneficiaire.documents;
+
+      if (!documents) {
+        return;
+      }
+
+      const fichiers: DocFile[] = [];
+
+      // =====================================================
+      // PERSONAL PHOTO
+      // =====================================================
+
+      if (documents.personalPhoto) {
+        const fileName =
+          this.getFileNameFromPath(
+            documents.personalPhoto
+          );
+
+        fichiers.push({
+          id:
+            `${beneficiaire.id}-personal-photo`,
+
+          nom:
+            fileName ||
+            'Photo personnelle',
+
+          type:
+            this.getFileExtension(
+              fileName ||
+              documents.personalPhoto
+            ),
+
+          taille:
+            '—',
+
+          url:
+            documents.personalPhoto,
+
+          kind:
+            'personalPhoto'
         });
       }
-    });
-  }
 
-  filterParrainDonors() {
-    this.parrainDonors = this.donors ? this.donors.filter(d => d.status === 'parrain') : [];
-  }
+      // =====================================================
+      // HOUSE PHOTO
+      // =====================================================
 
+      if (documents.housePhoto) {
+        const fileName =
+          this.getFileNameFromPath(
+            documents.housePhoto
+          );
 
-  filtrerBeneficiaires() {
-    return this.beneficiaries.filter(b => {
-      const correspondNom = this.filtreNom ? b.name.toLowerCase().includes(this.filtreNom.toLowerCase()) : true;
-      const correspondAge = this.filtreAge !== null ? b.Age === this.filtreAge : true;
-      return correspondNom && correspondAge;
-    });
-  }
+        fichiers.push({
+          id:
+            `${beneficiaire.id}-house-photo`,
 
-  exportToXLSX() {
-    const worksheet = XLSX.utils.json_to_sheet(this.beneficiaries);
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'Bénéficiaires');
-    XLSX.writeFile(workbook, 'beneficiaires.xlsx');
-  }
+          nom:
+            fileName ||
+            'Photo du domicile',
 
- exportToPDF() {
-  if (!this.beneficiaries || this.beneficiaries.length === 0) {
-    Swal.fire('Erreur', 'Aucun bénéficiaire à exporter.', 'error');
-    return;
-  }
+          type:
+            this.getFileExtension(
+              fileName ||
+              documents.housePhoto
+            ),
 
-  const doc = new jsPDF();
-  doc.setFontSize(12);
-  let y = 20;
-  const pageHeight = 297; // hauteur A4 en mm
-  const bottomMargin = 20; // marge basse pour éviter d'écrire trop bas
+          taille:
+            '—',
 
-  doc.text('Liste des bénéficiaires', 20, y);
-  y += 10;
+          url:
+            documents.housePhoto,
 
-  this.beneficiaries.forEach((beneficiaire: any, index: number) => {
-    // Vérifier si on doit passer à la page suivante avant d'écrire
-    if (y + 60 > pageHeight - bottomMargin) {
-      doc.addPage();
-      y = 20; // reset y en haut de la page
-    }
-
-    doc.text(`Nom: ${beneficiaire.name} ${beneficiaire.lastname}`, 20, y);
-    doc.text(`Email: ${beneficiaire.email}`, 20, y + 6);
-    y += 15;
-    doc.text(`Téléphone: ${beneficiaire.phoneNumber}`, 20, y);
-    doc.text(`Adresse: ${beneficiaire.address}`, 20, y + 6);
-    doc.text(`Gouvernorat: ${beneficiaire.gouvernorat}`, 20, y + 12);
-    doc.text(`Âge: ${beneficiaire.Age}`, 20, y + 18);
-    doc.text(`Enfants:`, 20, y + 24);
-
-    // Affichage des enfants
-    beneficiaire.children.forEach((enfant: any, index: number) => {
-      if (y + 30 + (index * 6) > pageHeight - bottomMargin) {
-        doc.addPage();
-        y = 20;
+          kind:
+            'housePhoto'
+        });
       }
-      doc.text(`Enfant ${index + 1}: ${enfant.name}, Âge: ${enfant.age}`, 20, y + 30 + (index * 6));
-    });
 
-    y += 30 + (beneficiaire.children.length * 6);
+      const bulletin =
+        documents.bulletin;
 
-    // Ligne horizontale après chaque bénéficiaire
-    if (y + 30 > pageHeight - bottomMargin) {
-      doc.addPage();
-      y = 20;
+      if (
+        bulletin &&
+        (
+          bulletin.originalName ||
+          bulletin.data
+        )
+      ) {
+        fichiers.push({
+          id:
+            `${beneficiaire.id}-bulletin`,
+
+          nom:
+            bulletin.originalName ||
+            'bulletin.pdf',
+
+          type:
+            this.normalizeDocumentType(
+              bulletin.mimeType || '',
+              bulletin.originalName ||
+                'bulletin.pdf'
+            ),
+
+          taille:
+            this.formatDocumentSize(
+              bulletin.size
+            ),
+
+          kind:
+            'bulletin'
+        });
+      }
+
+      // No submitted documents
+      if (fichiers.length === 0) {
+        return;
+      }
+
+      result.push({
+        id:
+          beneficiaire.id,
+
+        beneficiaireId:
+          beneficiaire.id,
+
+        date:
+          beneficiaire['updatedAt'] ??
+          beneficiaire['createdAt'] ??
+          '',
+
+        fichiers
+      });
     }
-    doc.line(20, y + 30, 200, y + 30);
+  );
 
-    y += 35;
-  });
+  this.depots = result;
 
-  doc.save('beneficiaires.pdf');
+  console.log('Dépôts construits:',this.depots);
+}
+
+private getFileNameFromPath(
+  path: string
+): string {
+
+  if (!path) {
+    return '';
+  }
+
+  return (
+    path
+      .split('/')
+      .pop()
+      ?.split('\\')
+      .pop() ??
+    ''
+  );
 }
 
 
+  get filteredDepots(): Depot[] {
+    const search = this.documentSearch.trim().toLowerCase();
 
+    return this.depots.filter((depot) => {
+      if (
+        this.documentBeneficiaireFilter !== 'all' &&
+        depot.beneficiaireId !== this.documentBeneficiaireFilter
+      ) {
+        return false;
+      }
 
-  showMessage(message: string, icon: 'success' | 'error') {
-    Swal.fire({
-      icon,
-      title: icon === 'success' ? 'Succès' : 'Erreur',
-      text: message,
+      if (!search) {
+        return true;
+      }
+
+      const beneficiaire = this.beneficiaires.find(
+        (item) => item.id === depot.beneficiaireId,
+      );
+
+      const content = [
+        beneficiaire ? `${beneficiaire.prenom} ${beneficiaire.nom}` : '',
+
+        depot.date,
+
+        ...depot.fichiers.map((fichier) => fichier.nom),
+      ]
+        .join(' ')
+        .toLowerCase();
+
+      return content.includes(search);
     });
   }
 
-  resetBeneficiaireForm() {
-    this.nouveauBeneficiaire = {
-      _id: '',
-      name: '',
-      lastname: '',
-      address: '',
-      email: '',
-      password: '',
-      phoneNumber: '',
-      Age: 0,
-      gouvernorat: '',
-      children: [{ name: '', age: null }]
-    };
+  // =========================================================
+  // UPLOAD DOCUMENTS
+  // =========================================================
+
+  uploadDocuments(beneficiaireId: string, event: Event): void {
+    const input = event.target as HTMLInputElement;
+
+    const files = input.files;
+
+    if (!files || files.length === 0) {
+      return;
+    }
+
+    const formData = new FormData();
+
+    Array.from(files).forEach((file) => {
+      /*
+          If your backend multer expects another
+          field name, change ONLY "documents".
+        */
+
+      formData.append('documents', file);
+    });
+
+    this.beneficiaireService
+      .uploadDocuments(beneficiaireId, formData)
+      .subscribe({
+        next: () => {
+          input.value = '';
+
+          this.loadBeneficiaires();
+        },
+
+        error: (error: any) => {
+          console.error('Erreur upload documents:', error);
+
+          alert(error?.error?.message ?? 'Impossible d’envoyer les documents.');
+        },
+      });
+  }
+
+  // =========================================================
+  // DOWNLOAD BULLETIN
+  // =========================================================
+
+  downloadBulletin(beneficiaireId: string): void {
+    this.beneficiaireService.downloadBulletin(beneficiaireId).subscribe({
+      next: (blob: Blob) => {
+        const url = window.URL.createObjectURL(blob);
+
+        const anchor = document.createElement('a');
+
+        anchor.href = url;
+
+        anchor.download = `bulletin-${beneficiaireId}.pdf`;
+
+        anchor.click();
+
+        window.URL.revokeObjectURL(url);
+      },
+
+      error: (error: any) => {
+        console.error('Erreur téléchargement bulletin:', error);
+
+        alert('Impossible de télécharger le bulletin.');
+      },
+    });
+  }
+
+  // =========================================================
+  // DOCUMENT HELPERS
+  // =========================================================
+
+  private getFileExtension(filename: string): string {
+    return filename?.split('.').pop()?.toLowerCase() ?? 'file';
+  }
+
+  private normalizeDocumentType(type: string, filename: string): string {
+    if (!type) {
+      return this.getFileExtension(filename);
+    }
+
+    if (type.includes('/')) {
+      const subtype = type.split('/').pop();
+
+      return subtype ?? 'file';
+    }
+
+    return type;
+  }
+
+  private formatDocumentSize(size: any): string {
+    if (size === null || size === undefined || size === '') {
+      return '—';
+    }
+
+    if (typeof size === 'string') {
+      return size;
+    }
+
+    const numericSize = Number(size);
+
+    if (Number.isNaN(numericSize)) {
+      return '—';
+    }
+
+    if (numericSize < 1024) {
+      return `${numericSize} o`;
+    }
+
+    if (numericSize < 1024 * 1024) {
+      return `${(numericSize / 1024).toFixed(1)} Ko`;
+    }
+
+    return `${(numericSize / (1024 * 1024)).toFixed(1)} Mo`;
+  }
+
+  // =========================================================
+  // UTILS
+  // =========================================================
+
+  private today(): string {
+    return new Date().toISOString().slice(0, 10);
   }
 }
-
-
