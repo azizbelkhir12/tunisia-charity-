@@ -54,9 +54,9 @@ export class SidebarAdminComponent implements OnInit {
       exact: true,
     },
     {
-      to: '/admin-compte/gestion-des-parametres',
-      label: 'Paramètres',
-      icon: 'settings',
+      to: '/admin-compte/gestion-feedback',
+      label: 'Feedback',
+      icon: 'MessageSquare',
     },
   ];
 

@@ -1,94 +1,276 @@
 import { Component, OnInit } from '@angular/core';
-import { ContactService } from '../services/contact/contact.service';
-import Swal from 'sweetalert2';
+import {
+  MessageSquare,
+  Search,
+  Trash2,
+  Mail,
+  CalendarDays,
+  Users
+} from 'lucide-angular';
 
+import { ContactService } from '../services/contact/contact.service';
+
+interface Feedback {
+  _id: string;
+  name: string;
+  email: string;
+  subject: string;
+  message: string;
+  createdAt: string;
+}
+
+interface StatCard {
+  label: string;
+  value: number;
+  icon: any;
+  colorClass: string;
+}
 @Component({
   selector: 'app-gestion-feedback',
   standalone: false,
   templateUrl: './gestion-feedback.component.html',
   styleUrl: './gestion-feedback.component.css'
 })
-export class GestionFeedbackComponent implements OnInit {
+export class GestionFeedbackComponent  {
+readonly MessageSquare = MessageSquare;
+  readonly Search = Search;
+  readonly Trash2 = Trash2;
+  readonly Mail = Mail;
+  readonly CalendarDays = CalendarDays;
+  readonly Users = Users;
 
+  q = '';
 
-  totalFeedbacks: number = 0;
-  feedbacks: any[] = [];
-i: any;
+  items: Feedback[] = [];
 
-  constructor(private contactService : ContactService) {}
+  loading = false;
+  errorMessage = '';
+
+  constructor(
+    private ContactService: ContactService
+  ) {}
 
   ngOnInit(): void {
-    
-    this.feedbacks = [];
-    this.chargerFeedbacks();
-    this.totalFeedbacks = this.feedbacks.length;
+    this.loadFeedbacks();
   }
 
-  chargerFeedbacks(): void {
-    this.contactService.getContactForm().subscribe({
-      next: (response: any[]) => {
-        this.feedbacks = response;
-        this.totalFeedbacks = this.feedbacks.length;
-        
+  // =========================================================
+  // LOAD FEEDBACKS
+  // =========================================================
+
+  loadFeedbacks(): void {
+    this.loading = true;
+    this.errorMessage = '';
+
+    this.ContactService.getContactForm().subscribe({
+      next: (response: any) => {
+        console.log('Feedback API response:', response);
+
+        if (Array.isArray(response)) {
+          this.items = response;
+        } else if (Array.isArray(response?.feedbacks)) {
+          this.items = response.feedbacks;
+        } else if (Array.isArray(response?.data)) {
+          this.items = response.data;
+        } else {
+          console.error(
+            'Unexpected feedback response format:',
+            response
+          );
+
+          this.items = [];
+        }
+
+        this.loading = false;
       },
+
       error: (error) => {
-        console.error('Erreur lors de la récupération des Feedbacks:', error);
-        Swal.fire({
-          position: 'center',
-          icon: 'error',
-          title: 'Erreur',
-          text: 'Impossible de récupérer les Feedbacks',
-          showConfirmButton: true
-        });
+        console.error(
+          'Error loading feedbacks:',
+          error
+        );
+
+        this.items = [];
+        this.loading = false;
+        this.errorMessage =
+          'Impossible de charger les feedbacks.';
       }
     });
   }
 
-  supprimerFeedback(id: string): void {
+  // =========================================================
+  // STATISTICS
+  // =========================================================
+
+  get totalFeedbacks(): number {
+    return this.items.length;
+  }
+
+  get feedbacksThisMonth(): number {
+    const now = new Date();
+
+    return this.items.filter((feedback) => {
+      if (!feedback.createdAt) {
+        return false;
+      }
+
+      const feedbackDate = new Date(
+        feedback.createdAt
+      );
+
+      if (isNaN(feedbackDate.getTime())) {
+        return false;
+      }
+
+      return (
+        feedbackDate.getFullYear() === now.getFullYear() &&
+        feedbackDate.getMonth() === now.getMonth()
+      );
+    }).length;
+  }
+
+  get uniqueAuthors(): number {
+    const emails = this.items
+      .filter((feedback) => feedback.email)
+      .map((feedback) =>
+        feedback.email.trim().toLowerCase()
+      );
+
+    return new Set(emails).size;
+  }
+
+  get uniqueSubjects(): number {
+    const subjects = this.items
+      .filter((feedback) => feedback.subject)
+      .map((feedback) =>
+        feedback.subject.trim().toLowerCase()
+      );
+
+    return new Set(subjects).size;
+  }
+
+  get statsCards(): StatCard[] {
+    return [
+      {
+        label: 'Total feedbacks',
+        value: this.totalFeedbacks,
+        icon: MessageSquare,
+        colorClass: 'icon-primary'
+      },
+      {
+        label: 'Ce mois-ci',
+        value: this.feedbacksThisMonth,
+        icon: CalendarDays,
+        colorClass: 'icon-sky'
+      },
+      {
+        label: 'Auteurs uniques',
+        value: this.uniqueAuthors,
+        icon: Users,
+        colorClass: 'icon-green'
+      },
+      {
+        label: 'Sujets distincts',
+        value: this.uniqueSubjects,
+        icon: Mail,
+        colorClass: 'icon-orange'
+      }
+    ];
+  }
+
+  // =========================================================
+  // SEARCH
+  // =========================================================
+
+  get filteredFeedbacks(): Feedback[] {
+    const term = this.q
+      .trim()
+      .toLowerCase();
+
+    if (!term) {
+      return this.items;
+    }
+
+    return this.items.filter((feedback) => {
+      const content = [
+        feedback.name || '',
+        feedback.email || '',
+        feedback.subject || '',
+        feedback.message || ''
+      ]
+        .join(' ')
+        .toLowerCase();
+
+      return content.includes(term);
+    });
+  }
+
+  // =========================================================
+  // DELETE
+  // =========================================================
+
+  remove(id: string): void {
     if (!id) {
-      console.error('ID is undefined or null');
-      Swal.fire({
-        position: 'center',
-        icon: 'error',
-        title: 'Erreur',
-        text: 'ID du Feedback manquant',
-        showConfirmButton: true
-      });
+      console.error('Feedback ID is missing');
       return;
     }
-  
-    Swal.fire({
-      title: 'Êtes-vous sûr ?',
-      text: "Vous ne pourrez pas revenir en arrière !",
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#3085d6',
-      cancelButtonColor: '#d33',
-      confirmButtonText: 'Oui, supprimer !'
-    }).then((result) => {
-      if (result.isConfirmed) {
-        this.contactService.deleteContactForm(id).subscribe({
-          next: () => {
-            Swal.fire(
-              'Supprimé !',
-              'Le Feedback a été supprimé.',
-              'success'
-            );
-            this.chargerFeedbacks();
-          },
-          error: (error) => {
-            console.error('Erreur lors de la suppression du Feedback:', error);
-            Swal.fire({
-              position: 'center',
-              icon: 'error',
-              title: 'Erreur',
-              text: 'Impossible de supprimer le Feedback: ' + error.message,
-              showConfirmButton: true
-            });
-          }
-        });
-      }
-    });
+
+    const feedback = this.items.find(
+      item => item._id === id
+    );
+
+    const confirmed = window.confirm(
+      feedback
+        ? `Supprimer définitivement le feedback de ${feedback.name} ?`
+        : 'Supprimer définitivement ce feedback ?'
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+    this.ContactService
+      .deleteContactForm(id)
+      .subscribe({
+        next: (response) => {
+          console.log(
+            'Feedback deleted:',
+            response
+          );
+
+          this.items = this.items.filter(
+            item => item._id !== id
+          );
+        },
+
+        error: (error) => {
+          console.error(
+            'Error deleting feedback:',
+            error
+          );
+
+          window.alert(
+            'Une erreur est survenue pendant la suppression.'
+          );
+        }
+      });
   }
 
+  // =========================================================
+  // TRACK BY
+  // =========================================================
+
+  trackByFeedbackId(
+    index: number,
+    feedback: Feedback
+  ): string {
+    return feedback._id;
+  }
+
+  trackByStatLabel(
+    index: number,
+    stat: StatCard
+  ): string {
+    return stat.label;
+  }
 }
