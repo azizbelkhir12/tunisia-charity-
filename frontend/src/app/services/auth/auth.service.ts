@@ -63,10 +63,7 @@ export class AuthService {
   }
 
   login(credentials: any): Observable<any> {
-    return this.http.post(
-      `${this.apiUrl}/auth/login`,
-      credentials
-    );
+    return this.http.post(`${this.apiUrl}/auth/login`,credentials);
   }
 
   forgotPassword(
@@ -109,6 +106,17 @@ export class AuthService {
       }
     );
   }
+
+  setCurrentUser(user: any): void {
+  localStorage.setItem(
+    'currentUser',
+    JSON.stringify(user)
+  );
+
+  this.currentUser.next(user);
+}
+
+
 
   isTokenExpired(): boolean {
     const token = this.token;

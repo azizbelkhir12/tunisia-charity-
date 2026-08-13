@@ -493,6 +493,15 @@ router-outlet {
   display: none;
 }
 
+.logout-button {
+  width: 100%;
+  border: none;
+  background: transparent;
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
 /* =====================================================
    SCROLLBAR SIDEBAR
 ===================================================== */

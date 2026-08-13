@@ -56,14 +56,12 @@ interface TokenPayload {
   iat?: number;
   exp?: number;
 }
-
-interface StoredUser {
+interface StoredUser extends BackendUser {
   id: string;
-  email: string;
   userType: BackendUserType;
   role: string;
-  nom: string;
 }
+
 @Component({
   selector: 'app-login',
   standalone: false,
@@ -219,58 +217,54 @@ export class LoginComponent implements OnInit{
     });
   }
 
-  private handleLoginSuccess(
-    response: LoginResponse,
-  ): void {
-    this.isLoading = false;
+ private handleLoginSuccess(response: LoginResponse): void {
+  this.isLoading = false;
 
-    if (
-      !response.token ||
-      !response.data?.user
-    ) {
-      this.errorMessage =
-        'Réponse invalide reçue du serveur.';
-      return;
-    }
+  if (!response.token || !response.data?.user) {
+    this.errorMessage = 'Réponse invalide reçue du serveur.';
+    return;
+  }
 
-    const decodedToken =
-      jwtDecode<TokenPayload>(response.token);
+  try {
+    const decodedToken = jwtDecode<TokenPayload>(response.token);
 
-    const currentUser: StoredUser = {
-      // Le backend utilise "id", pas "userId"
-      id:
-        decodedToken.id ||
-        response.data.user._id,
+    const backendUser = response.data.user;
 
-      email:
-        decodedToken.email ||
-        response.data.user.email,
+    const currentUser = {
+      // On garde TOUTES les informations retournées par le backend
+      ...backendUser,
 
-      userType:
-        decodedToken.userType ||
-        response.data.userType,
+      // On normalise l'id
+      id: decodedToken.id || backendUser._id,
+      _id: backendUser._id || decodedToken.id,
 
-      role:
-        decodedToken.role ||
-        response.data.user.role ||
-        'user',
-
-      nom:
-        response.data.user.nom || '',
+      // Informations d'authentification
+      email: decodedToken.email || backendUser.email,
+      userType: decodedToken.userType || response.data.userType,
+      role: decodedToken.role || backendUser.role || 'user',
     };
 
     localStorage.setItem(
-      'token',
-      response.token,
-    );
+  'token',
+  response.token
+);
 
-    localStorage.setItem(
-      'currentUser',
-      JSON.stringify(currentUser),
-    );
+// Sauvegarde + émission BehaviorSubject
+this.authService.setCurrentUser(
+  currentUser
+);
 
-    this.redirectUser(currentUser.userType);
+// Navigation seulement après
+this.redirectUser(
+  currentUser.userType
+);
+  } catch (error) {
+    console.error('Erreur pendant le traitement du token:', error);
+
+    this.errorMessage =
+      'Une erreur est survenue pendant la connexion.';
   }
+}
 
   private handleLoginError(error: any): void {
     this.isLoading = false;

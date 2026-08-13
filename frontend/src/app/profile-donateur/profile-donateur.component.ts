@@ -64,7 +64,6 @@ export class ProfileDonateurComponent {
     if (userId) {
       this.donorService.getDonorsById(userId).subscribe({
         next: (donor) => {
-          console.log('Donor data:', donor);
           this.utilisateur = donor;
           // Patch the form with the utilisateur data
           this.profileForm.patchValue({

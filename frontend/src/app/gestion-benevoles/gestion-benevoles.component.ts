@@ -135,7 +135,6 @@ export class GestionBenevolesComponent implements OnInit {
   loadVolunteers(): void {
   this.volunteerService.getVolunteers().subscribe({
     next: (response: any[]) => {
-      console.log('Réponse du serveur :', response);
 
       this.volunteers = response.map((volunteer: any) => ({
         id: volunteer.id ?? volunteer._id,
@@ -175,11 +174,6 @@ export class GestionBenevolesComponent implements OnInit {
             ? 'inactive'
             : 'active',
       }));
-
-      console.log(
-        'Bénévoles transformés :',
-        this.volunteers,
-      );
     },
 
     error: error => {
@@ -196,10 +190,6 @@ export class GestionBenevolesComponent implements OnInit {
 loadDemandes(): void {
   this.demandeService.getAllDemandes().subscribe({
     next: (response: any) => {
-      console.log(
-        'Réponse demandes du serveur :',
-        response,
-      );
 
       const demandes = Array.isArray(response)
         ? response
@@ -247,11 +237,6 @@ loadDemandes(): void {
             demande.updatedAt ??
             '',
         }),
-      );
-
-      console.log(
-        'Demandes transformées :',
-        this.requests,
       );
     },
 

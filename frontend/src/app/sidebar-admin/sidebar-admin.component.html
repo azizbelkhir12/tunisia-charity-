@@ -25,11 +25,14 @@
     </nav>
 
     <div class="sidebar-footer">
-      <a routerLink="/" class="navigation-link return-link">
+      <button
+        type="button"
+        class="navigation-link return-link logout-button"
+        (click)="logout()"
+      >
         <i-lucide name="log-out" class="navigation-icon"></i-lucide>
-
         <span>Retour au site</span>
-      </a>
+      </button>
     </div>
   </aside>
 

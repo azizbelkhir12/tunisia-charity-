@@ -236,8 +236,6 @@ export class GestionBeneficiairesComponent implements OnInit {
 
     this.beneficiaireService.getBeneficiaires().subscribe({
       next: (response: any) => {
-        console.log('Bénéficiaires chargés:', response);
-
         const data = response?.data?.beneficiaries;
 
         if (Array.isArray(data)) {
@@ -247,11 +245,6 @@ export class GestionBeneficiairesComponent implements OnInit {
         } else {
           this.beneficiaires = [];
         }
-
-        console.log(
-          'Liste bénéficiaires utilisée par le composant:',
-          this.beneficiaires,
-        );
 
         this.buildDepots();
 
@@ -519,7 +512,6 @@ export class GestionBeneficiairesComponent implements OnInit {
 
     this.beneficiaireService.createBeneficiaire(beneficiaireData).subscribe({
       next: (response: any) => {
-        console.log('Bénéficiaire créé:', response);
 
         this.creatingBeneficiaire = false;
 
@@ -990,7 +982,6 @@ export class GestionBeneficiairesComponent implements OnInit {
 
   this.depots = result;
 
-  console.log('Dépôts construits:',this.depots);
 }
 
 private getFileNameFromPath(

@@ -64,7 +64,6 @@ readonly MessageSquare = MessageSquare;
 
     this.ContactService.getContactForm().subscribe({
       next: (response: any) => {
-        console.log('Feedback API response:', response);
 
         if (Array.isArray(response)) {
           this.items = response;
