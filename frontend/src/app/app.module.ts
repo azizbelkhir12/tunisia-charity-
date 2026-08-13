@@ -64,7 +64,12 @@ import {
   Clock,
   Download,
   FileSpreadsheet,
-  MessageSquare
+  MessageSquare,
+  User,
+  History,
+  HandCoins,
+  Baby,
+  Pencil
 } from 'lucide-angular';
 
 import { AppComponent } from './app.component';
@@ -241,7 +246,12 @@ export function HttpLoaderFactory(http: HttpClient) {
       Clock,
       Download,
       FileSpreadsheet,
-      MessageSquare
+      MessageSquare,
+      User,
+      HandCoins,
+      History,
+      Baby,
+      Pencil
     }),
     TranslateModule.forRoot({
       loader: {

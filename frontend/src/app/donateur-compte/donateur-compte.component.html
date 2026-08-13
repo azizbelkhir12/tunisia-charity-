@@ -1,73 +1,855 @@
-<app-nav-bar-membre></app-nav-bar-membre>
+<div class="donor-page">
+  <!-- ===================================================== -->
+  <!-- SIDEBAR -->
+  <!-- ===================================================== -->
 
-<div class="dashboard-container">
-  <!-- En-tête -->
-  <div class="dashboard-header">
-    <h4 class="dashboard-title">Bienvenue, {{ utilisateur?.name }} dans votre Espace 👋</h4>
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <img src="assets/logo2.png" alt="Tunisia Charity" class="sidebar-logo" />
 
-    <!-- Badge Type Donateur -->
-    <div class="badge-type" *ngIf="typeDonateur === 'parrain'">Donateur Parrain</div>
-    <div class="badge-type" *ngIf="typeDonateur === 'standard'">Donateur Standard</div>
-  </div>
+      <div>
+        <div class="sidebar-brand">Tunisia Charity</div>
 
-  <!-- Message personnalisé -->
-  <div class="donateur-message" *ngIf="typeDonateur === 'standard' || typeDonateur === 'parrain'">
-    <p style="font-size: 20px; text-align: center;">Merci pour vos dons réguliers à notre association ❤️</p>
-  </div>
-
-  <!-- Cartes -->
-  <div class="cards-container">
-    <div class="dashboard-card" [class.active]="activeSection === 'profile'" (click)="showSection('profile')">
-      <div class="card-icon-bg">
-        <i class="fas fa-user-edit icon"></i>
+        <div class="sidebar-subtitle">Espace donateur</div>
       </div>
-      <h3>Mes informations</h3>
-      <p>Consulter / modifier mon profil</p>
     </div>
 
-    <div class="dashboard-card" [class.active]="activeSection === 'don'" (click)="showSection('don')">
-      <div class="card-icon-bg">
-        <i class="fas fa-donate icon"></i>
-      </div>
-      <h3>Effectuer un Don</h3>
-      <p>Faire un nouveau don</p>
+    <!-- NAVIGATION -->
+
+    <nav class="sidebar-navigation">
+      <button
+        *ngFor="let item of navigationItems"
+        type="button"
+        class="navigation-item"
+        [class.active]="tab === item.id"
+        (click)="setTab(item.id)"
+      >
+        <i-lucide [name]="item.icon" class="navigation-icon"></i-lucide>
+
+        <span>
+          {{ item.label }}
+        </span>
+      </button>
+    </nav>
+
+    <!-- LOGOUT -->
+
+    <div class="sidebar-footer">
+      <a routerLink="/" class="logout-link">
+        <i-lucide name="log-out" class="navigation-icon"></i-lucide>
+
+        <span> Se déconnecter </span>
+      </a>
+    </div>
+  </aside>
+
+  <!-- ===================================================== -->
+  <!-- RIGHT CONTENT -->
+  <!-- ===================================================== -->
+
+  <div class="content-wrapper">
+    <!-- =================================================== -->
+    <!-- LOADING -->
+    <!-- =================================================== -->
+
+    <div *ngIf="loading" class="main-content">
+      <section class="main-card">
+        <p class="card-subtitle">Chargement de votre espace donateur...</p>
+      </section>
     </div>
 
-    <div class="dashboard-card" [class.active]="activeSection === 'historique'" (click)="showSection('historique')">
-      <div class="card-icon-bg">
-        <i class="fas fa-history icon"></i>
-      </div>
-      <h3>Historique</h3>
-      <p>Voir mes paiements</p>
+    <!-- =================================================== -->
+    <!-- LOAD ERROR -->
+    <!-- =================================================== -->
+
+    <div *ngIf="!loading && loadError" class="main-content">
+      <section class="main-card">
+        <h2 class="card-title">Impossible de charger votre compte</h2>
+
+        <p class="form-error">
+          {{ loadError }}
+        </p>
+      </section>
     </div>
 
-    <div class="dashboard-card" *ngIf="typeDonateur === 'parrain'" [class.active]="activeSection === 'enfants'" (click)="showSection('enfants')">
-      <div class="card-icon-bg">
-        <i class="fas fa-child icon"></i>
-      </div>
-      <h3>Enfants Parrainés</h3>
-      <p>Informations sur les enfants</p>
-    </div>
+    <!-- =================================================== -->
+    <!-- DONOR CONTENT -->
+    <!-- =================================================== -->
 
-    <div class="dashboard-card" *ngIf="typeDonateur === 'standard'" [class.active]="activeSection === 'rapports'" (click)="showSection('rapports')">
-      <div class="card-icon-bg">
-        <i class="fas fa-chart-line icon"></i>
-      </div>
-      <h3>Rapports Financiers</h3>
-      <p>Voir les rapports de l'association</p>
-    </div>
-  </div>
+    <ng-container *ngIf="!loading && !loadError">
+      <!-- ================================================= -->
+      <!-- HEADER -->
+      <!-- ================================================= -->
 
-  <!-- Section dynamique -->
-  <div class="content-section">
-    <app-profile-donateur *ngIf="activeSection === 'profile'"></app-profile-donateur>
-    <app-effectuer-don *ngIf="activeSection === 'don'"></app-effectuer-don>
-    <app-historique-paiement *ngIf="activeSection === 'historique'"></app-historique-paiement>
-    <app-parinnage-enfants *ngIf="activeSection === 'enfants' && typeDonateur === 'parrain'"></app-parinnage-enfants>
-    <app-rapports-donnateur-standard *ngIf="activeSection === 'rapports' && typeDonateur === 'standard'"></app-rapports-donnateur-standard>
+      <header class="top-header">
+        <div>
+          <h1 class="welcome-title">Bonjour {{ infos.name }} 👋</h1>
+
+          <p class="account-type">
+            Compte
+            {{ isParrain ? "Donateur parrain" : "Donateur standard" }}
+          </p>
+        </div>
+
+        <!-- DYNAMIC STATUS BADGE -->
+
+        <div class="header-actions">
+          <span
+            class="account-badge"
+            [class.parrain]="isParrain"
+            [class.standard]="!isParrain"
+          >
+            <i-lucide
+              [name]="isParrain ? 'heart-handshake' : 'hand-coins'"
+              class="badge-icon"
+            ></i-lucide>
+
+            {{ isParrain ? "Parrain" : "Standard" }}
+          </span>
+        </div>
+      </header>
+
+      <!-- ================================================= -->
+      <!-- MOBILE NAVIGATION -->
+      <!-- ================================================= -->
+
+      <div class="mobile-navigation">
+        <button
+          *ngFor="let item of navigationItems"
+          type="button"
+          class="mobile-navigation-item"
+          [class.active]="tab === item.id"
+          (click)="setTab(item.id)"
+        >
+          {{ item.label }}
+        </button>
+      </div>
+
+      <!-- ================================================= -->
+      <!-- MAIN CONTENT -->
+      <!-- ================================================= -->
+
+      <main class="main-content">
+        <!-- ================================================= -->
+        <!-- MES INFORMATIONS -->
+        <!-- ================================================= -->
+
+        <section *ngIf="tab === 'infos'" class="main-card">
+          <div class="information-header">
+            <div>
+              <h2 class="card-title">Mes informations</h2>
+
+              <p class="card-subtitle">
+                Vos données personnelles enregistrées.
+              </p>
+            </div>
+
+            <button
+              *ngIf="!editing"
+              type="button"
+              class="primary-pill-button"
+              (click)="startEdit()"
+            >
+              <i-lucide name="pencil" class="button-icon"></i-lucide>
+
+              Modifier mes informations
+            </button>
+          </div>
+
+          <!-- =============================================== -->
+          <!-- UPDATE SUCCESS -->
+          <!-- =============================================== -->
+
+          <div *ngIf="saved && !editing" class="success-message">
+            <i-lucide name="circle-check" class="success-icon"></i-lucide>
+
+            Vos informations ont été mises à jour.
+          </div>
+
+          <!-- =============================================== -->
+          <!-- PROFILE VIEW MODE -->
+          <!-- =============================================== -->
+
+          <div *ngIf="!editing" class="information-grid">
+            <!-- NAME -->
+
+            <div class="information-box">
+              <span class="information-label"> Nom complet </span>
+
+              <span class="information-value">
+                {{ infos.name }}
+              </span>
+            </div>
+
+            <!-- EMAIL -->
+
+            <div class="information-box">
+              <span class="information-label"> Email </span>
+
+              <span class="information-value">
+                {{ infos.email }}
+              </span>
+            </div>
+
+            <!-- PHONE -->
+
+            <div class="information-box">
+              <span class="information-label"> Téléphone </span>
+
+              <span class="information-value">
+                {{ infos.phone }}
+              </span>
+            </div>
+
+            <!-- ADDRESS -->
+
+            <div class="information-box">
+              <span class="information-label"> Adresse </span>
+
+              <span class="information-value">
+                {{ infos.address }}
+              </span>
+            </div>
+
+            <!-- ZIP CODE -->
+
+            <div class="information-box">
+              <span class="information-label"> Code postal </span>
+
+              <span class="information-value">
+                {{ infos.zipCode }}
+              </span>
+            </div>
+
+            <!-- STATUS -->
+
+            <div class="information-box">
+              <span class="information-label"> Type de compte </span>
+
+              <span class="information-value">
+                {{ isParrain ? "Donateur parrain" : "Donateur standard" }}
+              </span>
+            </div>
+          </div>
+
+          <!-- =============================================== -->
+          <!-- PROFILE EDIT MODE -->
+          <!-- =============================================== -->
+
+          <form
+            *ngIf="editing"
+            class="form-grid"
+            (ngSubmit)="saveProfile()"
+            novalidate
+          >
+            <!-- NAME -->
+
+            <label class="field">
+              <span class="field-label"> Nom complet </span>
+
+              <input
+                type="text"
+                [(ngModel)]="draft.name"
+                name="name"
+                class="input-x"
+              />
+            </label>
+
+            <!-- EMAIL -->
+
+            <label class="field">
+              <span class="field-label"> Email </span>
+
+              <input
+                type="email"
+                [(ngModel)]="draft.email"
+                name="email"
+                class="input-x"
+              />
+            </label>
+
+            <!-- PHONE -->
+
+            <label class="field">
+              <span class="field-label"> Téléphone </span>
+
+              <input
+                type="text"
+                [(ngModel)]="draft.phone"
+                name="phone"
+                class="input-x"
+              />
+            </label>
+
+            <!-- ADDRESS -->
+
+            <label class="field">
+              <span class="field-label"> Adresse </span>
+
+              <input
+                type="text"
+                [(ngModel)]="draft.address"
+                name="address"
+                class="input-x"
+              />
+            </label>
+
+            <!-- ZIP CODE -->
+
+            <label class="field">
+              <span class="field-label"> Code postal </span>
+
+              <input
+                type="text"
+                [(ngModel)]="draft.zipCode"
+                name="zipCode"
+                class="input-x"
+              />
+            </label>
+
+            <!-- ERROR -->
+
+            <p *ngIf="profileError" class="form-error full-width">
+              {{ profileError }}
+            </p>
+
+            <!-- BUTTONS -->
+
+            <div class="form-buttons full-width">
+              <button type="submit" class="primary-action-button">
+                <i-lucide name="save" class="button-icon"></i-lucide>
+
+                Enregistrer
+              </button>
+
+              <button
+                type="button"
+                class="secondary-action-button"
+                (click)="cancelEdit()"
+              >
+                <i-lucide name="x" class="button-icon"></i-lucide>
+
+                Annuler
+              </button>
+            </div>
+          </form>
+        </section>
+
+        <!-- ================================================= -->
+        <!-- EFFECTUER UN DON -->
+        <!-- ================================================= -->
+
+        <ng-container *ngIf="tab === 'don'">
+          <!-- =============================================== -->
+          <!-- DON SUCCESS -->
+          <!-- =============================================== -->
+
+          <section *ngIf="donationDone" class="main-card">
+            <h2 class="card-title">Don enregistré ✓</h2>
+
+            <div class="card-body">
+              <p class="don-success-text">
+                Merci {{ nom }} ! Votre don de
+
+                <strong> {{ montant }} TND </strong>
+
+                pour « {{ projet }} » via
+
+                <strong>
+                  {{ methode }}
+                </strong>
+
+                a bien été pris en compte.
+              </p>
+
+              <button
+                type="button"
+                class="primary-pill-button donation-reset"
+                (click)="resetDonation()"
+              >
+                Faire un autre don
+              </button>
+            </div>
+          </section>
+
+          <!-- =============================================== -->
+          <!-- DON FORM -->
+          <!-- =============================================== -->
+
+          <section *ngIf="!donationDone" class="main-card">
+            <h2 class="card-title">Effectuer un don</h2>
+
+            <p class="card-subtitle">Soutenez le projet de votre choix.</p>
+
+            <div class="card-body">
+              <form class="form-grid" (ngSubmit)="submitDonation()" novalidate>
+                <!-- AMOUNT -->
+
+                <label class="field">
+                  <span class="field-label"> Montant (TND) </span>
+
+                  <input
+                    type="number"
+                    min="1"
+                    [(ngModel)]="montant"
+                    name="montant"
+                    placeholder="100"
+                    class="input-x"
+                  />
+                </label>
+
+                <!-- PAYMENT METHOD -->
+
+                <label class="field">
+                  <span class="field-label"> Méthode de paiement </span>
+
+                  <select [(ngModel)]="methode" name="methode" class="input-x">
+                    <option value="En ligne">En ligne</option>
+
+                    <option value="Virement">Virement</option>
+
+                    <option value="Cash">Cash</option>
+                  </select>
+                </label>
+
+                <!-- FULL NAME -->
+
+                <label class="field">
+                  <span class="field-label"> Nom complet </span>
+
+                  <input
+                    type="text"
+                    [(ngModel)]="nom"
+                    name="donNom"
+                    class="input-x"
+                  />
+                </label>
+
+                <!-- EMAIL -->
+
+                <label class="field">
+                  <span class="field-label"> Email </span>
+
+                  <input
+                    type="email"
+                    [(ngModel)]="email"
+                    name="donEmail"
+                    class="input-x"
+                  />
+                </label>
+
+                <!-- PROJECT -->
+
+                <label class="field full-width">
+                  <span class="field-label"> Projet </span>
+
+                  <select [(ngModel)]="projet" name="projet" class="input-x">
+                    <option *ngFor="let project of PROJETS" [value]="project">
+                      {{ project }}
+                    </option>
+                  </select>
+                </label>
+
+                <!-- ERROR -->
+
+                <p *ngIf="donationError" class="form-error full-width">
+                  {{ donationError }}
+                </p>
+
+                <!-- BUTTON -->
+
+                <div class="full-width">
+                  <button type="submit" class="primary-action-button">
+                    Confirmer le don
+                  </button>
+                </div>
+              </form>
+            </div>
+          </section>
+        </ng-container>
+
+        <!-- ================================================= -->
+        <!-- HISTORIQUE DES PAIEMENTS -->
+        <!-- ================================================= -->
+
+        <ng-container *ngIf="tab === 'historique'">
+          <!-- =============================================== -->
+          <!-- KPI -->
+          <!-- =============================================== -->
+
+          <div class="kpi-grid kpi-grid-three">
+            <!-- TOTAL -->
+
+            <div class="kpi-card">
+              <div class="kpi-icon">
+                <i-lucide name="wallet"></i-lucide>
+              </div>
+
+              <div>
+                <div class="kpi-label">Total confirmé</div>
+
+                <div class="kpi-value">{{ totalConfirme }} TND</div>
+              </div>
+            </div>
+
+            <!-- CONFIRMED -->
+
+            <div class="kpi-card">
+              <div class="kpi-icon">
+                <i-lucide name="circle-check"></i-lucide>
+              </div>
+
+              <div>
+                <div class="kpi-label">Paiements confirmés</div>
+
+                <div class="kpi-value">
+                  {{ nombreConfirmes }}
+                </div>
+              </div>
+            </div>
+
+            <!-- PENDING -->
+
+            <div class="kpi-card">
+              <div class="kpi-icon">
+                <i-lucide name="clock"></i-lucide>
+              </div>
+
+              <div>
+                <div class="kpi-label">En attente</div>
+
+                <div class="kpi-value">
+                  {{ nombreEnAttente }}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- =============================================== -->
+          <!-- HISTORY TABLE -->
+          <!-- =============================================== -->
+
+          <section class="main-card section-spacing">
+            <h2 class="card-title">Historique de paiement</h2>
+
+            <div class="card-body">
+              <!-- SEARCH -->
+
+              <div class="search-wrapper">
+                <i-lucide name="search" class="search-icon"></i-lucide>
+
+                <input
+                  type="text"
+                  [(ngModel)]="paiementSearch"
+                  placeholder="Rechercher..."
+                  class="input-x search-input"
+                />
+              </div>
+
+              <!-- TABLE -->
+
+              <div class="table-wrapper">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Date</th>
+
+                      <th>Montant</th>
+
+                      <th>Méthode</th>
+
+                      <th>Statut</th>
+                    </tr>
+                  </thead>
+
+                  <tbody>
+                    <tr *ngFor="let payment of filteredPaiements">
+                      <!-- DATE -->
+
+                      <td>
+                        {{ payment.date || payment.createdAt || "-" }}
+                      </td>
+
+                      <!-- AMOUNT -->
+
+                      <td class="table-important">
+                        {{ payment.montant ?? payment.amount ?? 0 }}
+                        TND
+                      </td>
+
+                      <!-- METHOD -->
+
+                      <td>
+                        {{ payment.methode || payment.paymentMethod || "-" }}
+                      </td>
+
+                      <!-- STATUS -->
+
+                      <td>
+                        <span
+                          class="status-badge"
+                          [class.confirmed]="
+                            payment.status === 'Confirmé' ||
+                            payment.status === 'confirmed' ||
+                            payment.status === 'success' ||
+                            payment.status === 'paid'
+                          "
+                          [class.pending]="
+                            payment.status !== 'Confirmé' &&
+                            payment.status !== 'confirmed' &&
+                            payment.status !== 'success' &&
+                            payment.status !== 'paid'
+                          "
+                        >
+                          {{ payment.status || "En attente" }}
+                        </span>
+                      </td>
+                    </tr>
+
+                    <!-- EMPTY -->
+
+                    <tr *ngIf="filteredPaiements.length === 0">
+                      <td colspan="4" class="empty-table">
+                        Aucun paiement trouvé.
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </section>
+        </ng-container>
+
+        <!-- ================================================= -->
+        <!-- RAPPORTS - STANDARD DONOR ONLY -->
+        <!-- ================================================= -->
+
+        <section *ngIf="tab === 'rapports' && !isParrain" class="main-card">
+          <h2 class="card-title">Rapports</h2>
+
+          <p class="card-subtitle">Consultez les rapports de l'association.</p>
+
+          <div class="card-body">
+            <!-- SEARCH -->
+
+            <div class="search-wrapper">
+              <i-lucide name="search" class="search-icon"></i-lucide>
+
+              <input
+                type="text"
+                [(ngModel)]="rapportSearch"
+                placeholder="Rechercher un rapport..."
+                class="input-x search-input"
+              />
+            </div>
+
+            <!-- TABLE -->
+
+            <div class="table-wrapper">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Date</th>
+
+                    <th>Titre</th>
+
+                    <th>Type</th>
+                  </tr>
+                </thead>
+
+                <tbody>
+                  <tr *ngFor="let rapport of filteredRapports">
+                    <!-- DATE -->
+
+                    <td>
+                      {{
+                        rapport.date ? (rapport.date | date: "yyyy-MM-dd") : "-"
+                      }}
+                    </td>
+
+                    <!-- TITLE -->
+
+                    <td class="table-medium">
+                      {{ rapport.titre }}
+                    </td>
+
+                    <!-- TYPE -->
+
+                    <td>
+                      <span class="report-badge">
+                        {{
+                          rapport.type === "financier"
+                            ? "Financier"
+                            : rapport.type === "litteraire"
+                              ? "Littéraire"
+                              : rapport.type
+                        }}
+                      </span>
+                    </td>
+                  </tr>
+
+                  <!-- EMPTY -->
+
+                  <tr *ngIf="filteredRapports.length === 0">
+                    <td colspan="3" class="empty-table">
+                      Aucun rapport trouvé.
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ================================================= -->
+        <!-- PARRAINAGE - PARRAIN ONLY -->
+        <!-- ================================================= -->
+
+        <ng-container *ngIf="tab === 'parrainage' && isParrain">
+          <!-- =============================================== -->
+          <!-- KPI -->
+          <!-- =============================================== -->
+
+          <div class="kpi-grid kpi-grid-two">
+            <!-- BENEFICIARIES -->
+
+            <div class="kpi-card">
+              <div class="kpi-icon">
+                <i-lucide name="heart-handshake"></i-lucide>
+              </div>
+
+              <div>
+                <div class="kpi-label">Bénéficiaires parrainés</div>
+
+                <div class="kpi-value">
+                  {{ parrainages.length }}
+                </div>
+              </div>
+            </div>
+
+            <!-- CHILDREN -->
+
+            <div class="kpi-card">
+              <div class="kpi-icon">
+                <i-lucide name="baby"></i-lucide>
+              </div>
+
+              <div>
+                <div class="kpi-label">Enfants concernés</div>
+
+                <div class="kpi-value">
+                  {{ totalEnfants }}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- =============================================== -->
+          <!-- EMPTY PARRAINAGE -->
+          <!-- =============================================== -->
+
+          <section
+            *ngIf="parrainages.length === 0"
+            class="main-card section-spacing"
+          >
+            <h2 class="card-title">Parrainage enfant</h2>
+
+            <p class="card-subtitle">
+              Aucun bénéficiaire ne vous est actuellement attribué.
+            </p>
+          </section>
+
+          <!-- =============================================== -->
+          <!-- BENEFICIARIES -->
+          <!-- =============================================== -->
+
+          <div *ngIf="parrainages.length > 0" class="parrainage-grid">
+            <section
+              *ngFor="let beneficiary of parrainages"
+              class="parrainage-card"
+            >
+              <!-- BENEFICIARY HEADER -->
+
+              <div class="parrainage-header">
+                <div>
+                  <h3 class="parrainage-name">
+                    {{ beneficiary.name }}
+
+                    <ng-container *ngIf="beneficiary.lastname">
+                      {{ beneficiary.lastname }}
+                    </ng-container>
+                  </h3>
+
+                  <p class="parrainage-details">
+                    <ng-container *ngIf="beneficiary.gouvernorat">
+                      {{ beneficiary.gouvernorat }}
+                    </ng-container>
+
+                    <ng-container
+                      *ngIf="beneficiary.gouvernorat && beneficiary.phoneNumber"
+                    >
+                      ·
+                    </ng-container>
+
+                    <ng-container *ngIf="beneficiary.phoneNumber">
+                      {{ beneficiary.phoneNumber }}
+                    </ng-container>
+                  </p>
+                </div>
+              </div>
+
+              <!-- ADDRESS -->
+
+              <div
+                *ngIf="beneficiary.address"
+                class="information-box"
+                style="margin-top: 20px"
+              >
+                <span class="information-label"> Adresse </span>
+
+                <span class="information-value">
+                  {{ beneficiary.address }}
+                </span>
+              </div>
+
+              <!-- CHILDREN TITLE -->
+
+              <h4 class="children-title">Enfants</h4>
+
+              <!-- CHILDREN -->
+
+              <ul
+                *ngIf="beneficiary.children && beneficiary.children.length > 0"
+                class="children-list"
+              >
+                <li
+                  *ngFor="let child of beneficiary.children"
+                  class="child-item"
+                >
+                  <span class="child-name">
+                    <i-lucide name="baby" class="child-icon"></i-lucide>
+
+                    {{ child.name }}
+                  </span>
+
+                  <span class="child-age"> {{ child.age }} ans </span>
+                </li>
+              </ul>
+
+              <!-- NO CHILD -->
+
+              <div
+                *ngIf="
+                  !beneficiary.children || beneficiary.children.length === 0
+                "
+                class="empty-table"
+              >
+                Aucun enfant enregistré.
+              </div>
+            </section>
+          </div>
+        </ng-container>
+      </main>
+    </ng-container>
   </div>
 </div>
-
-<app-footer></app-footer>
-
-
