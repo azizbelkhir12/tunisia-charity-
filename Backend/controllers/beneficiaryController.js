@@ -203,45 +203,57 @@ exports.deleteBeneficiary = async (req, res) => {
 exports.submitDocuments = async (req, res) => {
   try {
     const { id } = req.params;
-    const updatedDocuments = {};
 
-    // Imgur URLs from middleware
-    if (req.imgurUrlPersonalPhoto) {
-      updatedDocuments.personalPhoto = req.imgurUrlPersonalPhoto;
-    }
-    if (req.imgurUrlHousePhoto) {
-      updatedDocuments.housePhoto = req.imgurUrlHousePhoto;
+    if (!req.files || req.files.length === 0) {
+      return res.status(400).json({
+        error: 'No documents provided'
+      });
     }
 
-    // Bulletin file info (PDF or image)
-    if (req.files?.bulletin?.[0]) {
-  const bulletinFile = req.files.bulletin[0];
-  updatedDocuments.bulletin = {
-    data: bulletinFile.buffer, // actual file data
-    originalName: bulletinFile.originalname,
-    mimeType: bulletinFile.mimetype,
-    size: bulletinFile.size
-  };
-}
+    let descriptions = req.body.descriptions || [];
 
-    // Update beneficiary documents in DB
+    // If only one description was sent
+    if (!Array.isArray(descriptions)) {
+      descriptions = [descriptions];
+    }
+
+    const documents = req.files.map((file, index) => ({
+      data: file.buffer,
+      originalName: file.originalname,
+      mimeType: file.mimetype,
+      size: file.size,
+      description: descriptions[index] || ''
+    }));
+
     const beneficiary = await Beneficiary.findByIdAndUpdate(
       id,
-      { $set: { documents: updatedDocuments } },
-      { new: true, runValidators: true }
+      {
+        $push: {
+          documents: {
+            $each: documents
+          }
+        }
+      },
+      {
+        new: true,
+        runValidators: true
+      }
     );
 
     if (!beneficiary) {
-      return res.status(404).json({ error: 'Beneficiary not found' });
+      return res.status(404).json({
+        error: 'Beneficiary not found'
+      });
     }
 
     res.status(200).json({
       message: 'Documents uploaded successfully',
-      documents: updatedDocuments,
-      beneficiary
+      documents: beneficiary.documents
     });
+
   } catch (error) {
     console.error('Error uploading documents:', error);
+
     res.status(500).json({
       error: 'Failed to upload documents',
       details: error.message

@@ -268,6 +268,48 @@ exports.searchBeneficiaries = async (req, res) => {
 };
 
 
+exports.markAllNotificationsAsRead = async (req, res) => {
+  try {
+
+    const beneficiary =
+      await Beneficiary.findById(req.params.id);
+
+    if (!beneficiary) {
+      return res.status(404).json({
+        success: false,
+        message: "Beneficiary not found"
+      });
+    }
+
+    await Beneficiary.findByIdAndUpdate(
+      req.params.id,
+      {
+        $addToSet: {
+          readNotifications: {
+            $each: beneficiary.notifications
+          }
+        }
+      }
+    );
+
+    return res.status(200).json({
+      success: true,
+      message:
+        "Toutes les notifications ont été marquées comme lues"
+    });
+
+  } catch (error) {
+
+    console.error(error);
+
+    return res.status(500).json({
+      success: false,
+      message: error.message
+    });
+  }
+};
+
+
 
 exports.emailBeneficiary = async (req, res) => {
   const { email, broadcast } = req.body;

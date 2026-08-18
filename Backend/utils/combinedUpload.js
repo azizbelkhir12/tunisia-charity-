@@ -5,22 +5,20 @@ const upload = require('./upload');
 
 const combinedUpload = multer({
   storage: multer.memoryStorage(),
+
   fileFilter: (req, file, cb) => {
-    if (['personalPhoto', 'housePhoto'].includes(file.fieldname)) {
+    // Images
+    if (file.mimetype.startsWith('image/')) {
       return uploadImage.fileFilter(req, file, cb);
     }
-    if (file.fieldname === 'bulletin') {
-      return upload.fileFilter(req, file, cb);
-    }
-    cb(new Error('Champ de fichier inattendu'));
+
+    // Other authorized documents: PDF, etc.
+    return upload.fileFilter(req, file, cb);
   },
+
   limits: {
-    fileSize: 5 * 1024 * 1024 // 5MB
+    fileSize: 5 * 1024 * 1024 // 5 MB per file
   }
-}).fields([
-  { name: 'personalPhoto', maxCount: 1 },
-  { name: 'housePhoto', maxCount: 1 },
-  { name: 'bulletin', maxCount: 1 }
-]);
+}).array('documents', 20); // Maximum 20 files
 
 module.exports = combinedUpload;

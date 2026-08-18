@@ -69,7 +69,14 @@ import {
   History,
   HandCoins,
   Baby,
-  Pencil
+  Pencil,
+  FolderUp,
+  Camera,
+  Save,
+  Megaphone,
+  BellOff,
+  CircleCheck,
+  Upload
 } from 'lucide-angular';
 
 import { AppComponent } from './app.component';
@@ -251,7 +258,14 @@ export function HttpLoaderFactory(http: HttpClient) {
       HandCoins,
       History,
       Baby,
-      Pencil
+      Pencil,
+      FolderUp,
+      Camera,
+      Save,
+      Megaphone,
+      BellOff,
+      CircleCheck,
+      Upload,
     }),
     TranslateModule.forRoot({
       loader: {
