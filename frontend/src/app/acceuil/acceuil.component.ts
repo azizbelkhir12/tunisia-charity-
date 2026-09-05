@@ -3,6 +3,7 @@ import {
   ChangeDetectorRef,
   Component,
   ElementRef,
+  HostListener,
   OnDestroy,
   QueryList,
   ViewChildren,
@@ -68,6 +69,14 @@ type Project = {
   progress: number;
 };
 
+type Lang = 'fr' | 'en' | 'ar';
+
+type Language = {
+  code: Lang;
+  label: string;
+  short: string;
+};
+
 
 
 @Component({
@@ -79,7 +88,7 @@ type Project = {
 export class AcceuilComponent implements AfterViewInit, OnDestroy {
   @ViewChildren('statCard') statCards!: QueryList<ElementRef<HTMLElement>>;
 
-  readonly currentYear = new Date().getFullYear();
+ readonly currentYear = new Date().getFullYear();
   readonly heroImg = 'assets/children.png';
   readonly actionFood = 'assets/aboutf.jpg';
   readonly actionEducation = 'assets/educatif.jpg';
@@ -169,6 +178,15 @@ export class AcceuilComponent implements AfterViewInit, OnDestroy {
   projects: Project[] = [];
   readonly socialIcons = ['facebook', 'instagram', 'twitter'];
 
+  readonly languages: Language[] = [
+    { code: 'fr', label: 'Français', short: 'FR' },
+    { code: 'en', label: 'English', short: 'EN' },
+    { code: 'ar', label: 'العربية', short: 'AR' },
+  ];
+  currentLang: Lang = 'fr';
+  languageOpen = false;
+  private readonly LANG_KEY = 'tc-lang';
+
   isSubmittingContact = false;
   isLoadingStats = false;
   open = false;
@@ -195,6 +213,13 @@ export class AcceuilComponent implements AfterViewInit, OnDestroy {
   }
 
    ngOnInit(): void {
+    const savedLang = window.localStorage.getItem(this.LANG_KEY) as Lang | null;
+
+    if (savedLang && this.languages.some((language) => language.code === savedLang)) {
+      this.currentLang = savedLang;
+    }
+
+    this.applyDocumentLanguage();
     this.loadStats();
   }
 
@@ -239,6 +264,42 @@ export class AcceuilComponent implements AfterViewInit, OnDestroy {
 
   toggleMenu(): void {
     this.open = !this.open;
+  }
+
+  get currentLanguage(): Language {
+    return (
+      this.languages.find((language) => language.code === this.currentLang) ??
+      this.languages[0]
+    );
+  }
+
+  toggleLanguageMenu(): void {
+    this.languageOpen = !this.languageOpen;
+  }
+
+  selectLanguage(lang: Lang): void {
+    this.currentLang = lang;
+    this.languageOpen = false;
+    window.localStorage.setItem(this.LANG_KEY, lang);
+    this.applyDocumentLanguage();
+  }
+
+  private applyDocumentLanguage(): void {
+    document.documentElement.lang = this.currentLang;
+    document.documentElement.dir = this.currentLang === 'ar' ? 'rtl' : 'ltr';
+  }
+
+  @HostListener('document:mousedown', ['$event'])
+  onLanguageOutsideClick(event: MouseEvent): void {
+    const target = event.target as Element | null;
+
+    if (
+      this.languageOpen &&
+      target &&
+      !target.closest('.language-switcher')
+    ) {
+      this.languageOpen = false;
+    }
   }
 
   private loadStats(): void {

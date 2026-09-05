@@ -76,7 +76,11 @@ import {
   Megaphone,
   BellOff,
   CircleCheck,
-  Upload
+  Upload,
+  Receipt,
+  CheckCircle2,
+  AlertCircle,
+  Globe
 } from 'lucide-angular';
 
 import { AppComponent } from './app.component';
@@ -266,6 +270,10 @@ export function HttpLoaderFactory(http: HttpClient) {
       BellOff,
       CircleCheck,
       Upload,
+      Receipt,
+      CheckCircle2,
+      AlertCircle,
+      Globe,
     }),
     TranslateModule.forRoot({
       loader: {

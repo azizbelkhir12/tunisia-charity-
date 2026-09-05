@@ -249,8 +249,6 @@ export class BeneficiaireCompteComponent implements OnInit {
       .getNotificationById(this.beneficiaireId)
       .subscribe({
         next: (response: any) => {
-          console.log('Réponse notifications :', response);
-
           const notifications =
             response?.data?.notifications ||
             response?.notifications ||

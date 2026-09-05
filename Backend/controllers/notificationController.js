@@ -1,67 +1,126 @@
 const Notification = require('../models/Notification');
 const Beneficiary = require('../models/Beneficiary');
+const Volunteer = require('../models/Volunteer');
 const nodemailer = require('nodemailer');
+const mongoose = require('mongoose');
 
 // Send notification to beneficiary
 exports.sendNotification = async (req, res) => {
     try {
-        const { idBeneficiaire, titre, contenu } = req.body;
+        const { id, titre, contenu } = req.body;
 
         // Validate input
-        if (!idBeneficiaire || !titre || !contenu) {
-            return res.status(400).json({ 
+        if (!id || !titre || !contenu) {
+            return res.status(400).json({
                 success: false,
-                message: 'All fields are required' 
+                message: "All fields are required"
             });
         }
 
-        // Check if beneficiary exists
-        const beneficiary = await Beneficiary.findById(idBeneficiaire);
-        if (!beneficiary) {
-            return res.status(404).json({ 
+        // Validate MongoDB ObjectId
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).json({
                 success: false,
-                message: 'Beneficiary not found' 
+                message: "Invalid user ID"
             });
         }
 
-        // Create and save notification
-        const notification = new Notification({
-            idBeneficiaire,
-            titre,
-            contenu,
-            dateEnvoi: new Date()
-        });
+        /*
+         * 1. Check if the ID belongs to a Beneficiary
+         */
+        const beneficiary = await Beneficiary.findById(id);
 
-        const savedNotification = await notification.save();
+        if (beneficiary) {
 
-        // Add notification to beneficiary's notifications array
-        beneficiary.notifications.push(savedNotification._id);
-        await beneficiary.save();
+            const notification = new Notification({
+                idBeneficiaire: beneficiary._id,
+                idVolunteer: null,
+                titre,
+                contenu,
+                dateEnvoi: new Date()
+            });
 
-        res.status(201).json({
-            success: true,
-            message: 'Notification sent successfully',
-            data: {
-                notification: savedNotification,
-                beneficiary: {
-                    id: beneficiary._id,
-                    name: beneficiary.name,
-                    lastname: beneficiary.lastname,
-                    email: beneficiary.email
+            const savedNotification = await notification.save();
+
+            // Add notification reference to beneficiary
+            beneficiary.notifications.push(savedNotification._id);
+            await beneficiary.save();
+
+            return res.status(201).json({
+                success: true,
+                message: "Notification sent successfully",
+                userType: "beneficiary",
+
+                data: {
+                    notification: savedNotification,
+
+                    user: {
+                        id: beneficiary._id,
+                        name: beneficiary.name,
+                        lastname: beneficiary.lastname,
+                        email: beneficiary.email
+                    }
                 }
-            }
+            });
+        }
+
+        /*
+         * 2. Check if the ID belongs to a Volunteer
+         */
+        const volunteer = await Volunteer.findById(id);
+
+        if (volunteer) {
+
+            const notification = new Notification({
+                idBeneficiaire: null,
+                idVolunteer: volunteer._id,
+                titre,
+                contenu,
+                dateEnvoi: new Date()
+            });
+
+            const savedNotification = await notification.save();
+
+            // Add notification reference to volunteer
+            volunteer.notifications.push(savedNotification._id);
+            await volunteer.save();
+
+            return res.status(201).json({
+                success: true,
+                message: "Notification sent successfully",
+                userType: "volunteer",
+
+                data: {
+                    notification: savedNotification,
+
+                    user: {
+                        id: volunteer._id,
+                        name: volunteer.name,
+                        lastName: volunteer.lastName,
+                        email: volunteer.email
+                    }
+                }
+            });
+        }
+
+        /*
+         * 3. ID doesn't belong to anyone
+         */
+        return res.status(404).json({
+            success: false,
+            message: "Beneficiary or Volunteer not found"
         });
 
     } catch (error) {
-        console.error('Error sending notification:', error);
-        res.status(500).json({ 
+        console.error("Error sending notification:", error);
+
+        return res.status(500).json({
             success: false,
-            message: 'Error sending notification',
+            message: "Error sending notification",
             error: error.message
         });
     }
 };
-
 
 exports.broadcastNotification = async (req, res) => {
     try {
@@ -149,49 +208,83 @@ exports.getAllNotifications = async (req, res) => {
 };
 
 // Get all notifications for admin
-exports.getNotificationsByBeneficiaryId = async (req, res) => {
+exports.getNotificationsByUserId = async (req, res) => {
     try {
         const { id } = req.params;
 
-        // Validate the ID parameter
         if (!id) {
             return res.status(400).json({
                 success: false,
-                message: 'Beneficiary ID is required'
+                message: "User ID is required"
             });
         }
 
-        // Check if beneficiary exists
-        const beneficiaryExists = await Beneficiary.findById(id);
-        if (!beneficiaryExists) {
-            return res.status(404).json({
-                success: false,
-                message: 'Beneficiary not found'
+        /*
+         * 1. Check if ID belongs to a Beneficiary
+         */
+        const beneficiary = await Beneficiary.findById(id);
+
+        if (beneficiary) {
+            const notifications = await Notification.find({
+                idBeneficiaire: id
+            })
+                .populate(
+                    "idBeneficiaire",
+                    "name lastname email phoneNumber"
+                )
+                .sort({ dateEnvoi: -1 });
+
+            return res.status(200).json({
+                success: true,
+                userType: "beneficiary",
+                count: notifications.length,
+                user: {
+                    id: beneficiary._id,
+                    name: beneficiary.name,
+                    lastname: beneficiary.lastname,
+                    email: beneficiary.email
+                },
+                notifications
             });
         }
 
-        // Get notifications for the specific beneficiary
-        const notifications = await Notification.find({ idBeneficiaire: id })
-            .populate('idBeneficiaire', 'name lastname email phoneNumber')
-            .sort({ dateEnvoi: -1 });
+        /*
+         * 2. Check if ID belongs to a Volunteer
+         */
+        const volunteer = await Volunteer.findById(id)
+            .populate({
+                path: "notifications",
+                options: {
+                    sort: { dateEnvoi: -1 }
+                }
+            });
 
-        res.status(200).json({
-            success: true,
-            count: notifications.length,
-            beneficiary: {
-                id: beneficiaryExists._id,
-                name: beneficiaryExists.name,
-                lastname: beneficiaryExists.lastname,
-                email: beneficiaryExists.email
-            },
-            notifications: notifications
+        if (volunteer) {
+            return res.status(200).json({
+                success: true,
+                userType: "volunteer",
+                count: volunteer.notifications.length,
+                user: {
+                    id: volunteer._id,
+                    name: volunteer.name,
+                    lastName: volunteer.lastName,
+                    email: volunteer.email
+                },
+                notifications: volunteer.notifications
+            });
+        }
+
+        return res.status(404).json({
+            success: false,
+            message: "Beneficiary or Volunteer not found"
         });
 
     } catch (error) {
-        console.error('Error fetching notifications by beneficiary ID:', error);
-        res.status(500).json({ 
+        console.error("Error fetching notifications:", error);
+
+        return res.status(500).json({
             success: false,
-            message: 'Error fetching notifications',
+            message: "Error fetching notifications",
             error: error.message
         });
     }
@@ -270,37 +363,64 @@ exports.searchBeneficiaries = async (req, res) => {
 
 exports.markAllNotificationsAsRead = async (req, res) => {
   try {
+    const { id } = req.params;
 
-    const beneficiary =
-      await Beneficiary.findById(req.params.id);
-
-    if (!beneficiary) {
-      return res.status(404).json({
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({
         success: false,
-        message: "Beneficiary not found"
+        message: "Invalid user ID"
       });
     }
 
-    await Beneficiary.findByIdAndUpdate(
-      req.params.id,
-      {
-        $addToSet: {
-          readNotifications: {
-            $each: beneficiary.notifications
+    const beneficiary = await Beneficiary.findById(id);
+
+    if (beneficiary) {
+      await Beneficiary.findByIdAndUpdate(
+        id,
+        {
+          $addToSet: {
+            readNotifications: {
+              $each: beneficiary.notifications
+            }
           }
         }
-      }
-    );
+      );
 
-    return res.status(200).json({
-      success: true,
-      message:
-        "Toutes les notifications ont été marquées comme lues"
+      return res.status(200).json({
+        success: true,
+        userType: "beneficiary",
+        message: "Toutes les notifications ont été marquées comme lues"
+      });
+    }
+
+    const volunteer = await Volunteer.findById(id);
+
+    if (volunteer) {
+      await Volunteer.findByIdAndUpdate(
+        id,
+        {
+          $addToSet: {
+            readNotifications: {
+              $each: volunteer.notifications
+            }
+          }
+        }
+      );
+
+      return res.status(200).json({
+        success: true,
+        userType: "volunteer",
+        message: "Toutes les notifications ont été marquées comme lues"
+      });
+    }
+
+    return res.status(404).json({
+      success: false,
+      message: "Beneficiary or Volunteer not found"
     });
 
   } catch (error) {
-
-    console.error(error);
+    console.error("Error marking notifications as read:", error);
 
     return res.status(500).json({
       success: false,
@@ -308,7 +428,6 @@ exports.markAllNotificationsAsRead = async (req, res) => {
     });
   }
 };
-
 
 
 exports.emailBeneficiary = async (req, res) => {

@@ -77,6 +77,53 @@
     <i-lucide name="heart" class="w-4 h-4" fill="currentColor"></i-lucide>
     Faire un don
   </a>
+
+  <div class="language-switcher relative">
+    <button
+      type="button"
+      (click)="toggleLanguageMenu()"
+      aria-label="Changer la langue"
+      aria-haspopup="listbox"
+      [attr.aria-expanded]="languageOpen"
+      class="inline-flex items-center gap-1.5 rounded-full border border-border px-3 py-2 text-sm font-medium text-foreground/80 hover:text-primary hover:border-primary transition"
+    >
+      <i-lucide name="globe" class="w-4 h-4"></i-lucide>
+      {{ currentLanguage.short }}
+      <i-lucide
+        name="chevron-down"
+        class="w-3.5 h-3.5 transition-transform"
+        [class.rotate-180]="languageOpen"
+      ></i-lucide>
+    </button>
+
+    <ul
+      *ngIf="languageOpen"
+      role="listbox"
+      class="absolute right-0 mt-2 w-40 rounded-xl border border-border bg-card shadow-lg p-1 z-50"
+    >
+      <li *ngFor="let language of languages">
+        <button
+          type="button"
+          role="option"
+          [attr.aria-selected]="currentLang === language.code"
+          (click)="selectLanguage(language.code)"
+          class="w-full flex items-center justify-between rounded-lg px-3 py-2 text-sm hover:bg-muted transition"
+          [ngClass]="
+            currentLang === language.code
+              ? 'text-primary font-semibold'
+              : 'text-foreground'
+          "
+        >
+          {{ language.label }}
+          <i-lucide
+            *ngIf="currentLang === language.code"
+            name="check"
+            class="w-4 h-4"
+          ></i-lucide>
+        </button>
+      </li>
+    </ul>
+  </div>
 </div>
       <button
         type="button"
@@ -152,6 +199,29 @@
     S'inscrire
   </a>
 </div>
+
+        <div class="language-switcher pt-3 mt-1 border-t border-border flex items-center justify-between">
+          <span class="text-sm text-muted-foreground inline-flex items-center gap-2">
+            <i-lucide name="globe" class="w-4 h-4"></i-lucide>
+            Langue
+          </span>
+
+          <div class="flex items-center gap-2">
+            <button
+              *ngFor="let language of languages"
+              type="button"
+              (click)="selectLanguage(language.code)"
+              class="rounded-full px-3 py-1.5 text-xs font-semibold border transition"
+              [ngClass]="
+                currentLang === language.code
+                  ? 'bg-primary text-primary-foreground border-primary'
+                  : 'border-border text-foreground/80 hover:border-primary hover:text-primary'
+              "
+            >
+              {{ language.short }}
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   </header>

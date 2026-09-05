@@ -17,8 +17,8 @@ export class NotificationService {
     return this.http.post<any>(`${this.apiUrl}/sendmultiple`, notificationData);
   }
 
-  getNotificationById(beneficiaryId: string): Observable<any> {
-    return this.http.get(`${this.apiUrl}/getbeneficiary/${beneficiaryId}`);
+  getNotificationById(Id: string): Observable<any> {
+    return this.http.get(`${this.apiUrl}/getNotifications/${Id}`);
   }
 
   getNotificationStats(): Observable<any> {
@@ -33,13 +33,7 @@ export class NotificationService {
     return this.http.put(`${this.apiUrl}/${beneficiaryId}/read-all`, {});
   }
 
-  sendEmailNotification(
-    email: string,
-    broadcast: boolean = false,
-  ): Observable<any> {
-    return this.http.post(`${this.apiUrl}/emailBeneficiary`, {
-      email,
-      broadcast,
-    });
+  sendEmailNotification(email: string,broadcast: boolean = false,): Observable<any> {
+    return this.http.post(`${this.apiUrl}/emailBeneficiary`, {email, broadcast, });
   }
 }

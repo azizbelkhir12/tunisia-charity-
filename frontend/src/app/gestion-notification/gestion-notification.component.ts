@@ -170,7 +170,11 @@ export class GestionNotificationComponent {
       )
       .subscribe({
         next: (res: any) => {
-          const beneficiaires = this.getArray(res.beneficiaires, ['beneficiaires','beneficiaries','data',]);
+          const beneficiaires = this.getArray(res.beneficiaires, [
+            'beneficiaires',
+            'beneficiaries',
+            'data',
+          ]);
 
           const beneficiaryMembers: Member[] = beneficiaires.map((b: any) => {
             const prenom = b.Prenom || b.prenom || b.firstName || '';
@@ -248,7 +252,10 @@ export class GestionNotificationComponent {
           ].filter((member) => !!member.id);
 
           this.totalMembers = this.members.length;
-          this.notifications = this.getArray(res.notifications, ['notifications','data',]);
+          this.notifications = this.getArray(res.notifications, [
+            'notifications',
+            'data',
+          ]);
 
           const stats = res.stats?.data || res.stats || {};
 
@@ -298,9 +305,6 @@ export class GestionNotificationComponent {
     return [];
   }
 
-  // ============================================================
-  // FILTER MEMBERS
-  // ============================================================
 
   get filteredMembers(): Member[] {
     const search = this.q.trim().toLowerCase();
@@ -322,9 +326,6 @@ export class GestionNotificationComponent {
     });
   }
 
-  // ============================================================
-  // TARGET COUNT
-  // ============================================================
 
   get targetCount(): number {
     if (this.type === 'broadcast') {
@@ -334,17 +335,11 @@ export class GestionNotificationComponent {
     return this.selected.length;
   }
 
-  // ============================================================
-  // VIEW
-  // ============================================================
-
+ 
   changeView(view: ViewType): void {
     this.view = view;
   }
 
-  // ============================================================
-  // TYPE
-  // ============================================================
 
   changeType(type: NotifType): void {
     this.type = type;
@@ -354,10 +349,7 @@ export class GestionNotificationComponent {
     this.errors = {};
   }
 
-  // ============================================================
-  // SELECTION
-  // ============================================================
-
+  
   toggleMember(member: Member): void {
     if (this.type === 'monocast') {
       this.selected = [member.id];
@@ -382,10 +374,7 @@ export class GestionNotificationComponent {
     return this.selected.includes(id);
   }
 
-  // ============================================================
-  // VALIDATION
-  // ============================================================
-
+  
   validate(): boolean {
     const errors: Record<string, string> = {};
 
@@ -410,10 +399,7 @@ export class GestionNotificationComponent {
     return Object.keys(errors).length === 0;
   }
 
-  // ============================================================
-  // SEND
-  // ============================================================
-
+  
   submit(): void {
     if (!this.validate()) {
       return;
@@ -465,10 +451,8 @@ export class GestionNotificationComponent {
 
       const notificationData = {
         titre: this.titre.trim(),
-
         contenu: this.contenu.trim(),
-
-        idBeneficiaire: memberId,
+        id: memberId,
       };
 
       this.notificationService.sendNotification(notificationData).subscribe({
@@ -499,10 +483,8 @@ export class GestionNotificationComponent {
     const requests = this.selected.map((id) => {
       const notificationData = {
         titre: this.titre.trim(),
-
         contenu: this.contenu.trim(),
-
-        idBeneficiaire: id,
+        id: id,
       };
 
       return this.notificationService.sendNotification(notificationData);
@@ -557,10 +539,7 @@ export class GestionNotificationComponent {
     }, 3500);
   }
 
-  // ============================================================
-  // RELOAD NOTIFICATIONS
-  // ============================================================
-
+ 
   loadNotifications(): void {
     this.notificationService.getAllNotifications().subscribe({
       next: (response: any) => {
@@ -575,10 +554,7 @@ export class GestionNotificationComponent {
     });
   }
 
-  // ============================================================
-  // BENEFICIARY NAME
-  // ============================================================
-
+ 
   getBeneficiaryName(notification: NotificationItem): string {
     if (!notification.idBeneficiaire) {
       return '-';
@@ -604,10 +580,7 @@ export class GestionNotificationComponent {
     return beneficiary?.nom || 'Bénéficiaire';
   }
 
-  // ============================================================
-  // BENEFICIARY EMAIL
-  // ============================================================
-
+  
   getBeneficiaryEmail(notification: NotificationItem): string {
     if (!notification.idBeneficiaire) {
       return '';
@@ -624,10 +597,7 @@ export class GestionNotificationComponent {
     return beneficiary?.email || '';
   }
 
-  // ============================================================
-  // DATE
-  // ============================================================
-
+ 
   formatDate(date: string): string {
     if (!date) {
       return '-';

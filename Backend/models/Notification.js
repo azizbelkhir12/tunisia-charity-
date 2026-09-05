@@ -1,27 +1,39 @@
 const mongoose = require('mongoose');
 
 const notificationSchema = new mongoose.Schema({
-    titre: { 
-        type: String, 
-        required: true 
+
+    titre: {
+        type: String,
+        required: true
     },
-    contenu: { 
-        type: String, 
-        required: true 
+
+    contenu: {
+        type: String,
+        required: true
     },
-    idBeneficiaire: { 
-        type: mongoose.Schema.Types.ObjectId, 
-        ref: 'Beneficiary', 
-        required: true 
+
+    idBeneficiaire: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Beneficiary',
+        default: null
     },
-    dateEnvoi: { 
-        type: Date, 
-        default: Date.now 
+
+    idVolunteer: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Volunteer',
+        default: null
     },
-    lu: { 
-        type: Boolean, 
-        default: false 
+
+    dateEnvoi: {
+        type: Date,
+        default: Date.now
+    },
+
+    lu: {
+        type: Boolean,
+        default: false
     }
+
 });
 
 module.exports = mongoose.model('Notification', notificationSchema);

@@ -336,3 +336,84 @@ i-lucide {
     font-size: 2.7rem;
   }
 }
+
+/* ========================================
+   LANGUAGE SWITCHER
+   Added only for the FR / EN / AR selector
+======================================== */
+
+.gap-1\.5 {
+  gap: 0.375rem;
+}
+
+.w-3\.5 {
+  width: 0.875rem;
+}
+
+.h-3\.5 {
+  height: 0.875rem;
+}
+
+.right-0 {
+  right: 0;
+}
+
+.pt-3 {
+  padding-top: 0.75rem;
+}
+
+.rounded-lg {
+  border-radius: 0.5rem;
+}
+
+.border-primary {
+  border-color: var(--primary);
+}
+
+.text-foreground {
+  color: var(--foreground);
+}
+
+.shadow-lg {
+  box-shadow: 0 10px 30px rgba(24, 48, 40, 0.12);
+}
+
+.transition-transform {
+  transition: transform 180ms ease;
+}
+
+.rotate-180 {
+  transform: rotate(180deg);
+}
+
+.hover\:border-primary:hover {
+  border-color: var(--primary);
+}
+
+.language-switcher {
+  position: relative;
+}
+
+.language-switcher > button {
+  background: transparent;
+}
+
+.language-switcher ul {
+  min-width: 10rem;
+}
+
+.language-switcher ul button {
+  background: transparent;
+  color: inherit;
+  text-align: left;
+}
+
+.language-switcher ul button:hover {
+  background: var(--muted);
+}
+
+[dir="rtl"] .language-switcher ul {
+  right: auto;
+  left: 0;
+}
+

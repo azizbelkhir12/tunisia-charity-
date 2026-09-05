@@ -5,7 +5,7 @@ import { DemandeService } from '../services/demande/demande.service';
 
 import * as XLSX from 'xlsx';
 import jsPDF from 'jspdf';
-import autoTable from 'jspdf-autotable';
+import { autoTable } from 'jspdf-autotable';
 
 type VolunteerStatus = 'active' | 'inactive';
 type VolunteerView = 'list' | 'requests';

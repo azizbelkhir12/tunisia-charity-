@@ -1,59 +1,875 @@
-<app-nav-bar-membre></app-nav-bar-membre>
+<div class="benevole-layout">
+  <!-- ======================================================
+       SIDEBAR
+  ======================================================= -->
 
-<div class="dashboard-container">
-  <!-- En-tête -->
-  <div class="dashboard-header" *ngIf="benevole">
-    <h4 class="dashboard-title">
-      Bienvenue, {{ benevole.name }} dans votre Espace Bénévole 👋
-    </h4>
-  </div>
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <img src="assets/logo2.png" alt="Tunisia Charity" class="sidebar-logo" />
 
-  <!-- Cartes -->
-  <div class="cards-container">
-    <!-- Profil -->
-    <div class="dashboard-card" [class.active]="activeSection === 'profil'" (click)="showSection('profil')">
-      <div class="card-icon-bg">
-        <i class="fas fa-user-edit icon"></i>
+      <div class="sidebar-brand">
+        <div class="sidebar-title">Tunisia Charity</div>
+
+        <div class="sidebar-subtitle">Espace bénévole</div>
       </div>
-      <h3>Mon Profil</h3>
-      <p>Modifier mes informations</p>
     </div>
 
-    <!-- Abonnement -->
-    <div class="dashboard-card" [class.active]="activeSection === 'abonnement'" (click)="showSection('abonnement')">
-      <div class="card-icon-bg">
-        <i class="fas fa-credit-card icon"></i>
+    <!-- Navigation -->
+
+    <nav class="sidebar-navigation">
+      <button
+        *ngFor="let item of navigationItems"
+        type="button"
+        class="navigation-link"
+        [class.active]="activeTab === item.id"
+        (click)="selectTab(item.id)"
+      >
+        <i-lucide [name]="item.icon" class="navigation-icon"></i-lucide>
+
+        <span class="navigation-label">
+          {{ item.label }}
+        </span>
+
+        <span
+          *ngIf="item.id === 'notifications' && unreadNotificationsCount > 0"
+          class="notification-count"
+          [class.active-count]="activeTab === 'notifications'"
+        >
+          {{ unreadNotificationsCount }}
+        </span>
+      </button>
+    </nav>
+
+    <!-- Logout -->
+
+    <div class="sidebar-footer">
+      <a routerLink="/" class="logout-link">
+        <i-lucide name="log-out" class="navigation-icon"></i-lucide>
+
+        <span> Se déconnecter </span>
+      </a>
+    </div>
+  </aside>
+
+  <!-- ======================================================
+       PAGE
+  ======================================================= -->
+
+  <div class="page-container">
+    <!-- ====================================================
+         HEADER
+    ===================================================== -->
+
+    <header class="page-header">
+      <div>
+        <h1 class="welcome-title">
+          Bonjour
+          {{ profile.prenom || "Bénévole" }}
+          👋
+        </h1>
+
+        <p class="welcome-subtitle">
+          Compte bénévole
+
+          <ng-container *ngIf="profile.equipe">
+            · {{ profile.equipe }}
+          </ng-container>
+        </p>
       </div>
-      <h3>Abonnement</h3>
-      <p>Payer / Renouveler</p>
+
+      <!-- Header avatar initials -->
+
+      <div *ngIf="!profile.photo" class="avatar avatar-header">
+        {{ getInitials(profile) }}
+      </div>
+
+      <!-- Header avatar photo -->
+
+      <img
+        *ngIf="profile.photo"
+        [src]="profile.photo"
+        [alt]="profile.prenom + ' ' + profile.nom"
+        class="avatar avatar-header avatar-image"
+      />
+    </header>
+
+    <!-- ====================================================
+         MOBILE NAVIGATION
+    ===================================================== -->
+
+    <div class="mobile-navigation">
+      <button
+        *ngFor="let item of navigationItems"
+        type="button"
+        class="mobile-navigation-button"
+        [class.active]="activeTab === item.id"
+        (click)="selectTab(item.id)"
+      >
+        {{ item.label }}
+
+        <span
+          *ngIf="item.id === 'notifications' && unreadNotificationsCount > 0"
+          class="mobile-count"
+        >
+          {{ unreadNotificationsCount }}
+        </span>
+      </button>
     </div>
 
-    <!-- Historique Paiements -->
-    <div class="dashboard-card" [class.active]="activeSection === 'historique'" (click)="showSection('historique')">
-      <div class="card-icon-bg">
-        <i class="fas fa-history icon"></i>
-      </div>
-      <h3>Historique</h3>
-      <p>Mes paiements</p>
-    </div>
+    <!-- ====================================================
+         MAIN CONTENT
+    ===================================================== -->
 
-    <!-- Chat -->
-    <div class="dashboard-card" [class.active]="activeSection === 'chat'" (click)="showSection('chat')">
-      <div class="card-icon-bg">
-        <i class="fas fa-comments icon"></i>
-      </div>
-      <h3>Messagerie</h3>
-      <p>Contacter l'admin</p>
-    </div>
-  </div>
+    <main class="main-content">
+      <!-- ==================================================
+           1. PROFILE
+      =================================================== -->
 
-  <!-- Section dynamique -->
-  <div class="content-section">
-    <app-profil-benevole *ngIf="activeSection === 'profil'"></app-profil-benevole>
-    <app-abonnement-benevole *ngIf="activeSection === 'abonnement'"></app-abonnement-benevole>
-    <app-historique-paiements-benevoles *ngIf="activeSection === 'historique'"></app-historique-paiements-benevoles>
-    <app-chat-admin *ngIf="activeSection === 'chat'"></app-chat-admin>
+      <section *ngIf="activeTab === 'profil'" class="content-card">
+        <!-- Header -->
+
+        <div class="section-header">
+          <div>
+            <h2 class="section-title">Mon profil</h2>
+
+            <p class="section-description">Vos informations de bénévole.</p>
+          </div>
+
+          <button
+            *ngIf="!profileEditing && !volunteerLoading && !volunteerLoadError"
+            type="button"
+            class="primary-button"
+            (click)="startProfileEdit()"
+          >
+            <i-lucide name="pencil" class="button-icon"></i-lucide>
+
+            Modifier mes informations
+          </button>
+        </div>
+
+        <!-- =================================================
+             PROFILE LOADING
+        ================================================== -->
+
+        <div *ngIf="volunteerLoading" class="loading-state">
+          Chargement de votre profil...
+        </div>
+
+        <!-- =================================================
+             PROFILE LOAD ERROR
+        ================================================== -->
+
+        <div
+          *ngIf="volunteerLoadError && !volunteerLoading"
+          class="error-message"
+        >
+          {{ volunteerLoadError }}
+        </div>
+
+        <!-- =================================================
+             PROFILE CONTENT
+        ================================================== -->
+
+        <ng-container *ngIf="!volunteerLoading && !volunteerLoadError">
+          <!-- ===============================================
+               SUCCESS
+          ================================================ -->
+
+          <div *ngIf="profileSaved && !profileEditing" class="success-message">
+            <i-lucide name="check-circle-2" class="message-icon"></i-lucide>
+
+            Vos informations ont été mises à jour.
+          </div>
+
+          <!-- ===============================================
+               PROFILE EDIT FORM
+          ================================================ -->
+
+          <form
+            *ngIf="profileEditing"
+            class="profile-form"
+            (ngSubmit)="saveProfile()"
+            novalidate
+          >
+            <!-- =============================================
+                 PHOTO
+            ============================================== -->
+
+            <div class="photo-edit-section">
+              <!-- Initials -->
+
+              <div *ngIf="!profileDraft.photo" class="avatar avatar-profile">
+                {{ getInitials(profileDraft) }}
+              </div>
+
+              <!-- Photo -->
+
+              <img
+                *ngIf="profileDraft.photo"
+                [src]="profileDraft.photo"
+                [alt]="profileDraft.prenom + ' ' + profileDraft.nom"
+                class="avatar avatar-profile avatar-image"
+              />
+
+              <!-- Photo controls -->
+
+              <div class="photo-buttons">
+                <input
+                  #photoInput
+                  type="file"
+                  accept="image/png,image/jpeg"
+                  class="hidden-input"
+                  (change)="onPhotoSelected($event)"
+                />
+
+                <div>
+                  <button
+                    type="button"
+                    class="secondary-button"
+                    (click)="photoInput.click()"
+                  >
+                    <i-lucide name="camera" class="button-icon"></i-lucide>
+
+                    Changer la photo
+                  </button>
+
+                  <button
+                    *ngIf="profileDraft.photo"
+                    type="button"
+                    class="remove-photo-button"
+                    (click)="removePhoto()"
+                  >
+                    Retirer
+                  </button>
+                </div>
+
+                <p class="photo-help">JPG ou PNG, 2 Mo maximum.</p>
+              </div>
+            </div>
+
+            <!-- =============================================
+                 FORM FIELDS
+            ============================================== -->
+
+            <div class="form-grid">
+              <!-- Nom -->
+
+              <label class="form-field">
+                <span> Nom </span>
+
+                <input
+                  type="text"
+                  name="nom"
+                  [(ngModel)]="profileDraft.nom"
+                  class="form-control"
+                  autocomplete="family-name"
+                />
+              </label>
+
+              <!-- Prénom -->
+
+              <label class="form-field">
+                <span> Prénom </span>
+
+                <input
+                  type="text"
+                  name="prenom"
+                  [(ngModel)]="profileDraft.prenom"
+                  class="form-control"
+                  autocomplete="given-name"
+                />
+              </label>
+
+              <!-- Email -->
+
+              <label class="form-field">
+                <span> Email </span>
+
+                <input
+                  type="email"
+                  name="email"
+                  [(ngModel)]="profileDraft.email"
+                  class="form-control"
+                  autocomplete="email"
+                />
+              </label>
+
+              <!-- Téléphone -->
+
+              <label class="form-field">
+                <span> Téléphone </span>
+
+                <input
+                  type="tel"
+                  name="telephone"
+                  [(ngModel)]="profileDraft.telephone"
+                  class="form-control"
+                  autocomplete="tel"
+                />
+              </label>
+
+              <!-- Gouvernorat -->
+
+              <label class="form-field">
+                <span> Gouvernorat </span>
+
+                <select
+                  name="gouvernorat"
+                  [(ngModel)]="profileDraft.gouvernorat"
+                  class="form-control"
+                >
+                  <option value="" disabled>Sélectionnez un gouvernorat</option>
+
+                  <option
+                    *ngFor="let gouvernorat of gouvernorats"
+                    [value]="gouvernorat"
+                  >
+                    {{ gouvernorat }}
+                  </option>
+                </select>
+              </label>
+
+              <!-- Équipe -->
+
+              <label class="form-field">
+                <span> Équipe </span>
+
+                <select
+                  name="equipe"
+                  [(ngModel)]="profileDraft.equipe"
+                  class="form-control"
+                >
+                  <option value="" disabled>Sélectionnez une équipe</option>
+
+                  <option *ngFor="let equipe of equipes" [value]="equipe">
+                    {{ equipe }}
+                  </option>
+                </select>
+              </label>
+
+              <!-- Adresse -->
+
+              <label class="form-field full-width">
+                <span> Adresse </span>
+
+                <input
+                  type="text"
+                  name="adresse"
+                  [(ngModel)]="profileDraft.adresse"
+                  class="form-control"
+                  autocomplete="street-address"
+                />
+              </label>
+
+              <!-- Age -->
+
+              <label class="form-field">
+                <span> Âge </span>
+
+                <input
+                  type="number"
+                  name="age"
+                  min="16"
+                  max="120"
+                  [(ngModel)]="profileDraft.age"
+                  class="form-control"
+                />
+              </label>
+            </div>
+
+            <!-- Validation error -->
+
+            <p *ngIf="profileError" class="error-message">
+              {{ profileError }}
+            </p>
+
+            <!-- =============================================
+                 ACTIONS
+            ============================================== -->
+
+            <div class="form-actions">
+              <!-- Save -->
+
+              <button
+                type="submit"
+                class="primary-button save-button"
+                [disabled]="savingProfile"
+              >
+                <i-lucide name="save" class="button-icon"></i-lucide>
+
+                {{ savingProfile ? "Enregistrement..." : "Enregistrer" }}
+              </button>
+
+              <!-- Cancel -->
+
+              <button
+                type="button"
+                class="secondary-button"
+                [disabled]="savingProfile"
+                (click)="cancelProfileEdit()"
+              >
+                <i-lucide name="x" class="button-icon"></i-lucide>
+
+                Annuler
+              </button>
+            </div>
+          </form>
+
+          <!-- ===============================================
+               PROFILE VIEW
+          ================================================ -->
+
+          <div *ngIf="!profileEditing" class="profile-display">
+            <!-- Identity -->
+
+            <div class="profile-identity">
+              <!-- Initials -->
+
+              <div *ngIf="!profile.photo" class="avatar avatar-profile">
+                {{ getInitials(profile) }}
+              </div>
+
+              <!-- Photo -->
+
+              <img
+                *ngIf="profile.photo"
+                [src]="profile.photo"
+                [alt]="profile.prenom + ' ' + profile.nom"
+                class="avatar avatar-profile avatar-image"
+              />
+
+              <!-- Name -->
+
+              <p class="profile-name">
+                {{ profile.prenom }}
+                {{ profile.nom }}
+              </p>
+
+              <!-- Team -->
+
+              <span *ngIf="profile.equipe" class="team-badge">
+                {{ profile.equipe }}
+              </span>
+            </div>
+
+            <!-- Information -->
+
+            <div class="profile-information">
+              <div class="information-row">
+                <span class="information-label"> Nom </span>
+
+                <span class="information-value">
+                  {{ profile.nom || "-" }}
+                </span>
+              </div>
+
+              <div class="information-row">
+                <span class="information-label"> Prénom </span>
+
+                <span class="information-value">
+                  {{ profile.prenom || "-" }}
+                </span>
+              </div>
+
+              <div class="information-row">
+                <span class="information-label"> Email </span>
+
+                <span class="information-value">
+                  {{ profile.email || "-" }}
+                </span>
+              </div>
+
+              <div class="information-row">
+                <span class="information-label"> Téléphone </span>
+
+                <span class="information-value">
+                  {{ profile.telephone || "-" }}
+                </span>
+              </div>
+
+              <div class="information-row">
+                <span class="information-label"> Gouvernorat </span>
+
+                <span class="information-value">
+                  {{ profile.gouvernorat || "-" }}
+                </span>
+              </div>
+
+              <div class="information-row">
+                <span class="information-label"> Équipe </span>
+
+                <span class="information-value">
+                  {{ profile.equipe || "-" }}
+                </span>
+              </div>
+
+              <div class="information-row">
+                <span class="information-label"> Adresse </span>
+
+                <span class="information-value">
+                  {{ profile.adresse || "-" }}
+                </span>
+              </div>
+
+              <div class="information-row">
+                <span class="information-label"> Âge </span>
+
+                <span class="information-value">
+                  <ng-container *ngIf="profile.age">
+                    {{ profile.age }} ans
+                  </ng-container>
+
+                  <ng-container *ngIf="!profile.age"> - </ng-container>
+                </span>
+              </div>
+            </div>
+          </div>
+        </ng-container>
+      </section>
+
+      <!-- ==================================================
+           2. ABONNEMENT
+      =================================================== -->
+
+      <section *ngIf="activeTab === 'abonnement'" class="content-card">
+        <h2 class="section-title">Abonnement</h2>
+
+        <p class="section-description">
+          Cotisation annuelle de bénévole —
+          {{ montantAbonnement }} TND.
+        </p>
+
+        <form
+          class="subscription-form"
+          (ngSubmit)="submitSubscription()"
+          novalidate
+        >
+          <!-- ===============================================
+               PAYMENT METHODS
+          ================================================ -->
+
+          <div class="payment-method-section">
+            <span class="field-title"> Méthode de paiement </span>
+
+            <div class="payment-method-grid">
+              <button
+                *ngFor="let method of paymentMethods"
+                type="button"
+                class="payment-method-card"
+                [class.selected]="selectedPaymentMethod === method.id"
+                (click)="selectPaymentMethod(method.id)"
+              >
+                <<i-lucide
+                  [name]="method.icon"
+                  class="payment-method-icon"
+                ></i-lucide>
+
+                <span class="payment-method-title">
+                  {{ method.label }}
+                </span>
+
+                <span class="payment-method-description">
+                  {{ method.description }}
+                </span>
+              </button>
+            </div>
+          </div>
+
+          <!-- ===============================================
+               USER INFO
+          ================================================ -->
+
+          <div class="form-grid">
+            <!-- Name -->
+
+            <label class="form-field">
+              <span> Nom complet </span>
+
+              <input
+                type="text"
+                name="paymentName"
+                [(ngModel)]="paymentName"
+                class="form-control"
+              />
+            </label>
+
+            <!-- Email -->
+
+            <label class="form-field">
+              <span> Email </span>
+
+              <input
+                type="email"
+                name="paymentEmail"
+                [(ngModel)]="paymentEmail"
+                class="form-control"
+              />
+            </label>
+          </div>
+
+          <!-- ===============================================
+               AMOUNT
+          ================================================ -->
+
+          <div class="payment-total">
+            <span> Montant à payer </span>
+
+            <strong> {{ montantAbonnement }} TND </strong>
+          </div>
+
+          <!-- Error -->
+
+          <p *ngIf="paymentError" class="error-message">
+            {{ paymentError }}
+          </p>
+
+          <!-- Pay -->
+
+          <button type="submit" class="primary-button payment-submit-button">
+            <i-lucide name="credit-card" class="button-icon"></i-lucide>
+
+            Payer l'abonnement
+          </button>
+        </form>
+      </section>
+
+      <!-- ==================================================
+           3. HISTORIQUE DE PAIEMENTS
+      =================================================== -->
+
+      <section *ngIf="activeTab === 'paiements'" class="content-card">
+        <div class="section-header">
+          <!-- Title -->
+
+          <div>
+            <h2 class="section-title">Historique de paiements</h2>
+
+            <p class="section-description">
+              {{ paiements.length }}
+              paiement(s) ·
+
+              {{ totalSuccessfulPayments }}
+              TND réglés
+            </p>
+          </div>
+
+          <!-- Filters -->
+
+          <div class="filter-buttons">
+            <button
+              *ngFor="let filter of paymentFilters"
+              type="button"
+              class="filter-button"
+              [class.active]="paymentFilter === filter"
+              (click)="setPaymentFilter(filter)"
+            >
+              {{ filter }}
+            </button>
+          </div>
+        </div>
+
+        <!-- ===============================================
+             TABLE
+        ================================================ -->
+
+        <div class="table-wrapper">
+          <table class="payments-table">
+            <thead>
+              <tr>
+                <th>Date</th>
+
+                <th>Montant</th>
+
+                <th>Méthode</th>
+
+                <th>Statut</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              <!-- Payments -->
+
+              <tr *ngFor="let paiement of filteredPayments">
+                <td>
+                  {{ formatDate(paiement.date) }}
+                </td>
+
+                <td class="amount-cell">
+                  {{ paiement.montant }}
+                  TND
+                </td>
+
+                <td class="method-cell">
+                  {{ paiement.methode }}
+                </td>
+
+                <td>
+                  <span
+                    class="status-badge"
+                    [ngClass]="getStatusClass(paiement.status)"
+                  >
+                    <i-lucide
+                      [name]="getStatusIcon(paiement.status)"
+                      class="status-icon"
+                    ></i-lucide>
+                    {{ paiement.status }}
+                  </span>
+                </td>
+              </tr>
+
+              <!-- Empty -->
+
+              <tr *ngIf="filteredPayments.length === 0">
+                <td colspan="4" class="empty-table">
+                  Aucun paiement pour ce filtre.
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ==================================================
+           4. NOTIFICATIONS
+      =================================================== -->
+
+      <section *ngIf="activeTab === 'notifications'" class="content-card">
+        <!-- Header -->
+
+        <div class="section-header">
+          <div>
+            <h2 class="section-title">Notifications</h2>
+
+            <p class="section-description">
+              Messages envoyés par l'administration.
+            </p>
+          </div>
+
+          <button
+            type="button"
+            class="secondary-button"
+            [disabled]="notificationLoading || unreadNotificationsCount === 0"
+            (click)="markAllNotificationsAsRead()"
+          >
+            <i-lucide name="check-circle-2" class="button-icon"></i-lucide>
+
+            Tout marquer comme lu
+          </button>
+        </div>
+
+        <!-- ===============================================
+             SEARCH
+        ================================================ -->
+
+        <div *ngIf="!notificationLoading" class="notification-search">
+          <i-lucide name="search" class="search-icon"></i-lucide>
+
+          <input
+            type="text"
+            [(ngModel)]="notificationQuery"
+            name="notificationQuery"
+            placeholder="Rechercher une notification…"
+            class="form-control search-input"
+          />
+        </div>
+
+        <!-- ===============================================
+             LOADING
+        ================================================ -->
+
+        <div *ngIf="notificationLoading" class="loading-state">
+          Chargement des notifications...
+        </div>
+
+        <!-- ===============================================
+             ERROR
+        ================================================ -->
+
+        <div
+          *ngIf="notificationLoadError && !notificationLoading"
+          class="error-message"
+        >
+          {{ notificationLoadError }}
+        </div>
+
+        <!-- ===============================================
+             NOTIFICATION LIST
+        ================================================ -->
+
+        <div
+          *ngIf="!notificationLoading && !notificationLoadError"
+          class="notification-list"
+        >
+          <article
+            *ngFor="let notification of filteredNotifications"
+            class="notification-card"
+            [class.unread]="!isNotificationRead(notification.id)"
+          >
+            <!-- Notification icon -->
+
+            <div class="notification-icon-box">
+              <i-lucide name="megaphone" class="notification-icon"></i-lucide>
+            </div>
+
+            <!-- Content -->
+
+            <div class="notification-content">
+              <!-- Title -->
+
+              <div class="notification-title-row">
+                <h3>
+                  {{ notification.titre }}
+                </h3>
+
+                <span *ngIf="notification.type" class="notification-type">
+                  {{ notification.type }}
+                </span>
+
+                <span
+                  *ngIf="!isNotificationRead(notification.id)"
+                  class="new-badge"
+                >
+                  Nouveau
+                </span>
+              </div>
+
+              <!-- Message -->
+
+              <p class="notification-text">
+                {{ notification.contenu }}
+              </p>
+
+              <!-- Footer -->
+
+              <div class="notification-footer">
+                <span class="notification-date">
+                  {{ formatDate(notification.date) }}
+                </span>
+
+                <button
+                  *ngIf="!isNotificationRead(notification.id)"
+                  type="button"
+                  class="mark-read-button"
+                  (click)="markNotificationAsRead(notification.id)"
+                >
+                  Marquer comme lu
+                </button>
+              </div>
+            </div>
+          </article>
+
+          <!-- Empty search/list -->
+
+          <div
+            *ngIf="filteredNotifications.length === 0"
+            class="empty-notifications"
+          >
+            <i-lucide name="bell" class="empty-notification-icon"></i-lucide>
+
+            <p>Aucune notification trouvée.</p>
+          </div>
+        </div>
+      </section>
+    </main>
   </div>
 </div>
-
-<app-footer></app-footer>
