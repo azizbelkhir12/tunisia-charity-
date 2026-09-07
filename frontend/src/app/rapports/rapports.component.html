@@ -14,19 +14,17 @@
             class="icon icon-small"
           ></lucide-icon>
 
-          Transparence &amp; Redevabilité
+          {{ 'REPORTS_PAGE.HERO.BADGE' | translate }}
         </span>
 
         <h1 class="hero-title">
-          Nos
-          <em>rapports</em>
-          annuels
+          {{ 'REPORTS_PAGE.HERO.TITLE_PART1' | translate }}
+          <em>{{ 'REPORTS_PAGE.HERO.TITLE_EMPHASIS' | translate }}</em>
+          {{ 'REPORTS_PAGE.HERO.TITLE_PART2' | translate }}
         </h1>
 
         <p class="hero-description">
-          Retrouvez ici l'ensemble de nos rapports financiers et littéraires.
-          Consultez-les en ligne ou téléchargez-les librement — la transparence
-          est au cœur de notre engagement envers vous.
+          {{ 'REPORTS_PAGE.HERO.DESCRIPTION' | translate }}
         </p>
       </div>
     </section>
@@ -46,7 +44,7 @@
             class="icon icon-small"
           ></lucide-icon>
 
-          {{ filterItem.label }}
+          {{ filterItem.labelKey | translate }}
         </button>
       </div>
 
@@ -67,7 +65,7 @@
             <div class="report-information">
               <div class="report-metadata">
                 <span class="report-type-badge">
-                  {{ getReportBadge(report) }}
+                  {{ getReportBadge(report) | translate }}
                 </span>
 
                 <span class="report-year">
@@ -89,9 +87,12 @@
               </p>
 
               <div class="report-details">
-                <span>PDF</span>
+                <span>{{ 'REPORTS_PAGE.CARD.PDF' | translate }}</span>
                 <span>•</span>
-                <span>{{ report.pages }} pages</span>
+                <span>
+                  {{ report.pages }}
+                  {{ 'REPORTS_PAGE.CARD.PAGES' | translate }}
+                </span>
                 <span>•</span>
                 <span>{{ report.size }}</span>
               </div>
@@ -109,7 +110,7 @@
                 class="icon icon-small"
               ></lucide-icon>
 
-              Consulter
+              {{ 'REPORTS_PAGE.CARD.VIEW' | translate }}
             </button>
 
             <button
@@ -122,14 +123,14 @@
                 class="icon icon-small"
               ></lucide-icon>
 
-              Télécharger
+              {{ 'REPORTS_PAGE.CARD.DOWNLOAD' | translate }}
             </button>
           </div>
         </article>
       </div>
 
       <p *ngIf="filteredReports.length === 0" class="empty-reports-message">
-        Aucun rapport trouvé pour ce filtre.
+        {{ 'REPORTS_PAGE.EMPTY' | translate }}
       </p>
     </section>
 
@@ -137,11 +138,12 @@
     <section class="reports-container cta-section">
       <div class="cta-card">
         <div class="cta-content">
-          <h2 class="cta-title">Une question sur nos comptes ?</h2>
+          <h2 class="cta-title">
+            {{ 'REPORTS_PAGE.CTA.TITLE' | translate }}
+          </h2>
 
           <p class="cta-description">
-            Notre équipe est à votre disposition pour toute demande
-            d'information complémentaire sur nos rapports.
+            {{ 'REPORTS_PAGE.CTA.DESCRIPTION' | translate }}
           </p>
         </div>
 
@@ -151,7 +153,7 @@
             class="icon cta-heart-icon"
           ></lucide-icon>
 
-          Nous contacter
+          {{ 'REPORTS_PAGE.CTA.CONTACT' | translate }}
         </a>
       </div>
     </section>

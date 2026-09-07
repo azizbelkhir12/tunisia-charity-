@@ -6,16 +6,18 @@
     <section *ngIf="!selectedRole" class="role-picker">
       <div class="role-header">
         <span class="member-badge">
-          Espace membre
+          {{ "LOGIN_PAGE.ROLE_SELECTION.BADGE" | translate }}
         </span>
 
         <h1>
-          Bienvenue.
-          <em>Qui êtes-vous ?</em>
+          {{ "LOGIN_PAGE.ROLE_SELECTION.TITLE_PART1" | translate }}
+          <em>
+            {{ "LOGIN_PAGE.ROLE_SELECTION.TITLE_EM" | translate }}
+          </em>
         </h1>
 
         <p>
-          Choisissez votre profil pour accéder à l'espace qui vous correspond.
+          {{ "LOGIN_PAGE.ROLE_SELECTION.DESCRIPTION" | translate }}
         </p>
       </div>
 
@@ -27,218 +29,203 @@
           (click)="selectRole(role)"
         >
           <div class="role-icon-container">
-            <i-lucide
-              [name]="role.icon"
-              class="icon-28"
-            ></i-lucide>
+            <i-lucide [name]="role.icon" class="icon-28"></i-lucide>
           </div>
 
           <h2>
-            {{ role.title }}
+            {{ role.titleKey | translate }}
           </h2>
 
           <p class="role-description">
-            {{ role.description }}
+            {{ role.descriptionKey | translate }}
           </p>
 
           <ul class="role-perks">
-            <li
-              *ngFor="let perk of role.perks; trackBy: trackPerk"
-            >
+            <li *ngFor="let perk of role.perks; trackBy: trackPerk">
               <span class="perk-dot"></span>
-              <span>{{ perk }}</span>
+
+              <span>
+                {{ perk | translate }}
+              </span>
             </li>
           </ul>
 
           <div class="role-action">
-            <span>Se connecter</span>
+            <span>
+              {{ "LOGIN_PAGE.ROLE_SELECTION.LOGIN" | translate }}
+            </span>
+
             <span class="role-arrow">→</span>
           </div>
         </button>
       </div>
 
       <p class="register-text">
-        Pas encore de compte ?
+        {{ "LOGIN_PAGE.ROLE_SELECTION.NO_ACCOUNT" | translate }}
 
         <a routerLink="/register">
-          Créer un compte
+          {{ "LOGIN_PAGE.ROLE_SELECTION.CREATE_ACCOUNT" | translate }}
         </a>
       </p>
     </section>
 
     <!-- Login form -->
-    <section
-  *ngIf="selectedRole as role"
-  class="login-section"
->
-  <button
-    type="button"
-    class="change-role-button"
-    (click)="changeRole()"
-  >
-    <i-lucide
-      name="arrow-left"
-      class="icon-16"
-    ></i-lucide>
+    <section *ngIf="selectedRole as role" class="login-section">
+      <button type="button" class="change-role-button" (click)="changeRole()">
+        <i-lucide name="arrow-left" class="icon-16"></i-lucide>
 
-    <span>Changer de profil</span>
-  </button>
-
-  <div class="login-card">
-    <div class="login-card-header">
-      <div class="login-role-icon">
-        <i-lucide
-          [name]="role.icon"
-          class="icon-28"
-        ></i-lucide>
-      </div>
-
-      <div>
-        <p class="login-label">
-          Connexion
-        </p>
-
-        <h2>
-          Espace {{ role.title }}
-        </h2>
-      </div>
-    </div>
-
-    <div
-      *ngIf="submitted"
-      class="success-message"
-    >
-      <p class="success-title">
-        Connexion simulée ✓
-      </p>
-
-      <p>
-        Ceci est une maquette. L'authentification réelle n'est pas activée.
-      </p>
-    </div>
-
-    <form
-  class="login-form"
-  #loginForm="ngForm"
-  (ngSubmit)="onSubmit()"
->
-  <label class="form-field">
-    <span class="field-label">
-      Email
-    </span>
-
-    <div class="input-container">
-      <i-lucide
-        name="mail"
-        class="input-left-icon"
-      ></i-lucide>
-
-      <input
-        type="email"
-        name="email"
-        [(ngModel)]="email"
-        required
-        email
-        autocomplete="email"
-        placeholder="vous@exemple.com"
-      />
-    </div>
-  </label>
-
-  <label class="form-field">
-    <span class="field-label">
-      Mot de passe
-    </span>
-
-    <div class="input-container">
-      <i-lucide
-        name="lock"
-        class="input-left-icon"
-      ></i-lucide>
-
-      <input
-        [type]="showPassword ? 'text' : 'password'"
-        name="password"
-        [(ngModel)]="password"
-        required
-        autocomplete="current-password"
-        placeholder="••••••••"
-        class="password-input"
-      />
-
-      <button
-        type="button"
-        class="password-toggle"
-        (click)="togglePasswordVisibility()"
-      >
-        <i-lucide
-          [name]="showPassword ? 'eye-off' : 'eye'"
-          class="icon-16"
-        ></i-lucide>
+        <span>
+          {{ "LOGIN_PAGE.FORM.CHANGE_PROFILE" | translate }}
+        </span>
       </button>
-    </div>
-  </label>
 
-  <div class="form-options">
-    <label class="remember-me">
-      <input
-        type="checkbox"
-        name="rememberMe"
-        [(ngModel)]="rememberMe"
-      />
+      <div class="login-card">
+        <div class="login-card-header">
+          <div class="login-role-icon">
+            <i-lucide [name]="role.icon" class="icon-28"></i-lucide>
+          </div>
 
-      <span>Se souvenir de moi</span>
-    </label>
+          <div>
+            <p class="login-label">
+              {{ "LOGIN_PAGE.FORM.LOGIN" | translate }}
+            </p>
 
-    <a
-      routerLink="/forgot-password"
-      class="forgot-password"
-    >
-      Mot de passe oublié ?
-    </a>
-  </div>
+            <h2>
+              {{ "LOGIN_PAGE.FORM.SPACE" | translate }}
+              {{ role.titleKey | translate }}
+            </h2>
+          </div>
+        </div>
 
-  <div
-    *ngIf="errorMessage"
-    class="login-error"
-  >
-    {{ errorMessage }}
-  </div>
+        <!-- Success message -->
+        <div *ngIf="submitted" class="success-message">
+          <p class="success-title">
+            {{ "LOGIN_PAGE.SUCCESS.TITLE" | translate }}
+          </p>
 
-  <button
-    type="submit"
-    class="submit-button"
-    [disabled]="
-      isLoading ||
-      loginForm.invalid
-    "
-  >
-    <span *ngIf="!isLoading">
-      Se connecter en tant que
-      {{ role.title.toLowerCase() }}
-    </span>
+          <p>
+            {{ "LOGIN_PAGE.SUCCESS.DESCRIPTION" | translate }}
+          </p>
+        </div>
 
-    <span *ngIf="isLoading">
-      Connexion en cours...
-    </span>
-  </button>
+        <form class="login-form" #loginForm="ngForm" (ngSubmit)="onSubmit()">
+          <!-- Email -->
+          <label class="form-field">
+            <span class="field-label">
+              {{ "LOGIN_PAGE.FORM.EMAIL" | translate }}
+            </span>
 
-  <p class="new-account-text">
-    Nouveau ici ?
+            <div class="input-container">
+              <i-lucide name="mail" class="input-left-icon"></i-lucide>
 
-    <a
-      routerLink="/register"
-      [queryParams]="{
-        role: role.id
-      }"
-    >
-      Créer un compte
-      {{ role.title.toLowerCase() }}
-    </a>
-  </p>
-</form>
-  </div>
-</section>
+              <input
+                type="email"
+                name="email"
+                [(ngModel)]="email"
+                required
+                email
+                autocomplete="email"
+                [placeholder]="'LOGIN_PAGE.FORM.EMAIL_PLACEHOLDER' | translate"
+              />
+            </div>
+          </label>
+
+          <!-- Password -->
+          <label class="form-field">
+            <span class="field-label">
+              {{ "LOGIN_PAGE.FORM.PASSWORD" | translate }}
+            </span>
+
+            <div class="input-container">
+              <i-lucide name="lock" class="input-left-icon"></i-lucide>
+
+              <input
+                [type]="showPassword ? 'text' : 'password'"
+                name="password"
+                [(ngModel)]="password"
+                required
+                autocomplete="current-password"
+                [placeholder]="
+                  'LOGIN_PAGE.FORM.PASSWORD_PLACEHOLDER' | translate
+                "
+                class="password-input"
+              />
+
+              <button
+                type="button"
+                class="password-toggle"
+                (click)="togglePasswordVisibility()"
+                [attr.aria-label]="
+                  'LOGIN_PAGE.ACCESSIBILITY.TOGGLE_PASSWORD' | translate
+                "
+              >
+                <i-lucide
+                  [name]="showPassword ? 'eye-off' : 'eye'"
+                  class="icon-16"
+                ></i-lucide>
+              </button>
+            </div>
+          </label>
+
+          <!-- Options -->
+          <div class="form-options">
+            <label class="remember-me">
+              <input
+                type="checkbox"
+                name="rememberMe"
+                [(ngModel)]="rememberMe"
+              />
+
+              <span>
+                {{ "LOGIN_PAGE.FORM.REMEMBER_ME" | translate }}
+              </span>
+            </label>
+
+            <a routerLink="/forgot-password" class="forgot-password">
+              {{ "LOGIN_PAGE.FORM.FORGOT_PASSWORD" | translate }}
+            </a>
+          </div>
+
+          <!-- Error -->
+          <div *ngIf="errorMessage" class="login-error">
+            {{ errorMessage }}
+          </div>
+
+          <!-- Submit -->
+          <button
+            type="submit"
+            class="submit-button"
+            [disabled]="isLoading || loginForm.invalid"
+          >
+            <span *ngIf="!isLoading">
+              {{ "LOGIN_PAGE.FORM.LOGIN_AS" | translate }}
+
+              {{ role.titleKey | translate | lowercase }}
+            </span>
+
+            <span *ngIf="isLoading">
+              {{ "LOGIN_PAGE.FORM.LOGGING_IN" | translate }}
+            </span>
+          </button>
+
+          <!-- Register -->
+          <p class="new-account-text">
+            {{ "LOGIN_PAGE.FORM.NEW_HERE" | translate }}
+
+            <a
+              routerLink="/register"
+              [queryParams]="{
+                role: role.id,
+              }"
+            >
+              {{ "LOGIN_PAGE.FORM.CREATE_ACCOUNT" | translate }}
+
+              {{ role.titleKey | translate | lowercase }}
+            </a>
+          </p>
+        </form>
+      </div>
+    </section>
   </main>
 
   <app-footer></app-footer>

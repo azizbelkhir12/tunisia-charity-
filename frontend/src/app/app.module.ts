@@ -80,7 +80,8 @@ import {
   Receipt,
   CheckCircle2,
   AlertCircle,
-  Globe
+  Globe,
+  ChevronDown
 } from 'lucide-angular';
 
 import { AppComponent } from './app.component';
@@ -274,6 +275,7 @@ export function HttpLoaderFactory(http: HttpClient) {
       CheckCircle2,
       AlertCircle,
       Globe,
+      ChevronDown,
     }),
     TranslateModule.forRoot({
       loader: {

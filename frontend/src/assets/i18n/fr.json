@@ -1,177 +1,491 @@
 {
-  "NAV": {
-    "HOME": "Accueil",
-    "CONTACT": "Contact",
-    "Rapports": "Rapports",
-    "Rejoignez-nous": "Rejoignez-nous",
-    "LOGIN": "Se Connecter",
-    "REGISTER": "Créer compte",
+  "HOME": {
+    "NAV": {
+      "HOME": "Accueil",
+      "REPORTS": "Rapports",
+      "JOIN_US": "Rejoignez-nous",
+      "ABOUT": "À propos",
+      "ACTIONS": "Nos actions",
+      "PROJECTS": "Projets",
+      "CONTACT": "Contact"
+    },
+
+    "AUTH": {
+      "LOGIN": "Se connecter",
+      "REGISTER": "S'inscrire"
+    },
+
     "DONATE": "Faire un don",
-    "Langue" : "Langue"
-  },
-  "BANNER": {
-    "TEXT": "Votre soutien a le pouvoir de transformer des vies de manière concrète et durable. Chaque geste de générosité permet de nourrir un enfant affamé, de soigner un malade sans ressources, d'offrir un toit à une famille dans le besoin, ou de donner accès à l'éducation à un jeune privé d'avenir.",
-    "DONATE_BTN": "Faire un don"
-  },
-  "ABOUT": {
-    "SUBTITLE": "À propos de nous",
-    "TITLE": "Aide humanitaire en Tunisie",
-    "TEXT1": "L’association TUNISIA CHARITY تونس الخيرية est une organisation non gouvernementale à but non lucratif. Elle vise à servir la société en mobilisant les efforts des bienfaiteurs pour résoudre les problèmes de leurs communautés et venir en aide aux personnes dans le besoin.",
-    "TEXT2": "L’association intervient dans le domaine du secours aux sinistrés en cas d’urgence, du développement durable et de la lutte contre la pauvreté. Elle œuvre également à promouvoir l’esprit de coopération et de solidarité au sein de la société."
-  },
-  "SERVICE": {
-   "SUBTITLE": "Nos Actions",
-    "TITLE": "Nous croyons que nous pouvons sauver plus de vies avec vous",
 
-    "ITEMS": {
-      "EDUCATION": {
-        "TITLE": "Soutien à l’Éducation des Enfants",
-        "DESC": "Fournir des fournitures scolaires et du soutien aux enfants orphelins."
-      },
-      "WATER": {
-        "TITLE": "Eau Pure",
-        "DESC": "Assurer l'accès à une eau potable propre et sûre."
-      },
-      "SPONSORSHIP": {
-        "TITLE": "Parrainage d’Enfants",
-        "DESC": "Trouver des parrains pour soutenir les enfants dans le besoin."
-      },
-      "POVERTY": {
-        "TITLE": "Lutte contre la pauvreté",
-        "DESC": "Soutien aux familles précaires avec aide matérielle, éducative et sociale."
-      },
-      "EMERGENCY": {
-        "TITLE": "Urgence humanitaire",
-        "DESC": "Assistance immédiate aux victimes de crises avec aide alimentaire, abris et soins."
-      },
-      "SOCIAL": {
-        "TITLE": "Aide Sociale",
-        "DESC": "Aider les personnes en situation difficile."
+    "LANGUAGE": "Langue",
+
+    "ACCESSIBILITY": {
+      "HOME": "Accueil Tunisia Charity",
+      "MAIN_NAV": "Navigation principale",
+      "CHANGE_LANGUAGE": "Changer la langue",
+      "OPEN_MENU": "Ouvrir le menu",
+      "CLOSE_MENU": "Fermer le menu"
+    },
+
+    "HERO": {
+      "BADGE": "Association reconnue d'intérêt général",
+      "TITLE_PART1": "Chaque geste",
+      "TITLE_HIGHLIGHT1": "compte",
+      "TITLE_PART2": "chaque vie",
+      "TITLE_HIGHLIGHT2": "change",
+      "DESCRIPTION": "Depuis 2010, Espoir agit auprès des familles vulnérables — éducation, santé, accès à l'eau et abri d'urgence. Ensemble, construisons un monde plus juste.",
+      "DISCOVER_ACTIONS": "Découvrir nos actions",
+      "IMAGE_ALT": "Bénévoles et familles soutenues par l'association Espoir",
+      "FAMILIES": "familles",
+      "SUPPORTED_THIS_YEAR": "soutenues cette année"
+    },
+
+    "ABOUT": {
+      "LABEL": "À propos de nous",
+      "TITLE": "Une association humaine, des actions concrètes.",
+      "DESCRIPTION1": "Espoir est née d'une conviction : personne ne devrait être laissé de côté. Nous accompagnons enfants, femmes et familles à travers des programmes durables construits main dans la main avec les communautés locales.",
+      "DESCRIPTION2": "Grâce à nos donateurs et à nos 850 bénévoles, nous transformons chaque euro en un impact réel : une école qui ouvre, un puits qui coule, un enfant qui sourit.",
+
+      "ITEMS": {
+        "SOLIDARITY": {
+          "TITLE": "Solidarité",
+          "TEXT": "Une aide inconditionnelle, partout où c'est nécessaire."
+        },
+        "COMMUNITY": {
+          "TITLE": "Communauté",
+          "TEXT": "Un réseau de bénévoles engagés sur le terrain."
+        },
+        "TRANSPARENCY": {
+          "TITLE": "Transparence",
+          "TEXT": "100% des dons tracés, rapports publiés chaque année."
+        }
       }
+    },
+
+    "ACTIONS": {
+      "LABEL": "Nos actions",
+      "TITLE": "Sur le terrain, chaque jour.",
+      "DESCRIPTION": "Trois grands piliers guident notre engagement pour un impact durable.",
+      "LEARN_MORE": "En savoir plus",
+
+      "ITEMS": {
+        "EDUCATION": {
+          "TITLE": "Éducation pour tous",
+          "TEXT": "Écoles, matériel scolaire et bourses pour les enfants défavorisés."
+        },
+        "SOCIAL": {
+          "TITLE": "Aide sociale",
+          "TEXT": "Aider les personnes en situation difficile."
+        },
+        "SPONSORSHIP": {
+          "TITLE": "Parrainage des enfants",
+          "TEXT": "Trouver des parrains pour soutenir les enfants dans le besoin."
+        }
+      }
+    },
+
+    "IMPACT": {
+      "LABEL": "Notre impact",
+      "TITLE": "Des chiffres qui parlent d'eux-mêmes.",
+
+      "STATS": {
+        "DONORS": "Donateurs",
+        "BENEFICIARIES": "Bénéficiaires",
+        "VOLUNTEERS": "Bénévoles",
+        "PROJECTS": "Projets menés"
+      }
+    },
+
+    "PROJECTS": {
+      "LABEL": "Projets en cours",
+      "TITLE": "Aidez-nous à les faire aboutir.",
+      "FUNDING": "Financement",
+      "SUPPORT": "Soutenir ce projet",
+      "SHOW_MORE": "Voir plus",
+      "SHOW_LESS": "Voir moins",
+      "DEFAULT_TAG": "Projet solidaire",
+      "DEFAULT_TITLE": "Projet"
+    },
+
+    "CONTACT": {
+      "LABEL": "Votre avis compte",
+      "TITLE": "Partagez votre retour avec nous.",
+      "DESCRIPTION": "Une question, une idée, un message d'encouragement ? Nous lisons chaque témoignage et vous répondons dans les 48h.",
+
+      "FORM": {
+        "NAME": "Votre nom",
+        "NAME_PLACEHOLDER": "Marie Dupont",
+        "EMAIL": "Email",
+        "SUBJECT": "Sujet",
+        "SUBJECT_PLACEHOLDER": "À propos d'un projet…",
+        "MESSAGE": "Votre message",
+        "MESSAGE_PLACEHOLDER": "Partagez votre témoignage, question ou suggestion…",
+        "SEND": "Envoyer mon message",
+        "SENDING": "Envoi en cours..."
+      },
+
+      "SUCCESS_MESSAGE": "Merci ! Votre message a bien été envoyé.",
+
+      "ALERTS": {
+        "REQUIRED_TITLE": "Champs obligatoires",
+        "REQUIRED_TEXT": "Veuillez renseigner votre nom, votre email et votre message.",
+        "EMAIL_TITLE": "Email invalide",
+        "EMAIL_TEXT": "Veuillez saisir une adresse email valide.",
+        "OK": "D’accord",
+        "SUCCESS_TITLE": "Message envoyé",
+        "SUCCESS_TEXT": "Merci ! Votre message a bien été envoyé.",
+        "CLOSE": "Fermer",
+        "ERROR_TITLE": "Envoi impossible",
+        "ERROR_TEXT": "Une erreur est survenue lors de l’envoi du message. Veuillez réessayer.",
+        "RETRY": "Réessayer"
+      }
+    },
+
+    "FOOTER": {
+      "DESCRIPTION": "Une association reconnue d'intérêt général. Vos dons sont déductibles à 66% de vos impôts.",
+      "SOCIAL_NETWORK": "Réseau social",
+      "NAVIGATION": "Navigation",
+      "CONTACT": "Contact",
+      "ADDRESS": "63 rue Iran 1002, Tunis, Tunisie",
+      "RIGHTS": "Tous droits réservés.",
+      "DESIGNED_WITH": "Site conçu avec ❤️ pour un monde plus solidaire."
     }
   },
-  "FACTS": {
-    "TITLE": "Nos Réalisations",
-    "ITEMS": {
-      "VOLUNTEERS": "Bénévoles",
-      "DONORS": "Donateurs",
-      "BENEFICIARIES": "Bénéficiaires",
-      "PROJECTS": "Projets"
+
+  "REPORTS_PAGE": {
+    "META": {
+      "TITLE": "Rapports — Tunisia Charity",
+      "DESCRIPTION": "Consultez et téléchargez les rapports financiers et littéraires annuels de Tunisia Charity en toute transparence.",
+      "OG_DESCRIPTION": "Transparence et redevabilité : nos rapports financiers et littéraires à télécharger."
+    },
+
+    "HERO": {
+      "BADGE": "Transparence & Redevabilité",
+      "TITLE_PART1": "Nos",
+      "TITLE_EMPHASIS": "rapports",
+      "TITLE_PART2": "annuels",
+      "DESCRIPTION": "Retrouvez ici l'ensemble de nos rapports financiers et littéraires. Consultez-les en ligne ou téléchargez-les librement — la transparence est au cœur de notre engagement envers vous."
+    },
+
+    "FILTERS": {
+      "ALL": "Tous les rapports",
+      "FINANCIAL": "Financiers",
+      "LITERARY": "Littéraires"
+    },
+
+    "TYPES": {
+      "FINANCIAL": "Financier",
+      "LITERARY": "Littéraire"
+    },
+
+    "CARD": {
+      "PDF": "PDF",
+      "PAGES": "pages",
+      "VIEW": "Consulter",
+      "DOWNLOAD": "Télécharger"
+    },
+
+    "EMPTY": "Aucun rapport trouvé pour ce filtre.",
+
+    "CTA": {
+      "TITLE": "Une question sur nos comptes ?",
+      "DESCRIPTION": "Notre équipe est à votre disposition pour toute demande d'information complémentaire sur nos rapports.",
+      "CONTACT": "Nous contacter"
+    },
+
+    "PREVIEW": {
+      "LOADING_TITLE": "Chargement du rapport",
+      "LOADING": "Chargement du rapport..."
+    },
+
+    "ERRORS": {
+      "LOADING": "Une erreur est survenue lors du chargement des rapports.",
+      "DOWNLOAD": "Impossible de télécharger ce rapport.",
+      "VIEW": "Impossible de consulter ce rapport."
     }
   },
-  "CAUSES": {
-    "SUBTITLE": "Nos Projets",
-    "TITLE": "Explorons les différentes projets dans notre associations"
-  },
-  "CONTACT": {
-    "SUBTITLE": "À Votre Écoute",
-    "TITLE": "Des questions ? Contactez-nous !",
-    "NAME": "Veuillez entrer votre nom.",
-    "EMAIL": "Veuillez entrer une adresse e-mail valide.",
-    "SUBJECT": "Veuillez entrer un sujet",
-    "MESSAGE": "Message",
-    "SEND": "Envoyer Message"
-  },
-  "LANG": {
-    "BUTTON": "Langue",
-    "FR": "Français",
-    "EN": "English",
-    "AR": "العربية"
-  },
-
-
 
   
-  "CONTACT-PAGE": {
-    "TITLE": "Contactez-nous",
-    "SUBTITLE": "Nous aimerions avoir de vos nouvelles",
-    "INFORMATIONS": "Informations",
-    "ASSOCIATION": "Association",
-    "ADDRESS": "Adresse",
-    "PHONE": "Téléphone",
-    "EMAIL": "Email",
-    "WORK_HOURS": "Horaire de travail"
-  },
+  "JOIN_PAGE": {
+    "ROLES": {
+      "BADGE": "Devenir membre",
+      "TITLE_PART1": "Rejoignez",
+      "DESCRIPTION": "Choisissez le profil qui vous correspond et complétez votre demande d'adhésion.",
+      "VOLUNTEER": {
+        "TITLE": "Bénévole",
+        "DESCRIPTION": "Donnez de votre temps sur le terrain ou à distance."
+      },
+      "DONOR": {
+        "TITLE": "Donateur",
+        "DESCRIPTION": "Soutenez nos actions financièrement et suivez votre impact."
+      }
+    },
 
+    "COMMON": {
+      "SIGN_UP": "S'inscrire",
+      "ALREADY_ACCOUNT": "Vous avez déjà un compte ?",
+      "LOGIN": "Se connecter",
+      "CHANGE_PROFILE": "Changer de profil",
+      "REGISTRATION": "Inscription",
+      "CONTINUE": "Continuer",
+      "ALREADY_MEMBER": "Déjà membre ?"
+    },
+
+    "FIELDS": {
+      "LAST_NAME": "Nom",
+      "LAST_NAME_PLACEHOLDER": "Votre nom",
+      "FIRST_NAME": "Prénom",
+      "FIRST_NAME_PLACEHOLDER": "Votre prénom",
+      "AGE": "Âge",
+      "AGE_PLACEHOLDER": "Ex. 28",
+      "EMAIL": "Adresse email",
+      "EMAIL_PLACEHOLDER": "vous@exemple.com",
+      "PASSWORD": "Mot de passe",
+      "CONFIRM_PASSWORD": "Confirmer le mot de passe",
+      "ADDRESS": "Adresse",
+      "ADDRESS_PLACEHOLDER": "Rue, ville, code postal",
+      "ADDRESS_SHORT_PLACEHOLDER": "Rue, ville",
+      "GOVERNORATE": "Gouvernorat",
+      "SELECT_GOVERNORATE": "Choisir un gouvernorat",
+      "PHONE": "Numéro de téléphone",
+      "FULL_NAME": "Nom complet",
+      "FULL_NAME_PLACEHOLDER": "Prénom et nom",
+      "POSTAL_CODE": "Code postal",
+      "POSTAL_CODE_PLACEHOLDER": "Ex. 1000"
+    },
+
+    "VOLUNTEER": {
+      "TITLE": "Rejoindre en tant que bénévole",
+      "MOTIVATION_LABEL": "Pourquoi voulez-vous rejoindre Tunisia Charity ?",
+      "MOTIVATION_PLACEHOLDER": "Partagez votre motivation en quelques lignes…"
+    },
+
+    "DONOR": {
+      "TITLE": "Rejoindre en tant que donateur",
+      "TYPE_LABEL": "Type de donateur",
+      "TYPES": {
+        "STANDARD": {
+          "TITLE": "Donateur standard",
+          "DESCRIPTION": "Faites un don ponctuel selon vos envies."
+        },
+        "SPONSOR": {
+          "TITLE": "Donateur parrain",
+          "DESCRIPTION": "Soutien mensuel régulier d'un bénéficiaire ou projet."
+        }
+      }
+    },
+
+    "OTP": {
+      "EDIT_INFO": "Modifier mes informations",
+      "VERIFICATION": "Vérification",
+      "TITLE": "Entrez votre code OTP",
+      "DESCRIPTION": "Saisissez le code à 6 chiffres envoyé à",
+      "SENDING_CODE": "Envoi du code...",
+      "SUBMIT": "Envoyer ma demande",
+      "SUBMITTING": "Inscription...",
+      "HELP": "Votre demande ne sera enregistrée qu'après la validation de ce code."
+    },
+
+    "SUCCESS": {
+      "TITLE": "Demande envoyée !",
+      "BACK_HOME": "Retour à l'accueil",
+      "NEW_REQUEST": "Nouvelle demande",
+      "DONOR_MESSAGE": "Merci pour votre générosité. Votre inscription en tant que donateur a été enregistrée.",
+      "VOLUNTEER_MESSAGE": "Merci pour votre intérêt. Votre demande de bénévolat a été enregistrée et sera étudiée par notre équipe."
+    },
+
+    "ACCESSIBILITY": {
+      "TOGGLE_PASSWORD": "Afficher ou masquer le mot de passe",
+      "TOGGLE_CONFIRMATION": "Afficher ou masquer la confirmation",
+      "DIGIT": "Chiffre"
+    },
+
+    "ERRORS": {
+      "SEND_OTP": "Impossible d'envoyer le code OTP.",
+      "REGISTER_DONOR": "Impossible d'enregistrer le donateur."
+    },
+
+    "VALIDATION": {
+      "AGE_REQUIRED_PAYLOAD": "L'âge est obligatoire.",
+      "DONOR_TYPE_REQUIRED_PAYLOAD": "Le type de donateur est obligatoire.",
+
+      "LAST_NAME_REQUIRED": "Le nom est requis.",
+      "FIRST_NAME_REQUIRED": "Le prénom est requis.",
+      "AGE_REQUIRED": "L'âge est requis.",
+      "AGE_RANGE": "L'âge doit être compris entre 16 et 100 ans.",
+
+      "EMAIL_REQUIRED": "L'adresse email est requise.",
+      "EMAIL_INVALID": "Veuillez entrer une adresse email valide.",
+
+      "PASSWORD_REQUIRED": "Le mot de passe est requis.",
+      "PASSWORD_MIN": "Le mot de passe doit contenir au moins 8 caractères.",
+
+      "CONFIRM_REQUIRED": "La confirmation est requise.",
+      "CONFIRM_MATCH": "Les mots de passe ne correspondent pas.",
+
+      "ADDRESS_REQUIRED": "L'adresse est requise.",
+      "GOVERNORATE_REQUIRED": "Veuillez choisir un gouvernorat.",
+
+      "PHONE_REQUIRED": "Le numéro de téléphone est requis.",
+      "PHONE_INVALID": "Veuillez entrer un numéro de téléphone valide.",
+
+      "MOTIVATION_REQUIRED": "Expliquez brièvement votre motivation.",
+
+      "FULL_NAME_REQUIRED": "Le nom complet est requis.",
+
+      "POSTAL_REQUIRED": "Le code postal est requis.",
+      "POSTAL_INVALID": "Code postal invalide.",
+
+      "DONOR_TYPE_REQUIRED": "Veuillez choisir un type de donateur.",
+
+      "OTP_COMPLETE": "Veuillez saisir le code complet à 6 chiffres.",
+      "OTP_INVALID": "Le code OTP est incorrect.",
+      "OTP_EXPIRED": "Le code OTP a expiré.",
+      "OTP_USER_NOT_FOUND": "Aucune demande n'a été trouvée pour cet email.",
+      "OTP_ALREADY_VERIFIED": "Cette adresse email a déjà été vérifiée.",
+      "OTP_VERIFY": "Impossible de vérifier le code OTP."
+    }
+  },
 
   
-  "VOLUNTEER": {
-    "TITLE": "Faire du bénévolat avec nous",
-    "SIGNUP": "S'inscrire",
-    "NEW_HERE": "Nouveau sur notre site ?",
-    "NEW_HERE_TEXT": "Inscrivez-vous dès maintenant et aidez les autres, partagez la beauté, l’amour et les émotions à travers la charité !",
-    "LOGIN": "Connexion"
-  },
+  "LOGIN_PAGE": {
 
-  "FORM": {
-    "NAME": "Nom",
-    "FIRSTNAME": "Prénom",
-    "AGE": "Âge",
-    "EMAIL": "Adresse email",
-    "PASSWORD": "Mot de passe",
-    "CONFIRM_PASSWORD": "Confirmation du mot de passe",
-    "ADDRESS": "Adresse complète",
-    "GOVERNORATE": "Choisir un gouvernorat",
-    "PHONE": "Numéro de téléphone",
-    "REASON": "Pourquoi voulez-vous nous rejoindre ?"
-  },
+    "ROLE_SELECTION": {
+      "BADGE": "Espace membre",
+      "TITLE_PART1": "Bienvenue.",
+      "TITLE_EM": "Qui êtes-vous ?",
+      "DESCRIPTION": "Choisissez votre profil pour accéder à l'espace qui vous correspond.",
+      "LOGIN": "Se connecter",
+      "NO_ACCOUNT": "Pas encore de compte ?",
+      "CREATE_ACCOUNT": "Créer un compte"
+    },
 
-  "OTP": {
-    "TITLE": "Vérification de l'email",
-    "SENT": "Un code OTP a été envoyé à",
-    "INSTRUCTION": "Veuillez le saisir ci-dessous pour confirmer votre inscription.",
-    "PLACEHOLDER": "Entrez le code OTP",
-    "VERIFY": "Vérifier",
-    "CANCEL": "Annuler"
-  },
+    "ROLES": {
 
-  "ERRORS": {
-    "REQUIRED": "Ce champ est obligatoire",
-    "MIN_3": "Minimum 3 caractères",
-    "MAX_50": "Maximum 50 caractères",
-    "EMAIL_INVALID": "Format de l’email invalide",
-    "AGE_MIN": "Vous devez avoir au moins 18 ans",
-    "AGE_MAX": "L'âge ne doit pas dépasser 99",
-    "PASSWORD_MATCH": "Les mots de passe ne correspondent pas"
-  },
+      "VOLUNTEER": {
+        "TITLE": "Bénévole",
+        "DESCRIPTION": "Donnez de votre temps et rejoignez nos missions sur le terrain.",
+        "PERKS": {
+          "NEARBY_MISSIONS": "Missions près de chez vous",
+          "COMMUNITY": "Communauté engagée",
+          "HOURS": "Suivi de vos heures"
+        }
+      },
 
+      "DONOR": {
+        "TITLE": "Donateur",
+        "DESCRIPTION": "Suivez vos dons, téléchargez vos reçus fiscaux et découvrez leur impact réel.",
+        "PERKS": {
+          "DONATION_HISTORY": "Historique des dons",
+          "TAX_RECEIPTS": "Reçus fiscaux",
+          "IMPACT_REPORTS": "Rapports d'impact"
+        }
+      },
+
+      "BENEFICIARY": {
+        "TITLE": "Bénéficiaire",
+        "DESCRIPTION": "Accédez aux programmes d'aide et faites vos demandes en ligne.",
+        "PERKS": {
+          "AID_REQUESTS": "Demandes d'aide",
+          "CASE_TRACKING": "Suivi de dossier",
+          "DIRECT_CONTACT": "Contact direct"
+        }
+      }
+
+    },
+
+    "FORM": {
+      "CHANGE_PROFILE": "Changer de profil",
+      "LOGIN": "Connexion",
+      "SPACE": "Espace",
+      "EMAIL": "Email",
+      "EMAIL_PLACEHOLDER": "vous@exemple.com",
+      "PASSWORD": "Mot de passe",
+      "PASSWORD_PLACEHOLDER": "••••••••",
+      "REMEMBER_ME": "Se souvenir de moi",
+      "FORGOT_PASSWORD": "Mot de passe oublié ?",
+      "LOGIN_AS": "Se connecter en tant que",
+      "LOGGING_IN": "Connexion en cours...",
+      "NEW_HERE": "Nouveau ici ?",
+      "CREATE_ACCOUNT": "Créer un compte"
+    },
+
+    "SUCCESS": {
+      "TITLE": "Connexion simulée ✓",
+      "DESCRIPTION": "Ceci est une maquette. L'authentification réelle n'est pas activée."
+    },
+
+    "ACCESSIBILITY": {
+      "TOGGLE_PASSWORD": "Afficher ou masquer le mot de passe"
+    },
+
+    "ERRORS": {
+      "SELECT_PROFILE": "Veuillez sélectionner un profil.",
+      "EMAIL_REQUIRED": "Veuillez saisir votre adresse email.",
+      "PASSWORD_REQUIRED": "Veuillez saisir votre mot de passe.",
+      "INVALID_SERVER_RESPONSE": "Réponse invalide reçue du serveur.",
+      "LOGIN_PROCESS": "Une erreur est survenue pendant la connexion.",
+      "SERVER_UNAVAILABLE": "Impossible de contacter le serveur.",
+      "INVALID_CREDENTIALS": "Email ou mot de passe incorrect.",
+      "INVALID_INFORMATION": "Les informations envoyées sont invalides.",
+      "GENERIC": "Une erreur est survenue pendant la connexion."
+    }
+
+  },
 
   
-  "TABS": {
-    "VOLUNTEER": "Bénévole",
-    "DONOR": "Donateur",
-    "BENEFICIARY": "Bénéficiaire"
-  },
-
-  "LOGIN": {
-    "VOLUNTEER_TITLE": "Espace de connexion des bénévoles",
-    "DONOR_TITLE": "Espace de connexion des donateurs",
-    "BENEFICIARY_TITLE": "Espace de connexion des bénéficiaires",
-
-    "EMAIL_PLACEHOLDER": "Entrez votre adresse e-mail",
-    "PASSWORD_PLACEHOLDER": "Mot de passe",
-    "LOGIN_BTN": "Se connecter",
-    "LOGIN_SIMPLE": "Connexion",
-    "FORGOT_PASSWORD": "Mot de passe oublié ?",
-
-    "NEW_HERE": "Nouveau sur notre site ?",
-    "JOIN_VOLUNTEERS": "Rejoignez notre communauté de bénévoles et faites la différence dans la vie des personnes dans le besoin.",
-    "SIGNUP": "S'inscrire",
-
-    "MAKE_DIFFERENCE": "Faites la différence !",
-    "DONOR_TEXT": "Votre don peut nous aider à fournir des ressources essentielles à ceux qui en ont besoin. Chaque contribution compte.",
-
-    "NEED_HELP": "Besoin d'aide ?",
-    "BENEFICIARY_TEXT": "Nous sommes là pour vous aider. Connectez-vous pour accéder aux ressources disponibles ou contactez-nous pour plus d'informations."
+  "DONATION_PAGE": {
+    "HERO": {
+      "BADGE": "Soutenir nos actions",
+      "TITLE": "Faire un don",
+      "DESCRIPTION": "Chaque contribution compte. Choisissez le projet que vous souhaitez soutenir et la méthode de paiement qui vous convient."
+    },
+    "FORM": {
+      "FULL_NAME": "Nom complet",
+      "FULL_NAME_PLACEHOLDER": "Votre nom et prénom",
+      "AMOUNT": "Montant du don (TND)",
+      "AMOUNT_PLACEHOLDER": "Ex. 100",
+      "PAYMENT_METHOD": "Méthode de paiement",
+      "PROJECT": "Projet à soutenir",
+      "PROJECT_PLACEHOLDER": "Sélectionnez un projet",
+      "PROCESSING": "Traitement en cours…",
+      "CONFIRM_DONATION": "Confirmer mon don",
+      "SECURITY": "Vos informations sont sécurisées et ne seront jamais partagées."
+    },
+    "PAYMENT_METHODS": {
+      "BANK_TRANSFER": "Virement bancaire",
+      "ONLINE": "Paiement en ligne",
+      "CASH": "Paiement en espèces"
+    },
+    "PROJECTS": {
+      "EDUCATION": "Éducation pour tous",
+      "HEALTH": "Soins de santé primaires",
+      "WATER": "Accès à l’eau potable",
+      "SHELTER": "Abri d’urgence",
+      "FOOD": "Aide alimentaire",
+      "GENERAL": "Fonds généraux"
+    },
+    "ERRORS": {
+      "FULL_NAME_REQUIRED": "Le nom complet est requis.",
+      "FULL_NAME_MIN": "Le nom complet doit contenir au moins 3 caractères.",
+      "FULL_NAME_MAX": "Le nom complet ne doit pas dépasser 100 caractères.",
+      "AMOUNT_REQUIRED": "Veuillez indiquer un montant valide.",
+      "AMOUNT_POSITIVE": "Le montant doit être supérieur à 0.",
+      "AMOUNT_TOO_HIGH": "Le montant semble trop élevé.",
+      "PAYMENT_METHOD_REQUIRED": "Veuillez choisir une méthode de paiement.",
+      "PROJECT_REQUIRED": "Veuillez choisir un projet."
+    },
+    "SUCCESS": {
+      "TITLE": "Merci pour votre générosité !",
+      "DESCRIPTION": "Votre don a été enregistré. Notre équipe vous contactera sous peu pour finaliser le paiement.",
+      "DONOR": "Donateur",
+      "AMOUNT": "Montant",
+      "METHOD": "Méthode",
+      "PROJECT": "Projet",
+      "HOME": "Retour à l'accueil",
+      "REPORTS": "Voir nos rapports",
+      "ANOTHER_DONATION": "Faire un autre don"
+    }
   }
-
-
-
-
-
 }
-
-
-
-
 

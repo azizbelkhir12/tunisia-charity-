@@ -1,6 +1,13 @@
-import {Component,ElementRef,OnInit,QueryList,ViewChildren,} from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  OnInit,
+  QueryList,
+  ViewChildren,
+} from '@angular/core';
 import { Meta, Title } from '@angular/platform-browser';
 import { finalize } from 'rxjs/operators';
+import { TranslateService } from '@ngx-translate/core';
 
 // Utilise ici les noms réels de tes services.
 import { DemandeService } from '../services/demande/demande.service';
@@ -12,8 +19,8 @@ type PageStep = 'roles' | 'form' | 'otp' | 'success';
 
 interface RoleOption {
   id: RoleId;
-  title: string;
-  description: string;
+  titleKey: string;
+  descriptionKey: string;
   icon: string;
 }
 
@@ -65,8 +72,8 @@ interface DonorPayload {
 
 interface DonorTypeOption {
   id: Exclude<DonorType, ''>;
-  title: string;
-  description: string;
+  titleKey: string;
+  descriptionKey: string;
 }
 
 @Component({
@@ -105,15 +112,14 @@ export class BenevolatComponent implements OnInit {
   readonly roles: RoleOption[] = [
     {
       id: 'benevole',
-      title: 'Bénévole',
-      description: 'Donnez de votre temps sur le terrain ou à distance.',
+      titleKey: 'JOIN_PAGE.ROLES.VOLUNTEER.TITLE',
+      descriptionKey: 'JOIN_PAGE.ROLES.VOLUNTEER.DESCRIPTION',
       icon: 'hand-heart',
     },
     {
       id: 'donateur',
-      title: 'Donateur',
-      description:
-        'Soutenez nos actions financièrement et suivez votre impact.',
+      titleKey: 'JOIN_PAGE.ROLES.DONOR.TITLE',
+      descriptionKey: 'JOIN_PAGE.ROLES.DONOR.DESCRIPTION',
       icon: 'heart',
     },
   ];
@@ -121,13 +127,13 @@ export class BenevolatComponent implements OnInit {
   readonly donorTypes: DonorTypeOption[] = [
     {
       id: 'standard',
-      title: 'Donateur standard',
-      description: 'Faites un don ponctuel selon vos envies.',
+      titleKey: 'JOIN_PAGE.DONOR.TYPES.STANDARD.TITLE',
+      descriptionKey: 'JOIN_PAGE.DONOR.TYPES.STANDARD.DESCRIPTION',
     },
     {
       id: 'parrain',
-      title: 'Donateur parrain',
-      description: "Soutien mensuel régulier d'un bénéficiaire ou projet.",
+      titleKey: 'JOIN_PAGE.DONOR.TYPES.SPONSOR.TITLE',
+      descriptionKey: 'JOIN_PAGE.DONOR.TYPES.SPONSOR.DESCRIPTION',
     },
   ];
 
@@ -163,6 +169,7 @@ export class BenevolatComponent implements OnInit {
     private readonly metaService: Meta,
     private readonly demandeService: DemandeService,
     private readonly authService: AuthService,
+    private readonly translate: TranslateService,
   ) {}
 
   ngOnInit(): void {
@@ -180,8 +187,8 @@ export class BenevolatComponent implements OnInit {
   }
 
   trackOtpByIndex(index: number): number {
-  return index;
-}
+    return index;
+  }
 
   get otpEmail(): string {
     return this.volunteerForm.email.trim().toLowerCase();
@@ -194,16 +201,10 @@ export class BenevolatComponent implements OnInit {
 
   get successMessage(): string {
     if (this.selectedRole === 'donateur') {
-      return (
-        'Merci pour votre générosité. Votre inscription ' +
-        'en tant que donateur a été enregistrée.'
-      );
+      return this.translate.instant('JOIN_PAGE.SUCCESS.DONOR_MESSAGE');
     }
 
-    return (
-      'Merci pour votre intérêt. Votre demande de bénévolat ' +
-      'a été enregistrée et sera étudiée par notre équipe.'
-    );
+    return this.translate.instant('JOIN_PAGE.SUCCESS.VOLUNTEER_MESSAGE');
   }
 
   selectRole(role: RoleId): void {
@@ -264,10 +265,7 @@ export class BenevolatComponent implements OnInit {
     this.showDonorConfirmation = !this.showDonorConfirmation;
   }
 
-  /**
-   * Cette méthode ne contacte pas encore l'API.
-   * Elle valide le formulaire puis affiche l'étape OTP.
-   */
+
   submitVolunteer(): void {
     this.apiError = '';
     this.otpError = '';
@@ -301,144 +299,123 @@ export class BenevolatComponent implements OnInit {
           console.error('Erreur requestOtp :', error?.status, error?.error);
 
           this.apiError =
-            error?.error?.message || "Impossible d'envoyer le code OTP.";
+            error?.error?.message ||
+            this.translate.instant('JOIN_PAGE.ERRORS.SEND_OTP');
         },
       });
   }
- 
+
   submitDonor(): void {
-  this.apiError = '';
+    this.apiError = '';
 
-  if (!this.validateDonorForm()) {
-    return;
+    if (!this.validateDonorForm()) {
+      return;
+    }
+
+    const donorData = this.buildDonorPayload();
+
+    this.isSubmitting = true;
+
+    this.authService
+      .register(donorData)
+      .pipe(
+        finalize(() => {
+          this.isSubmitting = false;
+        }),
+      )
+      .subscribe({
+        next: () => {
+          this.currentStep = 'success';
+        },
+
+        error: (error) => {
+          console.error(
+            'Erreur inscription donateur :',
+            error?.status,
+            error?.error,
+          );
+
+          this.apiError =
+            error?.error?.message ||
+            error?.error?.error ||
+            this.translate.instant('JOIN_PAGE.ERRORS.REGISTER_DONOR');
+        },
+      });
   }
 
-  const donorData =
-    this.buildDonorPayload();
-
-  console.log(
-    'Données donateur envoyées :',
-    donorData
-  );
-
-  this.isSubmitting = true;
-
-  this.authService
-    .register(donorData)
-    .pipe(
-      finalize(() => {
-        this.isSubmitting = false;
-      })
-    )
-    .subscribe({
-      next: () => {
-        this.currentStep = 'success';
-      },
-
-      error: (error) => {
-        console.error(
-          'Erreur inscription donateur :',
-          error?.status,
-          error?.error
-        );
-
-        this.apiError =
-          error?.error?.message ||
-          error?.error?.error ||
-          "Impossible d'enregistrer le donateur.";
-      }
-    });
-}
-
-  /**
-   * L'appel API est exécuté uniquement après la saisie OTP.
-   */
+ 
   verifyVolunteerOtp(): void {
-  this.otpError = '';
-  this.apiError = '';
+    this.otpError = '';
+    this.apiError = '';
 
-  const otp = this.otpCode;
+    const otp = this.otpCode;
 
-  console.log(
-    'otpDigits :',
-    this.otpDigits
-  );
+    if (otp.length !== 6 || !/^\d{6}$/.test(otp)) {
+      this.otpError = this.translate.instant(
+        'JOIN_PAGE.VALIDATION.OTP_COMPLETE',
+      );
 
-  console.log(
-    'OTP envoyé :',
-    otp,
-    'Longueur :',
-    otp.length
-  );
+      return;
+    }
 
-  if (
-    otp.length !== 6 ||
-    !/^\d{6}$/.test(otp)
-  ) {
-    this.otpError =
-      'Veuillez saisir le code complet à 6 chiffres.';
+    const email = this.volunteerForm.email.trim().toLowerCase();
 
-    return;
+    this.isSubmitting = true;
+
+    this.demandeService
+      .verifyOtp(email, otp)
+      .pipe(
+        finalize(() => {
+          this.isSubmitting = false;
+        }),
+      )
+      .subscribe({
+        next: () => {
+          this.currentStep = 'success';
+        },
+
+        error: (error) => {
+          console.error(
+            'Erreur vérification OTP :',
+            error?.status,
+            error?.error,
+          );
+
+          const message = error?.error?.message;
+
+          switch (message) {
+            case 'Invalid OTP':
+              this.otpError = this.translate.instant(
+                'JOIN_PAGE.VALIDATION.OTP_INVALID',
+              );
+              break;
+
+            case 'OTP expired':
+              this.otpError = this.translate.instant(
+                'JOIN_PAGE.VALIDATION.OTP_EXPIRED',
+              );
+              break;
+
+            case 'User not found':
+              this.otpError = this.translate.instant(
+                'JOIN_PAGE.VALIDATION.OTP_USER_NOT_FOUND',
+              );
+              break;
+
+            case 'User already verified':
+              this.otpError = this.translate.instant(
+                'JOIN_PAGE.VALIDATION.OTP_ALREADY_VERIFIED',
+              );
+              break;
+
+            default:
+              this.otpError =
+                message ||
+                this.translate.instant('JOIN_PAGE.VALIDATION.OTP_VERIFY');
+          }
+        },
+      });
   }
-
-  const email =
-    this.volunteerForm.email
-      .trim()
-      .toLowerCase();
-
-  this.isSubmitting = true;
-
-  this.demandeService
-    .verifyOtp(email, otp)
-    .pipe(
-      finalize(() => {
-        this.isSubmitting = false;
-      })
-    )
-    .subscribe({
-      next: () => {
-        this.currentStep = 'success';
-      },
-
-      error: (error) => {
-        console.error(
-          'Erreur vérification OTP :',
-          error?.status,
-          error?.error
-        );
-
-        const message =
-          error?.error?.message;
-
-        switch (message) {
-          case 'Invalid OTP':
-            this.otpError =
-              'Le code OTP est incorrect.';
-            break;
-
-          case 'OTP expired':
-            this.otpError =
-              'Le code OTP a expiré.';
-            break;
-
-          case 'User not found':
-            this.otpError =
-              "Aucune demande n'a été trouvée pour cet email.";
-            break;
-
-          case 'User already verified':
-            this.otpError =
-              'Cette adresse email a déjà été vérifiée.';
-            break;
-
-          default:
-            this.otpError =
-              message ||
-              'Impossible de vérifier le code OTP.';
-        }
-      }
-    });
-}
 
   handleOtpChange(value: string, index: number): void {
     const digit = String(value ?? '')
@@ -500,48 +477,32 @@ export class BenevolatComponent implements OnInit {
     }
   }
 
-  handleOtpPaste(
-  event: ClipboardEvent
-): void {
-  event.preventDefault();
+  handleOtpPaste(event: ClipboardEvent): void {
+    event.preventDefault();
 
-  const pastedCode =
-    event.clipboardData
-      ?.getData('text')
-      .replace(/\D/g, '')
-      .slice(0, 6) ?? '';
+    const pastedCode =
+      event.clipboardData?.getData('text').replace(/\D/g, '').slice(0, 6) ?? '';
 
-  if (!pastedCode) {
-    return;
+    if (!pastedCode) {
+      return;
+    }
+
+    this.otpDigits = Array.from(
+      {
+        length: 6,
+      },
+      (_, index) => pastedCode[index] ?? '',
+    );
+
+    this.otpError = '';
+    this.apiError = '';
+
+    setTimeout(() => {
+      const targetIndex = Math.min(pastedCode.length, 6) - 1;
+
+      this.otpInputs.get(Math.max(targetIndex, 0))?.nativeElement.focus();
+    });
   }
-
-  this.otpDigits = Array.from(
-    {
-      length: 6
-    },
-    (_, index) =>
-      pastedCode[index] ?? ''
-  );
-
-  this.otpError = '';
-  this.apiError = '';
-
-  setTimeout(() => {
-    const targetIndex = Math.min(
-      pastedCode.length,
-      6
-    ) - 1;
-
-    this.otpInputs
-      .get(
-        Math.max(
-          targetIndex,
-          0
-        )
-      )
-      ?.nativeElement.focus();
-  });
-}
 
   trackRoleById(index: number, role: RoleOption): RoleId {
     return role.id;
@@ -557,7 +518,9 @@ export class BenevolatComponent implements OnInit {
 
   private buildVolunteerPayload(): VolunteerPayload {
     if (this.volunteerForm.age === null) {
-      throw new Error("L'âge est obligatoire.");
+      throw new Error(
+        this.translate.instant('JOIN_PAGE.VALIDATION.AGE_REQUIRED_PAYLOAD'),
+      );
     }
 
     return {
@@ -582,83 +545,111 @@ export class BenevolatComponent implements OnInit {
   }
 
   private buildDonorPayload(): DonorPayload {
-  if (!this.donorForm.type) {
-    throw new Error(
-      'Le type de donateur est obligatoire.'
-    );
+    if (!this.donorForm.type) {
+      throw new Error(
+        this.translate.instant(
+          'JOIN_PAGE.VALIDATION.DONOR_TYPE_REQUIRED_PAYLOAD',
+        ),
+      );
+    }
+
+    return {
+      name: this.donorForm.nomComplet.trim(),
+
+      email: this.donorForm.email.trim().toLowerCase(),
+
+      password: this.donorForm.motDePasse,
+
+      address: this.donorForm.adresse.trim(),
+
+      zipCode: this.donorForm.codePostal.trim(),
+
+      phone: this.donorForm.telephone.replace(/\s/g, ''),
+
+      type: this.donorForm.type,
+    };
   }
-
-  return {
-    name:
-      this.donorForm.nomComplet.trim(),
-
-    email:this.donorForm.email.trim().toLowerCase(),
-
-    password:this.donorForm.motDePasse,
-
-    address: this.donorForm.adresse.trim(),
-
-    zipCode: this.donorForm.codePostal.trim(),
-
-    phone:this.donorForm.telephone.replace(/\s/g, ''),
-
-    type:this.donorForm.type
-  };
-}
 
   private validateVolunteerForm(): boolean {
     const errors: Record<string, string> = {};
     const form = this.volunteerForm;
 
     if (!form.nom.trim()) {
-      errors['nom'] = 'Le nom est requis.';
+      errors['nom'] = this.translate.instant(
+        'JOIN_PAGE.VALIDATION.LAST_NAME_REQUIRED',
+      );
     }
 
     if (!form.prenom.trim()) {
-      errors['prenom'] = 'Le prénom est requis.';
+      errors['prenom'] = this.translate.instant(
+        'JOIN_PAGE.VALIDATION.FIRST_NAME_REQUIRED',
+      );
     }
 
     if (form.age === null || form.age === undefined) {
-      errors['age'] = "L'âge est requis.";
+      errors['age'] = this.translate.instant(
+        'JOIN_PAGE.VALIDATION.AGE_REQUIRED',
+      );
     } else if (!Number.isInteger(form.age) || form.age < 16 || form.age > 100) {
-      errors['age'] = "L'âge doit être compris entre 16 et 100 ans.";
+      errors['age'] = this.translate.instant('JOIN_PAGE.VALIDATION.AGE_RANGE');
     }
 
     if (!form.email.trim()) {
-      errors['email'] = "L'adresse email est requise.";
+      errors['email'] = this.translate.instant(
+        'JOIN_PAGE.VALIDATION.EMAIL_REQUIRED',
+      );
     } else if (!this.isValidEmail(form.email)) {
-      errors['email'] = 'Veuillez entrer une adresse email valide.';
+      errors['email'] = this.translate.instant(
+        'JOIN_PAGE.VALIDATION.EMAIL_INVALID',
+      );
     }
 
     if (!form.motDePasse) {
-      errors['motDePasse'] = 'Le mot de passe est requis.';
+      errors['motDePasse'] = this.translate.instant(
+        'JOIN_PAGE.VALIDATION.PASSWORD_REQUIRED',
+      );
     } else if (form.motDePasse.length < 8) {
-      errors['motDePasse'] =
-        'Le mot de passe doit contenir au moins 8 caractères.';
+      errors['motDePasse'] = this.translate.instant(
+        'JOIN_PAGE.VALIDATION.PASSWORD_MIN',
+      );
     }
 
     if (!form.confirmation) {
-      errors['confirmation'] = 'La confirmation est requise.';
+      errors['confirmation'] = this.translate.instant(
+        'JOIN_PAGE.VALIDATION.CONFIRM_REQUIRED',
+      );
     } else if (form.confirmation !== form.motDePasse) {
-      errors['confirmation'] = 'Les mots de passe ne correspondent pas.';
+      errors['confirmation'] = this.translate.instant(
+        'JOIN_PAGE.VALIDATION.CONFIRM_MATCH',
+      );
     }
 
     if (!form.adresse.trim()) {
-      errors['adresse'] = "L'adresse est requise.";
+      errors['adresse'] = this.translate.instant(
+        'JOIN_PAGE.VALIDATION.ADDRESS_REQUIRED',
+      );
     }
 
     if (!form.gouvernorat) {
-      errors['gouvernorat'] = 'Veuillez choisir un gouvernorat.';
+      errors['gouvernorat'] = this.translate.instant(
+        'JOIN_PAGE.VALIDATION.GOVERNORATE_REQUIRED',
+      );
     }
 
     if (!form.telephone.trim()) {
-      errors['telephone'] = 'Le numéro de téléphone est requis.';
+      errors['telephone'] = this.translate.instant(
+        'JOIN_PAGE.VALIDATION.PHONE_REQUIRED',
+      );
     } else if (!this.isValidPhone(form.telephone)) {
-      errors['telephone'] = 'Veuillez entrer un numéro de téléphone valide.';
+      errors['telephone'] = this.translate.instant(
+        'JOIN_PAGE.VALIDATION.PHONE_INVALID',
+      );
     }
 
     if (!form.motivation.trim()) {
-      errors['motivation'] = 'Expliquez brièvement votre motivation.';
+      errors['motivation'] = this.translate.instant(
+        'JOIN_PAGE.VALIDATION.MOTIVATION_REQUIRED',
+      );
     }
 
     this.volunteerErrors = errors;
@@ -671,46 +662,71 @@ export class BenevolatComponent implements OnInit {
     const form = this.donorForm;
 
     if (!form.nomComplet.trim()) {
-      errors['nomComplet'] = 'Le nom complet est requis.';
+      errors['nomComplet'] = this.translate.instant(
+        'JOIN_PAGE.VALIDATION.FULL_NAME_REQUIRED',
+      );
     }
 
     if (!form.email.trim()) {
-      errors['email'] = "L'adresse email est requise.";
+      errors['email'] = this.translate.instant(
+        'JOIN_PAGE.VALIDATION.EMAIL_REQUIRED',
+      );
     } else if (!this.isValidEmail(form.email)) {
-      errors['email'] = 'Veuillez entrer une adresse email valide.';
+      errors['email'] = this.translate.instant(
+        'JOIN_PAGE.VALIDATION.EMAIL_INVALID',
+      );
     }
 
     if (!form.motDePasse) {
-      errors['motDePasse'] = 'Le mot de passe est requis.';
+      errors['motDePasse'] = this.translate.instant(
+        'JOIN_PAGE.VALIDATION.PASSWORD_REQUIRED',
+      );
     } else if (form.motDePasse.length < 8) {
-      errors['motDePasse'] =
-        'Le mot de passe doit contenir au moins 8 caractères.';
+      errors['motDePasse'] = this.translate.instant(
+        'JOIN_PAGE.VALIDATION.PASSWORD_MIN',
+      );
     }
 
     if (!form.confirmation) {
-      errors['confirmation'] = 'La confirmation est requise.';
+      errors['confirmation'] = this.translate.instant(
+        'JOIN_PAGE.VALIDATION.CONFIRM_REQUIRED',
+      );
     } else if (form.confirmation !== form.motDePasse) {
-      errors['confirmation'] = 'Les mots de passe ne correspondent pas.';
+      errors['confirmation'] = this.translate.instant(
+        'JOIN_PAGE.VALIDATION.CONFIRM_MATCH',
+      );
     }
 
     if (!form.adresse.trim()) {
-      errors['adresse'] = "L'adresse est requise.";
+      errors['adresse'] = this.translate.instant(
+        'JOIN_PAGE.VALIDATION.ADDRESS_REQUIRED',
+      );
     }
 
     if (!form.codePostal.trim()) {
-      errors['codePostal'] = 'Le code postal est requis.';
+      errors['codePostal'] = this.translate.instant(
+        'JOIN_PAGE.VALIDATION.POSTAL_REQUIRED',
+      );
     } else if (!/^[0-9]{4,5}$/.test(form.codePostal.trim())) {
-      errors['codePostal'] = 'Code postal invalide.';
+      errors['codePostal'] = this.translate.instant(
+        'JOIN_PAGE.VALIDATION.POSTAL_INVALID',
+      );
     }
 
     if (!form.telephone.trim()) {
-      errors['telephone'] = 'Le numéro de téléphone est requis.';
+      errors['telephone'] = this.translate.instant(
+        'JOIN_PAGE.VALIDATION.PHONE_REQUIRED',
+      );
     } else if (!this.isValidPhone(form.telephone)) {
-      errors['telephone'] = 'Veuillez entrer un numéro de téléphone valide.';
+      errors['telephone'] = this.translate.instant(
+        'JOIN_PAGE.VALIDATION.PHONE_INVALID',
+      );
     }
 
     if (!form.type) {
-      errors['type'] = 'Veuillez choisir un type de donateur.';
+      errors['type'] = this.translate.instant(
+        'JOIN_PAGE.VALIDATION.DONOR_TYPE_REQUIRED',
+      );
     }
 
     this.donorErrors = errors;
@@ -754,6 +770,7 @@ export class BenevolatComponent implements OnInit {
     };
   }
 
+  
   private configurePageMetadata(): void {
     this.titleService.setTitle('Rejoignez-nous — Tunisia Charity');
 

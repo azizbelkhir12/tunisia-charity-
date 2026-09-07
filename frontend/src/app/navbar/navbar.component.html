@@ -7,16 +7,19 @@
   "
 >
   <div class="container-x flex items-center justify-between h-18 py-3">
+    <!-- LOGO -->
+
     <a
       routerLink="/"
       class="flex items-center gap-3"
-      aria-label="Accueil Tunisia Charity"
+      [attr.aria-label]="'NAVBAR.HOME' | translate"
     >
       <img
         [src]="logoAssetUrl"
-        alt="Tunisia Charity"
+        [attr.alt]="'NAVBAR.LOGO_ALT' | translate"
         class="h-12 w-12 rounded-full object-contain bg-white"
       />
+
       <span
         class="font-display text-xl font-semibold text-primary hidden sm:inline"
       >
@@ -24,9 +27,11 @@
       </span>
     </a>
 
+    <!-- DESKTOP NAVIGATION -->
+
     <nav
       class="hidden md:flex items-center gap-8"
-      aria-label="Navigation principale"
+      [attr.aria-label]="'NAVBAR.MAIN_NAVIGATION' | translate"
     >
       <a
         routerLink="/"
@@ -35,7 +40,7 @@
         ariaCurrentWhenActive="page"
         class="nav-link text-sm font-medium text-foreground/80 transition-colors"
       >
-        Accueil
+        {{ "HOME.NAV.HOME" | translate }}
       </a>
 
       <a
@@ -44,7 +49,7 @@
         ariaCurrentWhenActive="page"
         class="nav-link text-sm font-medium text-foreground/80 transition-colors"
       >
-        Rapports
+        {{ "HOME.NAV.REPORTS" | translate }}
       </a>
 
       <a
@@ -53,11 +58,15 @@
         ariaCurrentWhenActive="page"
         class="nav-link text-sm font-medium text-foreground/80 transition-colors"
       >
-        Rejoignez-nous
+        {{ "HOME.NAV.JOIN_US" | translate }}
       </a>
     </nav>
 
+    <!-- DESKTOP ACTIONS -->
+
     <div class="hidden md:flex items-center gap-2">
+      <!-- LOGIN -->
+
       <a
         routerLink="/login"
         routerLinkActive="active"
@@ -65,8 +74,11 @@
         class="auth-login inline-flex items-center gap-2 rounded-full border border-primary px-4 py-2.5 text-sm font-semibold text-primary transition"
       >
         <i-lucide name="log-in" class="w-4 h-4"></i-lucide>
-        Se connecter
+
+        {{ "HOME.AUTH.LOGIN" | translate }}
       </a>
+
+      <!-- DONATE -->
 
       <a
         routerLink="/payment"
@@ -74,26 +86,83 @@
         class="donate-button inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition"
       >
         <i-lucide name="heart" class="w-4 h-4" fill="currentColor"></i-lucide>
-        Faire un don
+
+        {{ "HOME.DONATE" | translate }}
       </a>
+
+      <!-- LANGUAGE SWITCHER -->
+
+      <div class="language-switcher">
+        <button
+          type="button"
+          class="language-button"
+          (click)="toggleLanguageMenu($event)"
+          [attr.aria-expanded]="languageOpen"
+          aria-haspopup="listbox"
+          [attr.aria-label]="'NAVBAR.CHANGE_LANGUAGE' | translate"
+        >
+          <i-lucide name="globe" class="w-4 h-4"></i-lucide>
+
+          <span>
+            {{ currentLang.toUpperCase() }}
+          </span>
+
+          <i-lucide
+            name="chevron-down"
+            class="language-chevron w-4 h-4"
+            [class.rotate]="languageOpen"
+          ></i-lucide>
+        </button>
+
+        <!-- DROPDOWN -->
+
+        <ul *ngIf="languageOpen" class="language-dropdown" role="listbox">
+          <li *ngFor="let language of languages">
+            <button
+              type="button"
+              class="language-option"
+              [class.active]="currentLang === language.code"
+              [attr.aria-selected]="currentLang === language.code"
+              (click)="selectLanguage(language.code)"
+            >
+              <span>
+                {{ language.label }}
+              </span>
+
+              <i-lucide
+                *ngIf="currentLang === language.code"
+                name="check"
+                class="w-4 h-4"
+              ></i-lucide>
+            </button>
+          </li>
+        </ul>
+      </div>
     </div>
+
+    <!-- MOBILE MENU BUTTON -->
 
     <button
       type="button"
       class="md:hidden p-2 rounded-md hover:bg-muted"
       (click)="toggleMenu()"
       [attr.aria-expanded]="open"
-      aria-label="Ouvrir le menu"
+      [attr.aria-label]="'NAVBAR.OPEN_MENU' | translate"
     >
       <i-lucide *ngIf="open; else menuIcon" name="x" class="w-6 h-6"></i-lucide>
+
       <ng-template #menuIcon>
         <i-lucide name="menu" class="w-6 h-6"></i-lucide>
       </ng-template>
     </button>
   </div>
 
+  <!-- MOBILE MENU -->
+
   <div *ngIf="open" class="md:hidden border-t border-border bg-background">
     <div class="container-x py-4 flex flex-col gap-2">
+      <!-- HOME -->
+
       <a
         routerLink="/"
         routerLinkActive="active"
@@ -102,8 +171,10 @@
         (click)="closeMenu()"
         class="mobile-nav-link"
       >
-        Accueil
+        {{ "NAVBAR.HOME" | translate }}
       </a>
+
+      <!-- REPORTS -->
 
       <a
         routerLink="/rapports"
@@ -112,8 +183,10 @@
         (click)="closeMenu()"
         class="mobile-nav-link"
       >
-        Rapports
+        {{ "NAVBAR.REPORTS" | translate }}
       </a>
+
+      <!-- JOIN US -->
 
       <a
         routerLink="/benevolat"
@@ -122,10 +195,14 @@
         (click)="closeMenu()"
         class="mobile-nav-link"
       >
-        Rejoignez-nous
+        {{ "NAVBAR.JOIN_US" | translate }}
       </a>
 
+      <!-- AUTH -->
+
       <div class="mobile-auth-actions">
+        <!-- LOGIN -->
+
         <a
           routerLink="/login"
           routerLinkActive="active"
@@ -134,8 +211,11 @@
           class="mobile-login-button"
         >
           <i-lucide name="log-in" class="w-4 h-4"></i-lucide>
-          Se connecter
+
+          {{ "HOME.AUTH.LOGIN" | translate }}
         </a>
+
+        <!-- REGISTER -->
 
         <a
           routerLink="/register"
@@ -145,8 +225,33 @@
           class="mobile-register-button"
         >
           <i-lucide name="user-plus" class="w-4 h-4"></i-lucide>
-          S'inscrire
+
+          {{ "NAVBAR.REGISTER" | translate }}
         </a>
+      </div>
+
+      <!-- MOBILE LANGUAGE -->
+
+      <div class="mobile-language-section">
+        <div class="mobile-language-label">
+          <i-lucide name="globe" class="w-4 h-4"></i-lucide>
+
+          <span>
+            {{ "NAVBAR.LANGUAGE" | translate }}
+          </span>
+        </div>
+
+        <div class="mobile-language-buttons">
+          <button
+            *ngFor="let language of languages"
+            type="button"
+            class="mobile-language-button"
+            [class.active]="currentLang === language.code"
+            (click)="selectLanguage(language.code)"
+          >
+            {{ language.short }}
+          </button>
+        </div>
       </div>
     </div>
   </div>

@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Meta, Title } from '@angular/platform-browser';
+import { TranslateService } from '@ngx-translate/core';
 
 type PaymentMethodId =
   | 'virement'
@@ -9,12 +10,12 @@ type PaymentMethodId =
 
 interface Project {
   value: string;
-  label: string;
+  labelKey: string;
 }
 
 interface PaymentMethod {
   id: Exclude<PaymentMethodId, ''>;
-  label: string;
+  labelKey: string;
   icon: string;
 }
 
@@ -42,51 +43,50 @@ type FormField = keyof FormErrors;
   styleUrl: './don-rapide.component.css'
 })
 export class DonRapideComponent implements OnInit {
- readonly projects: Project[] = [
+  readonly projects: Project[] = [
     {
       value: 'education',
-      label: 'Éducation pour tous'
+      labelKey: 'DONATION_PAGE.PROJECTS.EDUCATION'
     },
     {
       value: 'sante',
-      label: 'Soins de santé primaires'
+      labelKey: 'DONATION_PAGE.PROJECTS.HEALTH'
     },
     {
       value: 'eau',
-      label: 'Accès à l’eau potable'
+      labelKey: 'DONATION_PAGE.PROJECTS.WATER'
     },
     {
       value: 'abri',
-      label: 'Abri d’urgence'
+      labelKey: 'DONATION_PAGE.PROJECTS.SHELTER'
     },
     {
       value: 'alimentation',
-      label: 'Aide alimentaire'
+      labelKey: 'DONATION_PAGE.PROJECTS.FOOD'
     },
     {
       value: 'general',
-      label: 'Fonds généraux'
+      labelKey: 'DONATION_PAGE.PROJECTS.GENERAL'
     }
   ];
 
   readonly paymentMethods: PaymentMethod[] = [
     {
       id: 'virement',
-      label: 'Virement bancaire',
+      labelKey: 'DONATION_PAGE.PAYMENT_METHODS.BANK_TRANSFER',
       icon: 'landmark'
     },
     {
       id: 'en-ligne',
-      label: 'Paiement en ligne',
+      labelKey: 'DONATION_PAGE.PAYMENT_METHODS.ONLINE',
       icon: 'credit-card'
     },
     {
       id: 'cash',
-      label: 'Paiement en espèces',
+      labelKey: 'DONATION_PAGE.PAYMENT_METHODS.CASH',
       icon: 'banknote'
     }
   ];
-
 
   form: DonationForm = this.createEmptyForm();
 
@@ -97,7 +97,8 @@ export class DonRapideComponent implements OnInit {
 
   constructor(
     private readonly titleService: Title,
-    private readonly metaService: Meta
+    private readonly metaService: Meta,
+    private readonly translate: TranslateService
   ) {}
 
   ngOnInit(): void {
@@ -108,22 +109,26 @@ export class DonRapideComponent implements OnInit {
    * Nom du projet sélectionné.
    */
   get selectedProjectLabel(): string {
-    return (
-      this.projects.find(
-        project => project.value === this.form.project
-      )?.label ?? ''
+    const project = this.projects.find(
+      project => project.value === this.form.project
     );
+
+    return project
+      ? this.translate.instant(project.labelKey)
+      : '';
   }
 
   /**
    * Nom de la méthode de paiement sélectionnée.
    */
   get selectedMethodLabel(): string {
-    return (
-      this.paymentMethods.find(
-        method => method.id === this.form.method
-      )?.label ?? ''
+    const method = this.paymentMethods.find(
+      method => method.id === this.form.method
     );
+
+    return method
+      ? this.translate.instant(method.labelKey)
+      : '';
   }
 
   /**
@@ -165,13 +170,19 @@ export class DonRapideComponent implements OnInit {
 
     if (!fullName) {
       validationErrors.fullName =
-        'Le nom complet est requis.';
+        this.translate.instant(
+          'DONATION_PAGE.ERRORS.FULL_NAME_REQUIRED'
+        );
     } else if (fullName.length < 3) {
       validationErrors.fullName =
-        'Le nom complet doit contenir au moins 3 caractères.';
+        this.translate.instant(
+          'DONATION_PAGE.ERRORS.FULL_NAME_MIN'
+        );
     } else if (fullName.length > 100) {
       validationErrors.fullName =
-        'Le nom complet ne doit pas dépasser 100 caractères.';
+        this.translate.instant(
+          'DONATION_PAGE.ERRORS.FULL_NAME_MAX'
+        );
     }
 
     if (
@@ -180,23 +191,33 @@ export class DonRapideComponent implements OnInit {
       Number.isNaN(amount)
     ) {
       validationErrors.amount =
-        'Veuillez indiquer un montant valide.';
+        this.translate.instant(
+          'DONATION_PAGE.ERRORS.AMOUNT_REQUIRED'
+        );
     } else if (amount <= 0) {
       validationErrors.amount =
-        'Le montant doit être supérieur à 0.';
+        this.translate.instant(
+          'DONATION_PAGE.ERRORS.AMOUNT_POSITIVE'
+        );
     } else if (amount > 1_000_000) {
       validationErrors.amount =
-        'Le montant semble trop élevé.';
+        this.translate.instant(
+          'DONATION_PAGE.ERRORS.AMOUNT_TOO_HIGH'
+        );
     }
 
     if (!this.form.method) {
       validationErrors.method =
-        'Veuillez choisir une méthode de paiement.';
+        this.translate.instant(
+          'DONATION_PAGE.ERRORS.PAYMENT_METHOD_REQUIRED'
+        );
     }
 
     if (!this.form.project) {
       validationErrors.project =
-        'Veuillez choisir un projet.';
+        this.translate.instant(
+          'DONATION_PAGE.ERRORS.PROJECT_REQUIRED'
+        );
     }
 
     this.errors = validationErrors;
@@ -254,6 +275,9 @@ export class DonRapideComponent implements OnInit {
     };
   }
 
+  /**
+   * Les métadonnées restent volontairement en dur.
+   */
   private configurePageMetadata(): void {
     const description =
       'Soutenez Tunisia Charity par un don unique ou régulier. ' +

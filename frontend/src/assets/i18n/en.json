@@ -1,170 +1,490 @@
 {
-  "NAV": {
-    "HOME": "Home",
-    "CONTACT": "Contact",
-    "Rapports": "Reports",
-    "Rejoignez-nous": "Join Us",
-    "LOGIN": "Login",
-    "REGISTER": "Create Account",
+  "HOME": {
+    "NAV": {
+      "HOME": "Home",
+      "REPORTS": "Reports",
+      "JOIN_US": "Join us",
+      "ABOUT": "About",
+      "ACTIONS": "Our actions",
+      "PROJECTS": "Projects",
+      "CONTACT": "Contact"
+    },
+
+    "AUTH": {
+      "LOGIN": "Log in",
+      "REGISTER": "Sign up"
+    },
+
     "DONATE": "Donate",
-    "Langue" : "Language"
-  },
-  "BANNER": {
-    "TEXT": "Your support has the power to transform lives in a concrete and lasting way. Every act of generosity helps feed a hungry child, treat a patient without resources, provide shelter to a family in need, or give access to education to a young person without a future.",
-    "DONATE_BTN": "Donate Now"
-  },
-  "ABOUT": {
-    "SUBTITLE": "About Us",
-    "TITLE": "Humanitarian Aid in Tunisia",
-    "TEXT1": "The association TUNISIA CHARITY تونس الخيرية is a non-governmental non-profit organization. It aims to serve society by mobilizing the efforts of benefactors to solve the problems of their communities and help those in need.",
-    "TEXT2": "The association works in emergency relief, sustainable development, and the fight against poverty. It also promotes the spirit of cooperation and solidarity within society."
-  },
-  "SERVICE": {
-    "SUBTITLE": "Our Actions",
-    "TITLE": "We believe we can save more lives with you",
 
-    "ITEMS": {
-      "EDUCATION": {
-        "TITLE": "Children Education Support",
-        "DESC": "Providing school supplies and educational support for orphaned children."
-      },
-      "WATER": {
-        "TITLE": "Clean Water",
-        "DESC": "Ensuring access to clean and safe drinking water."
-      },
-      "SPONSORSHIP": {
-        "TITLE": "Child Sponsorship",
-        "DESC": "Finding sponsors to support children in need."
-      },
-      "POVERTY": {
-        "TITLE": "Fight Against Poverty",
-        "DESC": "Supporting vulnerable families with material, educational, and social aid."
-      },
-      "EMERGENCY": {
-        "TITLE": "Humanitarian Emergency",
-        "DESC": "Immediate assistance to crisis victims with food, shelter, and care."
-      },
-      "SOCIAL": {
-        "TITLE": "Social Aid",
-        "DESC": "Helping people in difficult situations."
+    "LANGUAGE": "Language",
+
+    "ACCESSIBILITY": {
+      "HOME": "Tunisia Charity Home",
+      "MAIN_NAV": "Main navigation",
+      "CHANGE_LANGUAGE": "Change language",
+      "OPEN_MENU": "Open menu",
+      "CLOSE_MENU": "Close menu"
+    },
+
+    "HERO": {
+      "BADGE": "Public interest recognized association",
+      "TITLE_PART1": "Every gesture",
+      "TITLE_HIGHLIGHT1": "matters",
+      "TITLE_PART2": "every life",
+      "TITLE_HIGHLIGHT2": "changes",
+      "DESCRIPTION": "Since 2010, Espoir has been supporting vulnerable families through education, healthcare, access to water and emergency shelter. Together, let's build a fairer world.",
+      "DISCOVER_ACTIONS": "Discover our actions",
+      "IMAGE_ALT": "Volunteers and families supported by the Espoir association",
+      "FAMILIES": "families",
+      "SUPPORTED_THIS_YEAR": "supported this year"
+    },
+
+    "ABOUT": {
+      "LABEL": "About us",
+      "TITLE": "A human association, concrete actions.",
+      "DESCRIPTION1": "Espoir was born from a conviction: no one should be left behind. We support children, women and families through sustainable programs built hand in hand with local communities.",
+      "DESCRIPTION2": "Thanks to our donors and our 850 volunteers, we turn every euro into real impact: a school that opens, a well that provides water, a child who smiles.",
+
+      "ITEMS": {
+        "SOLIDARITY": {
+          "TITLE": "Solidarity",
+          "TEXT": "Unconditional support wherever it is needed."
+        },
+        "COMMUNITY": {
+          "TITLE": "Community",
+          "TEXT": "A network of volunteers committed to helping in the field."
+        },
+        "TRANSPARENCY": {
+          "TITLE": "Transparency",
+          "TEXT": "100% of donations tracked, with reports published every year."
+        }
       }
+    },
+
+    "ACTIONS": {
+      "LABEL": "Our actions",
+      "TITLE": "On the ground, every day.",
+      "DESCRIPTION": "Three major pillars guide our commitment to creating lasting impact.",
+      "LEARN_MORE": "Learn more",
+
+      "ITEMS": {
+        "EDUCATION": {
+          "TITLE": "Education for all",
+          "TEXT": "Schools, school supplies and scholarships for disadvantaged children."
+        },
+        "SOCIAL": {
+          "TITLE": "Social support",
+          "TEXT": "Helping people facing difficult situations."
+        },
+        "SPONSORSHIP": {
+          "TITLE": "Child sponsorship",
+          "TEXT": "Finding sponsors to support children in need."
+        }
+      }
+    },
+
+    "IMPACT": {
+      "LABEL": "Our impact",
+      "TITLE": "Numbers that speak for themselves.",
+
+      "STATS": {
+        "DONORS": "Donors",
+        "BENEFICIARIES": "Beneficiaries",
+        "VOLUNTEERS": "Volunteers",
+        "PROJECTS": "Projects completed"
+      }
+    },
+
+    "PROJECTS": {
+      "LABEL": "Current projects",
+      "TITLE": "Help us bring them to completion.",
+      "FUNDING": "Funding",
+      "SUPPORT": "Support this project",
+      "SHOW_MORE": "Show more",
+      "SHOW_LESS": "Show less",
+      "DEFAULT_TAG": "Community project",
+      "DEFAULT_TITLE": "Project"
+    },
+
+    "CONTACT": {
+      "LABEL": "Your opinion matters",
+      "TITLE": "Share your feedback with us.",
+      "DESCRIPTION": "A question, an idea, a message of encouragement? We read every message and reply within 48 hours.",
+
+      "FORM": {
+        "NAME": "Your name",
+        "NAME_PLACEHOLDER": "Marie Dupont",
+        "EMAIL": "Email",
+        "SUBJECT": "Subject",
+        "SUBJECT_PLACEHOLDER": "About a project…",
+        "MESSAGE": "Your message",
+        "MESSAGE_PLACEHOLDER": "Share your testimonial, question or suggestion…",
+        "SEND": "Send my message",
+        "SENDING": "Sending..."
+      },
+
+      "SUCCESS_MESSAGE": "Thank you! Your message has been sent successfully.",
+
+      "ALERTS": {
+        "REQUIRED_TITLE": "Required fields",
+        "REQUIRED_TEXT": "Please provide your name, email and message.",
+        "EMAIL_TITLE": "Invalid email",
+        "EMAIL_TEXT": "Please enter a valid email address.",
+        "OK": "OK",
+        "SUCCESS_TITLE": "Message sent",
+        "SUCCESS_TEXT": "Thank you! Your message has been sent successfully.",
+        "CLOSE": "Close",
+        "ERROR_TITLE": "Unable to send",
+        "ERROR_TEXT": "An error occurred while sending your message. Please try again.",
+        "RETRY": "Retry"
+      }
+    },
+
+    "FOOTER": {
+      "DESCRIPTION": "A public interest recognized association. Your donations are tax-deductible up to 66% of your taxes.",
+      "SOCIAL_NETWORK": "Social network",
+      "NAVIGATION": "Navigation",
+      "CONTACT": "Contact",
+      "ADDRESS": "63 Iran Street, 1002 Tunis, Tunisia",
+      "RIGHTS": "All rights reserved.",
+      "DESIGNED_WITH": "Website designed with ❤️ for a more caring world."
     }
   },
-  "FACTS": {
-    "TITLE": "Our Achievements",
-    "ITEMS": {
-      "VOLUNTEERS": "Volunteers",
-      "DONORS": "Donors",
-      "BENEFICIARIES": "Beneficiaries",
-      "PROJECTS": "Projects"
+  "REPORTS_PAGE": {
+    "META": {
+      "TITLE": "Reports — Tunisia Charity",
+      "DESCRIPTION": "View and download Tunisia Charity's annual financial and activity reports with complete transparency.",
+      "OG_DESCRIPTION": "Transparency and accountability: our financial and activity reports available for download."
+    },
+
+    "HERO": {
+      "BADGE": "Transparency & Accountability",
+      "TITLE_PART1": "Our",
+      "TITLE_EMPHASIS": "annual",
+      "TITLE_PART2": "reports",
+      "DESCRIPTION": "Find all our financial and activity reports here. View them online or download them freely — transparency is at the heart of our commitment to you."
+    },
+
+    "FILTERS": {
+      "ALL": "All reports",
+      "FINANCIAL": "Financial",
+      "LITERARY": "Activity reports"
+    },
+
+    "TYPES": {
+      "FINANCIAL": "Financial",
+      "LITERARY": "Activity"
+    },
+
+    "CARD": {
+      "PDF": "PDF",
+      "PAGES": "pages",
+      "VIEW": "View",
+      "DOWNLOAD": "Download"
+    },
+
+    "EMPTY": "No reports found for this filter.",
+
+    "CTA": {
+      "TITLE": "Have a question about our accounts?",
+      "DESCRIPTION": "Our team is available to answer any questions or provide additional information about our reports.",
+      "CONTACT": "Contact us"
+    },
+
+    "PREVIEW": {
+      "LOADING_TITLE": "Loading report",
+      "LOADING": "Loading report..."
+    },
+
+    "ERRORS": {
+      "LOADING": "An error occurred while loading the reports.",
+      "DOWNLOAD": "Unable to download this report.",
+      "VIEW": "Unable to view this report."
+    }
+  }, 
+
+  
+  "JOIN_PAGE": {
+    "ROLES": {
+      "BADGE": "Become a member",
+      "TITLE_PART1": "Join",
+      "DESCRIPTION": "Choose the profile that suits you and complete your membership request.",
+      "VOLUNTEER": {
+        "TITLE": "Volunteer",
+        "DESCRIPTION": "Give your time in the field or remotely."
+      },
+      "DONOR": {
+        "TITLE": "Donor",
+        "DESCRIPTION": "Support our actions financially and track your impact."
+      }
+    },
+
+    "COMMON": {
+      "SIGN_UP": "Sign up",
+      "ALREADY_ACCOUNT": "Already have an account?",
+      "LOGIN": "Log in",
+      "CHANGE_PROFILE": "Change profile",
+      "REGISTRATION": "Registration",
+      "CONTINUE": "Continue",
+      "ALREADY_MEMBER": "Already a member?"
+    },
+
+    "FIELDS": {
+      "LAST_NAME": "Last name",
+      "LAST_NAME_PLACEHOLDER": "Your last name",
+      "FIRST_NAME": "First name",
+      "FIRST_NAME_PLACEHOLDER": "Your first name",
+      "AGE": "Age",
+      "AGE_PLACEHOLDER": "e.g. 28",
+      "EMAIL": "Email address",
+      "EMAIL_PLACEHOLDER": "you@example.com",
+      "PASSWORD": "Password",
+      "CONFIRM_PASSWORD": "Confirm password",
+      "ADDRESS": "Address",
+      "ADDRESS_PLACEHOLDER": "Street, city, postal code",
+      "ADDRESS_SHORT_PLACEHOLDER": "Street, city",
+      "GOVERNORATE": "Governorate",
+      "SELECT_GOVERNORATE": "Choose a governorate",
+      "PHONE": "Phone number",
+      "FULL_NAME": "Full name",
+      "FULL_NAME_PLACEHOLDER": "First and last name",
+      "POSTAL_CODE": "Postal code",
+      "POSTAL_CODE_PLACEHOLDER": "e.g. 1000"
+    },
+
+    "VOLUNTEER": {
+      "TITLE": "Join as a volunteer",
+      "MOTIVATION_LABEL": "Why do you want to join Tunisia Charity?",
+      "MOTIVATION_PLACEHOLDER": "Share your motivation in a few lines…"
+    },
+
+    "DONOR": {
+      "TITLE": "Join as a donor",
+      "TYPE_LABEL": "Donor type",
+      "TYPES": {
+        "STANDARD": {
+          "TITLE": "Standard donor",
+          "DESCRIPTION": "Make a one-time donation whenever you wish."
+        },
+        "SPONSOR": {
+          "TITLE": "Sponsor donor",
+          "DESCRIPTION": "Provide regular monthly support to a beneficiary or project."
+        }
+      }
+    },
+
+    "OTP": {
+      "EDIT_INFO": "Edit my information",
+      "VERIFICATION": "Verification",
+      "TITLE": "Enter your OTP code",
+      "DESCRIPTION": "Enter the 6-digit code sent to",
+      "SENDING_CODE": "Sending code...",
+      "SUBMIT": "Submit my request",
+      "SUBMITTING": "Registering...",
+      "HELP": "Your request will only be registered after this code is validated."
+    },
+
+    "SUCCESS": {
+      "TITLE": "Request sent!",
+      "BACK_HOME": "Back to home",
+      "NEW_REQUEST": "New request",
+      "DONOR_MESSAGE": "Thank you for your generosity. Your registration as a donor has been recorded.",
+      "VOLUNTEER_MESSAGE": "Thank you for your interest. Your volunteer request has been recorded and will be reviewed by our team."
+    },
+
+    "ACCESSIBILITY": {
+      "TOGGLE_PASSWORD": "Show or hide password",
+      "TOGGLE_CONFIRMATION": "Show or hide password confirmation",
+      "DIGIT": "Digit"
+    },
+
+    "ERRORS": {
+      "SEND_OTP": "Unable to send the OTP code.",
+      "REGISTER_DONOR": "Unable to register the donor."
+    },
+
+    "VALIDATION": {
+      "AGE_REQUIRED_PAYLOAD": "Age is required.",
+      "DONOR_TYPE_REQUIRED_PAYLOAD": "Donor type is required.",
+
+      "LAST_NAME_REQUIRED": "Last name is required.",
+      "FIRST_NAME_REQUIRED": "First name is required.",
+      "AGE_REQUIRED": "Age is required.",
+      "AGE_RANGE": "Age must be between 16 and 100 years.",
+
+      "EMAIL_REQUIRED": "Email address is required.",
+      "EMAIL_INVALID": "Please enter a valid email address.",
+
+      "PASSWORD_REQUIRED": "Password is required.",
+      "PASSWORD_MIN": "Password must contain at least 8 characters.",
+
+      "CONFIRM_REQUIRED": "Confirmation is required.",
+      "CONFIRM_MATCH": "Passwords do not match.",
+
+      "ADDRESS_REQUIRED": "Address is required.",
+      "GOVERNORATE_REQUIRED": "Please choose a governorate.",
+
+      "PHONE_REQUIRED": "Phone number is required.",
+      "PHONE_INVALID": "Please enter a valid phone number.",
+
+      "MOTIVATION_REQUIRED": "Please briefly explain your motivation.",
+
+      "FULL_NAME_REQUIRED": "Full name is required.",
+
+      "POSTAL_REQUIRED": "Postal code is required.",
+      "POSTAL_INVALID": "Invalid postal code.",
+
+      "DONOR_TYPE_REQUIRED": "Please choose a donor type.",
+
+      "OTP_COMPLETE": "Please enter the complete 6-digit code.",
+      "OTP_INVALID": "The OTP code is incorrect.",
+      "OTP_EXPIRED": "The OTP code has expired.",
+      "OTP_USER_NOT_FOUND": "No request was found for this email address.",
+      "OTP_ALREADY_VERIFIED": "This email address has already been verified.",
+      "OTP_VERIFY": "Unable to verify the OTP code."
     }
   },
-  "CAUSES": {
-    "SUBTITLE": "Our Projects",
-    "TITLE": "Let's explore the different projects in our association"
-  },
-  "CONTACT": {
-    "SUBTITLE": "At Your Service",
-    "TITLE": "Have questions? Contact us!",
-    "NAME": "Your Name",
-    "EMAIL": "Your Email",
-    "SUBJECT": "Subject",
-    "MESSAGE": "Message",
-    "SEND": "Send Message"
-  },
-  "LANG": {
-    "BUTTON": "Language",
-    "FR": "Français",
-    "EN": "English",
-    "AR": "العربية"
-  },
-
-
 
   
-  "CONTACT-PAGE": {
-    "TITLE": "Contact us",
-    "SUBTITLE": "We would love to hear from you",
-    "INFORMATIONS": "Information",
-    "ASSOCIATION": "Association",
-    "ADDRESS": "Address",
-    "PHONE": "Phone",
-    "EMAIL": "Email",
-    "WORK_HOURS": "Working hours"
-  },
+  "LOGIN_PAGE": {
 
+    "ROLE_SELECTION": {
+      "BADGE": "Member area",
+      "TITLE_PART1": "Welcome.",
+      "TITLE_EM": "Who are you?",
+      "DESCRIPTION": "Choose your profile to access the space that suits you.",
+      "LOGIN": "Log in",
+      "NO_ACCOUNT": "Don't have an account yet?",
+      "CREATE_ACCOUNT": "Create an account"
+    },
+
+    "ROLES": {
+
+      "VOLUNTEER": {
+        "TITLE": "Volunteer",
+        "DESCRIPTION": "Give your time and join our missions in the field.",
+        "PERKS": {
+          "NEARBY_MISSIONS": "Missions near you",
+          "COMMUNITY": "Engaged community",
+          "HOURS": "Track your hours"
+        }
+      },
+
+      "DONOR": {
+        "TITLE": "Donor",
+        "DESCRIPTION": "Track your donations, download your tax receipts and discover their real impact.",
+        "PERKS": {
+          "DONATION_HISTORY": "Donation history",
+          "TAX_RECEIPTS": "Tax receipts",
+          "IMPACT_REPORTS": "Impact reports"
+        }
+      },
+
+      "BENEFICIARY": {
+        "TITLE": "Beneficiary",
+        "DESCRIPTION": "Access assistance programs and submit your requests online.",
+        "PERKS": {
+          "AID_REQUESTS": "Assistance requests",
+          "CASE_TRACKING": "Case tracking",
+          "DIRECT_CONTACT": "Direct contact"
+        }
+      }
+
+    },
+
+    "FORM": {
+      "CHANGE_PROFILE": "Change profile",
+      "LOGIN": "Login",
+      "SPACE": "Space",
+      "EMAIL": "Email",
+      "EMAIL_PLACEHOLDER": "you@example.com",
+      "PASSWORD": "Password",
+      "PASSWORD_PLACEHOLDER": "••••••••",
+      "REMEMBER_ME": "Remember me",
+      "FORGOT_PASSWORD": "Forgot password?",
+      "LOGIN_AS": "Log in as",
+      "LOGGING_IN": "Logging in...",
+      "NEW_HERE": "New here?",
+      "CREATE_ACCOUNT": "Create a"
+    },
+
+    "SUCCESS": {
+      "TITLE": "Simulated login ✓",
+      "DESCRIPTION": "This is a mockup. Real authentication is not enabled."
+    },
+
+    "ACCESSIBILITY": {
+      "TOGGLE_PASSWORD": "Show or hide password"
+    },
+
+    "ERRORS": {
+      "SELECT_PROFILE": "Please select a profile.",
+      "EMAIL_REQUIRED": "Please enter your email address.",
+      "PASSWORD_REQUIRED": "Please enter your password.",
+      "INVALID_SERVER_RESPONSE": "Invalid response received from the server.",
+      "LOGIN_PROCESS": "An error occurred during login.",
+      "SERVER_UNAVAILABLE": "Unable to contact the server.",
+      "INVALID_CREDENTIALS": "Incorrect email or password.",
+      "INVALID_INFORMATION": "The submitted information is invalid.",
+      "GENERIC": "An error occurred during login."
+    }
+
+  },
 
   
-  "VOLUNTEER": {
-    "TITLE": "Volunteer with us",
-    "SIGNUP": "Signup",
-    "NEW_HERE": "New on our website?",
-    "NEW_HERE_TEXT": "Register now and help others, share beauty, love and emotions through charity!",
-    "LOGIN": "Login"
-  },
-
-  "FORM": {
-    "NAME": "Last name",
-    "FIRSTNAME": "First name",
-    "AGE": "Age",
-    "EMAIL": "Email address",
-    "PASSWORD": "Password",
-    "CONFIRM_PASSWORD": "Confirm password",
-    "ADDRESS": "Full address",
-    "GOVERNORATE": "Choose a governorate",
-    "PHONE": "Phone number",
-    "REASON": "Why do you want to join us?"
-  },
-
-  "OTP": {
-    "TITLE": "Email verification",
-    "SENT": "An OTP code was sent to",
-    "INSTRUCTION": "Please enter it below to confirm your registration.",
-    "PLACEHOLDER": "Enter OTP code",
-    "VERIFY": "Verify",
-    "CANCEL": "Cancel"
-  },
-
-  "ERRORS": {
-    "REQUIRED": "This field is required",
-    "MIN_3": "Minimum 3 characters",
-    "MAX_50": "Maximum 50 characters",
-    "EMAIL_INVALID": "Invalid email format",
-    "AGE_MIN": "You must be at least 18 years old",
-    "AGE_MAX": "Age cannot exceed 99",
-    "PASSWORD_MATCH": "Passwords do not match"
-  },
-
-
-  
-  "TABS": {
-    "VOLUNTEER": "Volunteer",
-    "DONOR": "Donor",
-    "BENEFICIARY": "Beneficiary"
-  },
-
-  "LOGIN": {
-    "VOLUNTEER_TITLE": "Volunteer login area",
-    "DONOR_TITLE": "Donor login area",
-    "BENEFICIARY_TITLE": "Beneficiary login area",
-
-    "EMAIL_PLACEHOLDER": "Enter your email address",
-    "PASSWORD_PLACEHOLDER": "Password",
-    "LOGIN_BTN": "Login",
-    "LOGIN_SIMPLE": "Login",
-    "FORGOT_PASSWORD": "Forgot password?",
-
-    "NEW_HERE": "New to our website?",
-    "JOIN_VOLUNTEERS": "Join our volunteer community and make a difference in the lives of people in need.",
-    "SIGNUP": "Sign up",
-
-    "MAKE_DIFFERENCE": "Make a difference!",
-    "DONOR_TEXT": "Your donation helps us provide essential resources to those in need. Every contribution counts.",
-
-    "NEED_HELP": "Need help?",
-    "BENEFICIARY_TEXT": "We are here to help you. Log in to access available resources or contact us for more information."
+  "DONATION_PAGE": {
+    "HERO": {
+      "BADGE": "Support our work",
+      "TITLE": "Make a donation",
+      "DESCRIPTION": "Every contribution matters. Choose the project you would like to support and the payment method that suits you."
+    },
+    "FORM": {
+      "FULL_NAME": "Full name",
+      "FULL_NAME_PLACEHOLDER": "Your first and last name",
+      "AMOUNT": "Donation amount (TND)",
+      "AMOUNT_PLACEHOLDER": "e.g. 100",
+      "PAYMENT_METHOD": "Payment method",
+      "PROJECT": "Project to support",
+      "PROJECT_PLACEHOLDER": "Select a project",
+      "PROCESSING": "Processing…",
+      "CONFIRM_DONATION": "Confirm my donation",
+      "SECURITY": "Your information is secure and will never be shared."
+    },
+    "PAYMENT_METHODS": {
+      "BANK_TRANSFER": "Bank transfer",
+      "ONLINE": "Online payment",
+      "CASH": "Cash payment"
+    },
+    "PROJECTS": {
+      "EDUCATION": "Education for all",
+      "HEALTH": "Primary healthcare",
+      "WATER": "Access to clean water",
+      "SHELTER": "Emergency shelter",
+      "FOOD": "Food assistance",
+      "GENERAL": "General funds"
+    },
+    "ERRORS": {
+      "FULL_NAME_REQUIRED": "Full name is required.",
+      "FULL_NAME_MIN": "Full name must contain at least 3 characters.",
+      "FULL_NAME_MAX": "Full name must not exceed 100 characters.",
+      "AMOUNT_REQUIRED": "Please enter a valid amount.",
+      "AMOUNT_POSITIVE": "The amount must be greater than 0.",
+      "AMOUNT_TOO_HIGH": "The amount seems too high.",
+      "PAYMENT_METHOD_REQUIRED": "Please choose a payment method.",
+      "PROJECT_REQUIRED": "Please choose a project."
+    },
+    "SUCCESS": {
+      "TITLE": "Thank you for your generosity!",
+      "DESCRIPTION": "Your donation has been registered. Our team will contact you shortly to finalize the payment.",
+      "DONOR": "Donor",
+      "AMOUNT": "Amount",
+      "METHOD": "Method",
+      "PROJECT": "Project",
+      "HOME": "Back to home",
+      "REPORTS": "View our reports",
+      "ANOTHER_DONATION": "Make another donation"
+    }
   }
-
-
-
 }
+
