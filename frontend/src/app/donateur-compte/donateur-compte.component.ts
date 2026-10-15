@@ -134,7 +134,6 @@ export class DonateurCompteComponent implements OnInit {
 
     this.donorService.getDonorsById(this.donorId).subscribe({
       next: (response: any) => {
-        console.log('Donor response:', response);
 
         const donorData = Array.isArray(response)
           ? response[0]
@@ -176,9 +175,7 @@ export class DonateurCompteComponent implements OnInit {
         // le profil est maintenant déterminé par MongoDB
         this.isParrain = this.infos.status === 'parrain';
 
-        console.log('Donor status:', this.infos.status);
-
-        console.log('Is parrain:', this.isParrain);
+        
 
         // Génère automatiquement la navigation
         this.buildNavigation();
@@ -315,8 +312,7 @@ export class DonateurCompteComponent implements OnInit {
 
     this.donorService.updateDonor(this.donorId, updatedDonor).subscribe({
       next: (response: any) => {
-        console.log('Donor updated:', response);
-
+        
         this.infos = {
           ...this.infos,
           ...updatedDonor,
@@ -350,7 +346,6 @@ export class DonateurCompteComponent implements OnInit {
 
     this.donorService.getDonationsByDonorId(this.donorId).subscribe({
       next: (response) => {
-        console.log('Donations response:', response);
 
         if (response && Array.isArray(response.donations)) {
           this.donations = response.donations;
@@ -428,7 +423,7 @@ export class DonateurCompteComponent implements OnInit {
   loadRapports(): void {
     this.rapportService.getRapports().subscribe({
       next: (response: any) => {
-        console.log('Rapports response:', response);
+       
 
         if (Array.isArray(response)) {
           this.rapports = response;
@@ -474,7 +469,7 @@ export class DonateurCompteComponent implements OnInit {
 
     this.donorService.getDonorWithBeneficiaries(this.donorId).subscribe({
       next: (response: any) => {
-        console.log('Donor beneficiaries response:', response);
+       
 
         const data = response?.donor || response?.data || response;
 

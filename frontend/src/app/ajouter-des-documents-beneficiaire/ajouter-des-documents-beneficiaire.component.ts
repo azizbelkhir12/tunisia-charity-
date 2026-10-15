@@ -53,7 +53,6 @@ export class AjouterDesDocumentsBeneficiaireComponent {
     
       try {
         const decoded = jwtDecode<TokenPayload>(token);
-        console.log('Decoded token:', decoded);
         return decoded.id; // adjust field name based on your token
       } catch (error) {
         console.error('Failed to decode token', error);
@@ -101,7 +100,6 @@ export class AjouterDesDocumentsBeneficiaireComponent {
     
         this.beneficiaryService.uploadDocuments(beneficiaryId, formData).subscribe({
           next: (response) => {
-            console.log('Documents uploaded successfully', response);
             Swal.close();
             Swal.fire({
               icon: 'success',
@@ -110,7 +108,6 @@ export class AjouterDesDocumentsBeneficiaireComponent {
             });
           },
           error: (err) => {
-            console.log('Upload error:', err);
             Swal.close();
             Swal.fire({
               icon: 'error',

@@ -10,7 +10,7 @@ export class AdminGuard implements CanActivate {
 
   canActivate(): boolean {
     if (this.authService.isLoggedIn && this.authService.isAdmin) {
-      console.log('Admin access granted');
+      
       return true;
     }
 

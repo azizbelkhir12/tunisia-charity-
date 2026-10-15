@@ -20,7 +20,6 @@ export class VoirDocumentsBeneficiaireComponent implements OnInit {
   fetchBeneficiaires(): void {
     this.beneficiaryService.getBeneficiaires().subscribe({
       next: (response) => {
-        console.log('Bénéficiaires chargés:', response);
         this.beneficiaires = response.data.beneficiaries;
       },
       error: (err) => {

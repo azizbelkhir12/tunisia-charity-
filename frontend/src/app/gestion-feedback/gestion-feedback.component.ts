@@ -232,11 +232,7 @@ readonly MessageSquare = MessageSquare;
       .deleteContactForm(id)
       .subscribe({
         next: (response) => {
-          console.log(
-            'Feedback deleted:',
-            response
-          );
-
+          
           this.items = this.items.filter(
             item => item._id !== id
           );

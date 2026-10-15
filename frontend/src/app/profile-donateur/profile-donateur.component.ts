@@ -94,7 +94,7 @@ export class ProfileDonateurComponent {
       if (userId) {
         this.donorService.updateDonor(userId, formData).subscribe({
           next: (res) => {
-            console.log('Image updated:', res);
+           
             this.utilisateur.img = res.donor.img; // Access the img from res.donor
             // Force UI refresh if needed
             this.utilisateur = { ...this.utilisateur };
@@ -125,7 +125,6 @@ export class ProfileDonateurComponent {
     if (userId) {
       this.donorService.updateDonor(userId, updatedData).subscribe({
         next: (res) => {
-          console.log('All fields updated:', res);
           this.utilisateur = { ...this.utilisateur, ...updatedData };
           for (const key in this.isEditing) {
             this.isEditing[key] = false;

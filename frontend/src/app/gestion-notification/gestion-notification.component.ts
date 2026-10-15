@@ -424,8 +424,6 @@ export class GestionNotificationComponent {
         .broadcastNotification(notificationData)
         .subscribe({
           next: (response) => {
-            console.log('Broadcast envoyé:', response);
-
             this.sendSuccess();
           },
 
@@ -457,7 +455,7 @@ export class GestionNotificationComponent {
 
       this.notificationService.sendNotification(notificationData).subscribe({
         next: (response) => {
-          console.log('Notification envoyée:', response);
+         
 
           this.sendSuccess();
         },
@@ -492,7 +490,6 @@ export class GestionNotificationComponent {
 
     forkJoin(requests).subscribe({
       next: (responses) => {
-        console.log('Multicast envoyé:', responses);
 
         this.sendSuccess();
       },

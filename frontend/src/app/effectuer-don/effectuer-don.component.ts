@@ -132,7 +132,6 @@ export class EffectuerDonComponent {
       formData.paymentType = 'local';  // Keep paymentType separately
     }
   
-    console.log('Form Data:', formData); // Ensure it has paymentType
   
     if (formData.paymentMethod === 'bank_transfer' || formData.paymentMethod === 'cash') {
       // Handle bank transfer or cash payment (add your Swal logic here)

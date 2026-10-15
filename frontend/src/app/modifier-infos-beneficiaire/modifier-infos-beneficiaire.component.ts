@@ -120,7 +120,6 @@ export class ModifierInfosBeneficiaireComponent implements OnInit {
   
         this.beneficiaryService.uploadPhoto(this.utilisateur._id, file).subscribe({
           next: (res) => {
-            console.log('Photo updated:', res);
             this.utilisateur.photoUrl = base64Image;
           },
           error: (err) => {

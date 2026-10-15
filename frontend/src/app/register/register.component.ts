@@ -112,14 +112,12 @@ export class RegisterComponent {
       img: this.signupForm.get('img')?.value ?? '', // Ensure it's not undefined
       };
 
-      console.log('Payload being sent:', donorData);
 
       // Exclude confirmPassword before sending the request
       const { confirmPassword, ...donorDataWithoutConfirm } = this.signupForm.value;
 
       this.AuthService.register(donorData).subscribe(
       (response) => {
-        console.log('Signup successful', response);
         this.successMessage = "Inscription réussie ! Vous pouvez maintenant vous connecter.";
         Swal.fire({
         icon: 'success',

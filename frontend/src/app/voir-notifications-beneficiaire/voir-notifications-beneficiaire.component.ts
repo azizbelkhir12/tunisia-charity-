@@ -23,7 +23,7 @@ export class VoirNotificationsBeneficiaireComponent implements OnInit {
     if (userId) {
       this.notificationService.getNotificationById(userId).subscribe({
         next: (response) => {
-          console.log('Notifications:', response);
+         
           
           if (response.success && response.notifications) {
             // Transform the API data to match your template

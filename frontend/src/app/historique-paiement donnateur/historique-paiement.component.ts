@@ -32,7 +32,6 @@ export class HistoriquePaiementComponent {
   
     this.donorsService.getDonationsByDonorId(donorId).subscribe({
       next: (response) => {
-        console.log('API Response:', response);
         
         // Check if response has donations array
         if (response.success && Array.isArray(response.donations)) {

@@ -240,10 +240,7 @@ export class BeneficiaireCompteComponent implements OnInit {
       return;
     }
 
-    console.log(
-      'Chargement des notifications du bénéficiaire :',
-      this.beneficiaireId,
-    );
+    
 
     this.notificationService
       .getNotificationById(this.beneficiaireId)
@@ -300,11 +297,6 @@ export class BeneficiaireCompteComponent implements OnInit {
             (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
           );
 
-          console.log('NOTIFICATIONS ANGULAR :', this.notifications);
-
-          console.log('NOTIFICATIONS LUES :', this.readNotificationIds);
-
-          console.log('NOMBRE NON LUES :', this.unreadCount);
         },
 
         error: (error) => {
@@ -669,32 +661,20 @@ export class BeneficiaireCompteComponent implements OnInit {
     }
 
     if (this.notifications.length === 0) {
-      console.log('Aucune notification à marquer comme lue.');
 
       return;
     }
-
-    console.log(
-      'Marquage de toutes les notifications comme lues...',
-      this.beneficiaireId,
-    );
 
     this.notificationService
       .markAllNotificationsAsRead(this.beneficiaireId)
       .subscribe({
         next: (response: any) => {
-          console.log(
-            'Toutes les notifications ont été marquées comme lues côté backend.',
-            response,
-          );
+
 
           this.readNotificationIds = this.notifications.map((notification) =>
             notification.id.toString(),
           );
 
-          console.log('readNotificationIds :', this.readNotificationIds);
-
-          console.log('Nombre de notifications non lues :', this.unreadCount);
         },
 
         error: (error) => {

@@ -40,7 +40,6 @@ export class RapportsDonnateurStandardComponent implements OnInit{
     
     this.rapportService.getRapports().subscribe({
       next: (data: any) => {
-        console.log('Rapports:', data); // Log the data received from the service
         this.rapports = data;
         this.loading = false;
       },

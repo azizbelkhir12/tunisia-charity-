@@ -267,7 +267,6 @@ export class BenevoleCompteComponent {
       )
       .subscribe({
         next: (response: any) => {
-          console.log('Volunteer response:', response);
 
           const volunteer = this.extractVolunteer(response);
 
@@ -498,8 +497,6 @@ export class BenevoleCompteComponent {
 
     const updateData = this.buildUpdatePayload();
 
-    console.log('Volunteer update payload:', updateData);
-
     this.savingProfile = true;
 
     this.volunteerService
@@ -656,7 +653,6 @@ export class BenevoleCompteComponent {
       )
       .subscribe({
         next: (response: any) => {
-          console.log('Notifications response:', response);
 
           const notifications = this.extractNotifications(response);
 
