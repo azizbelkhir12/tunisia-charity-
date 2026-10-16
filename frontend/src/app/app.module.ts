@@ -1,7 +1,7 @@
-import { NgModule } from '@angular/core';
+import { APP_INITIALIZER, NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { HttpClientModule, HttpClient } from '@angular/common/http';
+import { HTTP_INTERCEPTORS, HttpClientModule, HttpClient } from '@angular/common/http';
 import { AppRoutingModule } from './app-routing.module';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { GoogleMapsModule } from '@angular/google-maps';
@@ -85,6 +85,8 @@ import {
 } from 'lucide-angular';
 
 import { AppComponent } from './app.component';
+import { AuthService } from './services/auth/auth.service';
+import { ApiCredentialsInterceptor } from './services/auth/api-credentials.interceptor';
 
 // Composants
 import { AcceuilComponent } from './acceuil/acceuil.component';
@@ -139,6 +141,10 @@ import { ResetPasswordComponent } from './reset-password/reset-password.componen
 // AoT requires an exported function for factories
 export function HttpLoaderFactory(http: HttpClient) {
   return new TranslateHttpLoader(http, './assets/i18n/', '.json');
+}
+
+export function initializeAuth(authService: AuthService): () => Promise<void> {
+  return () => authService.autoLogin();
 }
 
 @NgModule({
@@ -285,7 +291,19 @@ export function HttpLoaderFactory(http: HttpClient) {
       },
     }),
   ],
-  providers: [],
+  providers: [
+    {
+      provide: APP_INITIALIZER,
+      useFactory: initializeAuth,
+      deps: [AuthService],
+      multi: true,
+    },
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: ApiCredentialsInterceptor,
+      multi: true,
+    },
+  ],
   bootstrap: [AppComponent],
 })
 export class AppModule {}

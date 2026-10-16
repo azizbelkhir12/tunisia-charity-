@@ -40,7 +40,6 @@ export class AdminLoginComponent {
       next: response => {
 
         if (
-          !response?.token ||
           !response?.data?.user
         ) {
           this.loginErrorMsg =
@@ -62,17 +61,7 @@ export class AdminLoginComponent {
             this.loginData.userType
         };
 
-        localStorage.setItem(
-          'token',
-          response.token
-        );
-
-        localStorage.setItem(
-          'currentUser',
-          JSON.stringify(authenticatedUser)
-        );
-
-        this.authService.currentUser.next(
+        this.authService.setCurrentUser(
           authenticatedUser
         );
 

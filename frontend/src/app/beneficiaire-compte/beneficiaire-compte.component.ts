@@ -2,6 +2,7 @@ import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 
 import { BeneficiaryService } from '../services/beneficiary/beneficiary.service';
 import { NotificationService } from '../services/notification/notification.service';
+import { AuthService } from '../services/auth/auth.service';
 import { Router } from '@angular/router';
 
 
@@ -157,6 +158,7 @@ export class BeneficiaireCompteComponent implements OnInit {
   constructor(
     private beneficiaryService: BeneficiaryService,
     private notificationService: NotificationService,
+    private authService: AuthService,
     private router: Router,
   ) {}
 
@@ -176,24 +178,7 @@ export class BeneficiaireCompteComponent implements OnInit {
   // =========================================================
 
   private getBeneficiaireId(): void {
-    /*
-     * Adapte cette partie à la manière dont tu stockes
-     * l'utilisateur connecté.
-     */
-
-    const currentUser = localStorage.getItem('currentUser');
-
-    if (!currentUser) {
-      return;
-    }
-
-    try {
-      const user = JSON.parse(currentUser);
-
-      this.beneficiaireId = user._id || user.id || user.beneficiaireId || '';
-    } catch (error) {
-      console.error('Erreur lors de la lecture de currentUser :', error);
-    }
+    this.beneficiaireId = this.authService.getCurrentUserId() || '';
   }
 
   loadBeneficiaire(): void {
@@ -884,15 +869,6 @@ export class BeneficiaireCompteComponent implements OnInit {
 
   logout(): void {
 
-  // Delete authentication data
-  localStorage.removeItem('token');
-  localStorage.removeItem('currentUser');
-
-  // If you have other authentication keys, remove them too
-  localStorage.removeItem('user');
-  localStorage.removeItem('beneficiaire');
-
-  // Redirect to login
-  this.router.navigate(['/login']);
+  this.authService.logout();
 }
 }

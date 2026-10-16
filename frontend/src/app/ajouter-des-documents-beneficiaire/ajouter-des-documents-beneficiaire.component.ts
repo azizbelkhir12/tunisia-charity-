@@ -1,12 +1,8 @@
 import { Component } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { BeneficiaryService } from '../services/beneficiary/beneficiary.service';
+import { AuthService } from '../services/auth/auth.service';
 import Swal from 'sweetalert2';
-
-interface TokenPayload {
-  id: string; // Adjust the field name and type based on your token structure
-}
-import { jwtDecode } from 'jwt-decode';
 
 @Component({
   selector: 'app-ajouter-des-documents-beneficiaire',
@@ -20,7 +16,11 @@ export class AjouterDesDocumentsBeneficiaireComponent {
     housePhotoPreview: string | ArrayBuffer | null = null;
     bulletinPreview: string = '';
 
-    constructor(private fb: FormBuilder , private beneficiaryService: BeneficiaryService) {
+    constructor(
+      private fb: FormBuilder,
+      private beneficiaryService: BeneficiaryService,
+      private authService: AuthService,
+    ) {
       this.documentForm = this.fb.group({
         personalPhoto: [null, Validators.required],
         housePhoto: [null, Validators.required],
@@ -47,23 +47,14 @@ export class AjouterDesDocumentsBeneficiaireComponent {
       }
     }
 
-    getBeneficiaryIdFromToken(): string | null {
-      const token = localStorage.getItem('token'); // or wherever your token is stored
-      if (!token) return null;
-    
-      try {
-        const decoded = jwtDecode<TokenPayload>(token);
-        return decoded.id; // adjust field name based on your token
-      } catch (error) {
-        console.error('Failed to decode token', error);
-        return null;
-      }
+    getBeneficiaryId(): string | null {
+      return this.authService.getCurrentUserId();
     }
     
 
     onSubmit(): void {
       if (this.documentForm.valid) {
-        const beneficiaryId = this.getBeneficiaryIdFromToken();
+        const beneficiaryId = this.getBeneficiaryId();
     
         if (!beneficiaryId) {
           Swal.fire({

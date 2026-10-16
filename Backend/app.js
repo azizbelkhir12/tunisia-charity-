@@ -39,7 +39,10 @@ app.use(bodyParser.json({ limit: '10mb' }));
 app.use(bodyParser.urlencoded({ limit: '10mb', extended: true }));
 
 //Middlewares
-app.use(cors());
+app.use(cors({
+  origin: process.env.FRONTEND_URL || 'http://localhost:4200',
+  credentials: true
+}));
 app.use(express.json());
 app.use('/uploads', express.static('uploads')); 
 

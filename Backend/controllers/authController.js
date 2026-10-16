@@ -6,6 +6,14 @@ const Volunteer = require('../models/Volunteer');
 const Beneficiary = require('../models/Beneficiary');
 const Admin = require('../models/Admin'); 
 const bcrypt = require('bcryptjs');
+const { getToken } = require('../utils/token');
+
+const authCookieOptions = () => ({
+  httpOnly: true,
+  secure: process.env.NODE_ENV === 'production',
+  sameSite: 'lax',
+  path: '/'
+});
 
 exports.login = async (req, res) => {
     try {
@@ -68,13 +76,14 @@ exports.login = async (req, res) => {
             { expiresIn: process.env.JWT_EXPIRES_IN || '1d' }
         );
 
+        res.cookie('authToken', token, authCookieOptions());
+
         // Prepare user data for response
         const userData = user.toObject();
         delete userData.password;
 
         res.status(200).json({
           status: 'success',
-          token,
           expiresIn: process.env.JWT_EXPIRES_IN || '1d',
           data: {
             user: userData,
@@ -310,4 +319,46 @@ exports.resetPassword = async (req, res) => {
     
     res.status(500).json({ message: 'Erreur du serveur.' });
   }
+};
+
+exports.getCurrentUser = async (req, res) => {
+  try {
+    const token = getToken(req);
+    if (!token) {
+      return res.status(401).json({ message: 'Authentication required' });
+    }
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const Models = {
+      donor: Donor,
+      volunteer: Volunteer,
+      beneficiary: Beneficiary,
+      admin: Admin
+    };
+    const Model = Models[decoded.userType];
+
+    if (!Model) {
+      return res.status(401).json({ message: 'Invalid user type' });
+    }
+
+    const user = await Model.findById(decoded.id);
+    if (!user) {
+      return res.status(401).json({ message: 'User not found' });
+    }
+
+    const userData = user.toObject();
+    delete userData.password;
+
+    return res.status(200).json({
+      status: 'success',
+      data: { user: userData, userType: decoded.userType }
+    });
+  } catch (error) {
+    return res.status(401).json({ message: 'Invalid or expired session' });
+  }
+};
+
+exports.logout = (req, res) => {
+  res.clearCookie('authToken', authCookieOptions());
+  return res.status(204).end();
 };

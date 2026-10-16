@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Meta, Title } from '@angular/platform-browser';
 import { Router } from '@angular/router';
+import { AuthService } from '../services/auth/auth.service';
 
 interface AdminNavigationItem {
   to: string;
@@ -65,6 +66,7 @@ export class SidebarAdminComponent implements OnInit {
     private titleService: Title,
     private metaService: Meta,
     private router: Router,
+    private authService: AuthService,
   ) {}
 
   ngOnInit(): void {
@@ -77,16 +79,7 @@ export class SidebarAdminComponent implements OnInit {
   }
 
   logout(): void {
-    // Supprimer les données d'authentification
-    localStorage.removeItem('token');
-    localStorage.removeItem('currentUser');
-
-    // Au cas où certaines données seraient dans sessionStorage
-    sessionStorage.removeItem('token');
-    sessionStorage.removeItem('currentUser');
-
-    // Redirection vers le site
-    this.router.navigate(['/']);
+    this.authService.logout();
   }
 
 }

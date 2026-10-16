@@ -2,7 +2,6 @@ import { Component, OnInit } from '@angular/core';
 import { Meta, Title } from '@angular/platform-browser';
 import { AuthService } from '../services/auth/auth.service';
 import { Router } from '@angular/router';
-import { jwtDecode } from 'jwt-decode';
 import { TranslateService } from '@ngx-translate/core';
 
 type RoleId =
@@ -41,27 +40,11 @@ interface BackendUser {
 
 interface LoginResponse {
   status: 'success' | 'fail' | 'error';
-  token: string;
   expiresIn: string;
   data: {
     user: BackendUser;
     userType: BackendUserType;
   };
-}
-
-interface TokenPayload {
-  id: string;
-  email: string;
-  userType: BackendUserType;
-  role: string;
-  iat?: number;
-  exp?: number;
-}
-
-interface StoredUser extends BackendUser {
-  id: string;
-  userType: BackendUserType;
-  role: string;
 }
 
 @Component({
@@ -315,10 +298,7 @@ export class LoginComponent implements OnInit{
     this.isLoading = false;
 
 
-    if (
-      !response.token ||
-      !response.data?.user
-    ) {
+    if (!response.data?.user) {
 
       this.errorMessage =
         this.translate.instant(
@@ -330,48 +310,13 @@ export class LoginComponent implements OnInit{
 
 
     try {
-
-      const decodedToken =
-        jwtDecode<TokenPayload>(
-          response.token
-        );
-
-
-      const backendUser =
-        response.data.user;
-
-
+      const backendUser = response.data.user;
       const currentUser = {
-
         ...backendUser,
-
-        id:
-          decodedToken.id ||
-          backendUser._id,
-
-        _id:
-          backendUser._id ||
-          decodedToken.id,
-
-        email:
-          decodedToken.email ||
-          backendUser.email,
-
-        userType:
-          decodedToken.userType ||
-          response.data.userType,
-
-        role:
-          decodedToken.role ||
-          backendUser.role ||
-          'user'
+        id: backendUser['id'] || backendUser._id,
+        userType: response.data.userType,
+        role: backendUser.role || 'user'
       };
-
-
-      localStorage.setItem(
-        'token',
-        response.token
-      );
 
       this.authService.setCurrentUser(
         currentUser

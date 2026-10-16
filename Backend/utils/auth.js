@@ -1,10 +1,11 @@
 const jwt = require("jsonwebtoken");
 const Volunteer = require("../models/Volunteer"); // Renamed to use Volunteer model
+const { getToken } = require('./token');
 
 const auth = async (req, res, next) => {
   try {
     // 1. Check for token
-    const token = req.headers.authorization?.split(" ")[1];
+    const token = getToken(req);
     if (!token) {
       return res.status(401).json({ message: "No token, authorization denied" });
     }
@@ -38,7 +39,7 @@ const auth = async (req, res, next) => {
 
 const adminAuth = async (req, res, next) => {
   try {
-    const token = req.headers.authorization?.split(" ")[1];
+    const token = getToken(req);
     if (!token) {
       return res.status(401).json({ message: "No token, authorization denied" });
     }

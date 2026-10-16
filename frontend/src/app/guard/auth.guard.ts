@@ -7,8 +7,7 @@ export class AuthGuard implements CanActivate, CanActivateChild {
   constructor(private router: Router, private authService: AuthService) {}
 
   canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean {
-    const token = this.authService.token;
-    if (token && !this.authService.isTokenExpired()) {
+    if (this.authService.isLoggedIn) {
       return true;
     } else {
       // Redirect depending on the URL
